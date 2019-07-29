@@ -1,1 +1,4 @@
-kubectl --kubeconfig kubeconfig.yaml logs ${1} -n cicd-django
+POD_NAME=$1
+
+
+kubectl --kubeconfig kubeconfig.yaml logs ${POD_NAME} -n cicd-django

@@ -20,3 +20,9 @@ This terraform script provisions infra resources for other projects.
 ### `kubectl`
 - `--kubeconfig`. ([K8 official](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/))
 
+
+## Reference
+
+- [Route53 Console](https://console.aws.amazon.com/route53/home?region=us-east-2)
+- [CircleCI Console](https://circleci.com/gh/rivernews/iriversland2-public/tree/master)
+- Advance Terraform syntax. ([Gruntwork](https://blog.gruntwork.io/terraform-tips-tricks-loops-if-statements-and-gotchas-f739bbae55f9))

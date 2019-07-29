@@ -36,7 +36,7 @@ resource "kubernetes_deployment" "app" {
 
         container {
           name  = "${var.app_name}"
-          image = var.app_container_image_tag == "" ? "${var.app_container_image}:latest" : "${var.app_container_image}:${var.app_container_image_tag}"
+          image = lower(trimspace(var.app_container_image_tag)) == "n" ? "${var.app_container_image}:latest" : "${var.app_container_image}:${var.app_container_image_tag}"
 
           # terraform official doc: https://www.terraform.io/docs/providers/kubernetes/r/deployment.html#image_pull_policy
           # private image registry: https://stackoverflow.com/questions/49639280/kubernetes-cannot-pull-image-from-private-docker-image-repository

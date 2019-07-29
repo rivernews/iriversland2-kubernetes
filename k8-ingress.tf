@@ -4,6 +4,7 @@
 # `helm_release` is similar to `helm install ...`
 resource "helm_release" "project-nginx-ingress" {
   name = "nginx-ingress"
+  namespace = "${kubernetes_service_account.tiller.metadata.0.namespace}"
 
   # or chart = "stable/nginx-ingress"
   # see https://github.com/digitalocean/digitalocean-cloud-controller-manager/issues/162
@@ -131,9 +132,10 @@ resource "kubernetes_ingress" "project-ingress-resource" {
     name      = "${var.project_name}-ingress-resource"
     namespace = "${kubernetes_service.app.metadata.0.namespace}"
 
+    # annotation spec: https://github.com/kubernetes/ingress-nginx/blob/master/docs/user-guide/nginx-configuration/annotations.md#annotations
     annotations = {
       "kubernetes.io/ingress.class" = "nginx"
-      # "ingress.kubernetes.io/ssl-redirect": "true"
+      "ingress.kubernetes.io/ssl-redirect" = "false"
     }
   }
 
