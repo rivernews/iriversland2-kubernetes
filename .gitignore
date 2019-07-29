@@ -1,3 +1,7 @@
+kubeconfig.yaml
+
+**credentials**
+
 #  Local .terraform directories
 **/.terraform/*
 
@@ -6,4 +10,5 @@
 *.tfstate.*
 
 # .tfvars files
-*.tfvars
+# *.tfvars
+**local**.tfvars

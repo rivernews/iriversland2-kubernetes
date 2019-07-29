@@ -1,0 +1,1 @@
+kubectl --kubeconfig kubeconfig.yaml logs ${1} -n cicd-django
