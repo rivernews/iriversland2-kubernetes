@@ -51,10 +51,12 @@ resource "helm_release" "project-nginx-ingress" {
     value = true
   }
 
-  #   set {
-  #       name = "controller.publishService.enabled"
-  #       value = true
-  #   }
+    set {
+        # based on: https://github.com/helm/charts/tree/master/stable/nginx-ingress
+        # and nginx debugging: https://github.com/kubernetes/ingress-nginx/blob/master/docs/troubleshooting.md#troubleshooting
+        name = "controller.extraArgs.v"
+        value = "5"
+    }
 
   depends_on = [
     "kubernetes_cluster_role_binding.tiller",
@@ -100,14 +102,14 @@ resource "helm_release" "project-external-dns" {
     name  = "domainFilters[0]"
     value = "${var.managed_k8_external_dns_domain}"
   }
-  set {
-    name  = "registry"
-    value = "txt"
-  }
-    set {
-      name  = "txt-owner-id"
-      value = "google-site-verification=E0yvL3DSuVCidTSdHUHMQWONt1iZYWXVqCVRkn4gQTQ"
-    }
+#   set {
+#     name  = "registry"
+#     value = "txt"
+#   }
+#     set {
+#       name  = "txt-owner-id"
+#       value = "google-site-verification=E0yvL3DSuVCidTSdHUHMQWONt1iZYWXVqCVRkn4gQTQ"
+#     }
 
   set {
     name  = "policy"
@@ -135,7 +137,7 @@ resource "kubernetes_ingress" "project-ingress-resource" {
     # annotation spec: https://github.com/kubernetes/ingress-nginx/blob/master/docs/user-guide/nginx-configuration/annotations.md#annotations
     annotations = {
       "kubernetes.io/ingress.class" = "nginx"
-      "ingress.kubernetes.io/ssl-redirect" = "false"
+    #   "ingress.kubernetes.io/ssl-redirect" = "false"
     }
   }
 

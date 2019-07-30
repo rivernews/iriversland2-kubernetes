@@ -16,25 +16,11 @@ resource "kubernetes_service" "app" {
     # session_affinity = "ClientIP"
 
     port {
+    #    name = "http"
+    #    protocol    = "TCP"
       port        = "${var.app_exposed_port}" # make this service visible to other services by this port; https://stackoverflow.com/a/49982009/9814131
       target_port = "${var.app_exposed_port}" # the port where your application is running on the container
     }
 
   }
 }
-
-# resource "kubernetes_pod" "example" {
-#   metadata {
-#     name = "terraform-example"
-#     labels = {
-#       app = "MyApp"
-#     }
-#   }
-
-#   spec {
-#     container {
-#       image = "nginx:1.7.9"
-#       name  = "example"
-#     }
-#   }
-# }

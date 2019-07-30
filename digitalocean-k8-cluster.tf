@@ -15,11 +15,13 @@ resource "digitalocean_tag" "project-cluster" {
 resource "digitalocean_kubernetes_cluster" "project_digitalocean_cluster" {
   name    = "${var.project_name}-cluster"
   region  = "sfo2"
-  version = "1.14.4-do.0"
+  version = "1.13.8-do.1"
+#   version = "1.14.4-do.1"
 
   node_pool {
     name       = "${var.project_name}-node-pool"
     size       = "s-1vcpu-2gb"
+    # size       = "s-2vcpu-4gb"
     node_count = 1
     tags       = ["${digitalocean_tag.project-cluster.id}"]
   }

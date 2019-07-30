@@ -18,6 +18,6 @@ app_exposed_port = 8000
 managed_route53_zone_name = "shaungc.com."
 managed_k8_external_dns_domain = "shaungc.com"
 
-app_deployed_domain = "me.shaungc.com"
+app_deployed_domain = "d2084fdcdf44c64128e9ff4361ea6c8384817090.shaungc.com"
 
 app_frontend_static_assets_dns_name = "iriversland2-static.s3.us-east-2.amazonaws.com"

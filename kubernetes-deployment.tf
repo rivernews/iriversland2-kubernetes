@@ -44,6 +44,7 @@ resource "kubernetes_deployment" "app" {
 
           port {
             container_port = "${var.app_exposed_port}"
+            # name = "http"
           }
 
           # refer to env in kubernetes_secret: https://gist.github.com/troyharvey/4506472732157221e04c6b15e3b3f094
