@@ -47,11 +47,25 @@
             - ✅ Why HTTP got redirected to HTTPS? Because Django's settings `SECURE_SSL_REDIRECT` will turn on in prod.
         - 🛑 Still not working well, got 404.
             - Seems like static file not serving well. Try;
-                - 🔥 Manually set DEBUG=true to get more info
-                - 🔥 Commit, push, then terraform update k8
-                - 🔥 Check out ingress's pod's log.
+                - 🛑 Manually set DEBUG=true to get more info
+                    - Still will hash ...
+                    - ❎ Add a fail test view to test
+                - ✅ Commit, push, then terraform update k8
+                - Check out ingress's pod's log.
+                - ✅ Run a collectstatic on k8 -> fix the 404, can now show frontend website.
 1. ➡️ (K8) Update deployment on K8 cluster
-    - Automating terraform - [use postrgres](https://www.terraform.io/docs/backends/types/pg.html) to store terraform state.
+    - 🔥 Automating terraform - [use postrgres](https://www.terraform.io/docs/backends/types/pg.html) to store terraform state.
+        - ✅ Test at local first - ok, verified that state has been upload to postgres.
+    - Integrate terraform in circleci.
+        - Test in terraform repo's own circleci first - have to setup
+        - Then try to integrate w/ iriversland's circleci
 1. ➡️ Keep an eye on cert-manager thing
 1. ➡️ Enable all production features in Django -- see the TODOs.
-1. Improve Secret management
+1. ➡️ Figure out hash static asset - when DEBUG=true, should expect collectstatic to generate static w/o hash
+    - ✅ Use fail test view to test! --> yes it generates debug error page
+    - Last thing to test - include `--no-input`  or not
+1. ➡️ Improve Secret management, use k8 secret instead, etc
+
+## Future Work, Enhancement
+
+- Writing out own `nginx.conf` for django on k8, [Stackoverflow](https://stackoverflow.com/a/12801120/9814131).
