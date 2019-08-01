@@ -1,6 +1,9 @@
 # terraform-provisioning
 This terraform script provisions infra resources for other projects.
 
+CircleCI
+[![CircleCI](https://circleci.com/gh/rivernews/terraform-provisioning.svg?style=svg)](https://circleci.com/gh/rivernews/terraform-provisioning)
+
 ## Prerequisites
 
 - Install `brew install terraform`
