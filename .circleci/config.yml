@@ -1,0 +1,38 @@
+version: 2.1
+
+# yaml basic and advance: https://circleci.com/docs/2.0/writing-yaml/#section=configuration
+
+jobs:
+  build:
+    docker:
+      - image: hashicorp/terraform:light
+    # environment:
+    #   IMAGE_NAME: shaungc/iriversland2-django
+    working_directory: ~/terraform
+    steps:
+      - checkout # retrieves the code from GitHub
+      - setup_remote_docker # sets up a remote, isolated environment for each build. This is required before you use any docker command inside a job step.
+      # - run:
+      #     name: Setup dynamic environment variables 
+      #     # circleci dynammic env, see https://circleci.com/docs/2.0/env-vars/#interpolating-environment-variables-to-set-other-environment-variables
+      #     # terraform env, see https://www.terraform.io/docs/configuration/variables.html#environment-variables
+      #     command: |
+      #       echo 'export TF_VAR_app_container_image="${IMAGE_NAME}"' >> $BASH_ENV
+      - run:
+          name: Initiate Terraform
+          command: |
+            chmod +x init-backend-cicd.sh
+            sh ./init-backend-cicd.sh
+            
+      - run:
+          name: Plan Terraform
+          command: |
+            terraform plan
+workflows:
+  version: 2
+  build-master:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: master
