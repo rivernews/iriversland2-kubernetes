@@ -57,8 +57,8 @@
     - 🔥 Automating terraform - [use postrgres](https://www.terraform.io/docs/backends/types/pg.html) to store terraform state.
         - ✅ Test at local first - ok, verified that state has been upload to postgres.
     - Integrate terraform in circleci.
-        - Test in terraform repo's own circleci first - have to setup
-        - Then try to integrate w/ iriversland's circleci
+        - ✅ Test in terraform repo's own circleci first - have to setup
+        - 🔥 Then try to integrate w/ iriversland's circleci
 1. ➡️ Keep an eye on cert-manager thing
 1. ➡️ Enable all production features in Django -- see the TODOs.
 1. ➡️ Figure out hash static asset - when DEBUG=true, should expect collectstatic to generate static w/o hash

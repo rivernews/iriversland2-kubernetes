@@ -28,6 +28,11 @@ jobs:
           name: Plan Terraform
           command: |
             terraform plan
+      
+      - run:
+          name: Check Git Version
+          command: |
+            git --version
 workflows:
   version: 2
   build-master:
