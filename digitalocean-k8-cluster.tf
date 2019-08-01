@@ -42,24 +42,31 @@ resource "digitalocean_kubernetes_cluster" "project_digitalocean_cluster" {
 # https://medium.com/@stepanvrany/terraforming-dok8s-helm-and-traefik-included-7ac42b5543dc
 #
 #
-# resource "local_file" "kubeconfig" {
-#     content     = "${digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.raw_config}"
-#     filename = "kubeconfig.yaml"
-# }
+resource "local_file" "kubeconfig" {
+    content     = "${digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.raw_config}"
+    filename = "kubeconfig.yaml"
+}
 # https://github.com/terraform-providers/terraform-provider-digitalocean/issues/234#issuecomment-493375811
 provider "null" {
   version = "~> 2.1"
 }
-resource "null_resource" "kubeconfig" {
+# resource "null_resource" "kubeconfig" {
 
-  provisioner "local-exec" {
-    command = ". ./pull-do-kubeconfig.sh ${digitalocean_kubernetes_cluster.project_digitalocean_cluster.id}"
-  }
+# #   provisioner "local-exec" {
+# #     # command = ". ./pull-do-kubeconfig.sh ${digitalocean_kubernetes_cluster.project_digitalocean_cluster.id}"
+# #     command = "echo ${digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.raw_config} > kubeconfig.yaml"
+# #     # kubeconfig.yaml
+# #   }
 
-  triggers = {
-    cluster_config = "${digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.raw_config}"
-  }
-}
+#   provisioner "file" {
+#     content = "${digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.raw_config}"
+#     destination = "kubeconfig.yaml"
+#   }
+
+#   triggers = {
+#     cluster_config = "${digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.raw_config}"
+#   }
+# }
 
 # initialize Kubernetes provider
 provider "kubernetes" {

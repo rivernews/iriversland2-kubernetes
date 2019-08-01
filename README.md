@@ -6,7 +6,7 @@ This terraform script provisions infra resources for other projects.
 ## Prerequisites
 
 - Install `brew install terraform`
-- Install `brew install kubernetes-cl` for `kubectl`
+- Install `brew install kubernetes-cli` for `kubectl`
 - Install `brew install doctl`, the cli tool for digitalocean.
     - Initialize auths for do, like `doctl auth init`
 - Run `export KUBECONFIG=kubeconfig.yaml`.
