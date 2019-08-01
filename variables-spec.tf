@@ -17,8 +17,6 @@ variable "app_exposed_port" {}
 variable "managed_route53_zone_name" {}
 variable "managed_k8_external_dns_domain" {}
 
-variable "app_deployed_domain" {}
-
 variable "app_frontend_static_assets_dns_name" {}
 
 

@@ -1,3 +1,7 @@
+locals {
+  app_deployed_domain = "${var.app_container_image_tag}.${var.managed_k8_external_dns_domain}"
+}
+
 # code based: https://medium.com/@stepanvrany/terraforming-dok8s-helm-and-traefik-included-7ac42b5543dc
 # Terraform official: helm_release - an instance of a chart running in a Kubernetes cluster. A Chart is a Helm package
 # https://www.terraform.io/docs/providers/helm/release.html
@@ -143,7 +147,7 @@ resource "kubernetes_ingress" "project-ingress-resource" {
 
   spec {
     rule {
-      host = "${var.app_deployed_domain}"
+      host = "${local.app_deployed_domain}"
       http {
 
         path {
@@ -208,7 +212,7 @@ resource "kubernetes_ingress" "project-app-static-assets-ingress-resource" {
 
   spec {
     rule {
-      host = "${var.app_deployed_domain}"
+      host = "${local.app_deployed_domain}"
       http {
 
         path {
