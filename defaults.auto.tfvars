@@ -2,9 +2,8 @@
 # what url should we use for dockerhub registry: https://stackoverflow.com/questions/34198392/docker-official-registry-docker-hub-url
 # docker_registry_url = "docker.io"
 docker_registry_url = "https://index.docker.io/v1/"
-app_container_image = "shaungc/iriversland2-django"
 # https://hub.docker.com/r/shaungc/iriversland2-django/tags
-# app_container_image_tag = "latest"
+app_container_image = "shaungc/iriversland2-django"
 
 # cicd_namespace = "kube-system"
 cicd_namespace = "cicd-django"

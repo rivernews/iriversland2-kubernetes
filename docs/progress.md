@@ -58,9 +58,13 @@
         - ✅ Test at local first - ok, verified that state has been upload to postgres.
     - Integrate terraform in circleci.
         - ✅ Test in terraform repo's own circleci first - have to setup
-        - 🔥 Then try to integrate w/ iriversland's circleci
-            - 🔥 Need to figure out a way to generate `kubeconfig.yaml`.
-                - You can try tf `local_file`, see if the tag issue is gone. Or other methods... like just use the `.raw_config` entry, and echo that in a file, using `local-exec`.
+        - ✅ Then try to integrate w/ iriversland's circleci
+            - ✅ Need to figure out a way to generate `kubeconfig.yaml`.
+                - You can try tf ✅ `local_file`, see if the tag issue is gone. Or other methods... like just use the `.raw_config` entry, and echo that in a file, using `local-exec`.
+1. ➡️ 🎉 Milestone reached
+    - 🔥 Code improvement; esp. env var, try to reduce redundant manual work
+    - 🔥 Tech Internal Documentation
+    - ➡️ Publishing community doc
 1. ➡️ Keep an eye on cert-manager thing
 1. ➡️ Enable all production features in Django -- see the TODOs.
 1. ➡️ Figure out hash static asset - when DEBUG=true, should expect collectstatic to generate static w/o hash
