@@ -62,8 +62,9 @@
             - ✅ Need to figure out a way to generate `kubeconfig.yaml`.
                 - You can try tf ✅ `local_file`, see if the tag issue is gone. Or other methods... like just use the `.raw_config` entry, and echo that in a file, using `local-exec`.
 1. ➡️ 🎉 Milestone reached
-    - 🔥 Code improvement; esp. env var, try to reduce redundant manual work
-    - 🔥 Tech Internal Documentation
+    - Improve the code base while writing the tech doc
+        - 🔥 Tech Internal Documentation
+        - 🔥 Code improvement; esp. env var, try to reduce redundant manual work
     - ➡️ Publishing community doc
 1. ➡️ Keep an eye on cert-manager thing
 1. ➡️ Enable all production features in Django -- see the TODOs.
