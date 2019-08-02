@@ -66,6 +66,7 @@
         - 🔥 Tech Internal Documentation
         - 🔥 Code improvement; esp. env var, try to reduce redundant manual work
     - ➡️ Publishing community doc
+1. Use a shorter hash tag for image tag and domain name.
 1. ➡️ Keep an eye on cert-manager thing
 1. ➡️ Enable all production features in Django -- see the TODOs.
 1. ➡️ Figure out hash static asset - when DEBUG=true, should expect collectstatic to generate static w/o hash
