@@ -3,6 +3,7 @@ This terraform script provisions infra resources for other projects.
 
 [![CircleCI](https://circleci.com/gh/rivernews/terraform-provisioning.svg?style=svg)](https://circleci.com/gh/rivernews/terraform-provisioning)
 
+
 ## Prerequisites
 
 - Install `brew install terraform`
@@ -10,6 +11,36 @@ This terraform script provisions infra resources for other projects.
 - Install `brew install doctl`, the cli tool for digitalocean.
     - Initialize auths for do, like `doctl auth init`
 - Run `export KUBECONFIG=kubeconfig.yaml`.
+
+## How to use
+
+1. Provide the credentials, create the files below in the project root directory:
+
+For `backend-credentials.tfvars`: specify `conn_str`, we use postgres for terraform remote state storage backend.
+
+For `credentials.auto.tfvars`: specify the following:
+
+```terraform
+do_token = "digitalocean-token"
+
+aws_access_key = "AWS key"
+aws_secret_key = "AWS secret"
+aws_region = "AWS region like us-east-2"
+
+docker_email = "Dockerhub email"
+docker_username = "Dockerhub username"
+docker_password = "Dockerhub password"
+```
+
+For `local.auto.tfvars`
+
+``` terraform
+project_name = "your-project-name"
+app_container_image_tag = "the-tag-when-you-docker-build"
+```
+
+2. Run `init-backend-local.sh`. Avoid running terraform init yourself.
+
 
 ## Integrating Terraform into CircleCI
 
