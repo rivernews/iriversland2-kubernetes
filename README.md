@@ -40,14 +40,19 @@ app_container_image_tag = "the-tag-when-you-docker-build"
 ```
 
 2. Run `init-backend-local.sh`. Avoid running terraform init yourself.
+3. Run `terraform plan` to check. If everything seems good, run `terraform apply`. It will double check with you again. Remember the state would be stored on remote postgres, which means that it is persistent regardless of where you run this terraform script.
 
 
-## Integrating Terraform into CircleCI
+## Roadmap 
+
+Integrating Terraform into CircleCI
 
 - ✅ Running only terraform in circle ci
     - As long as you make sure to pass credentials and local files to circleci by env var (set via circleci web UI), you should be able to access those env var in jobs, and so to complete the commands.
-- 🔥 Running both app build AND terraform in circle ci, sequentially.
+- ✅ Running both app build AND terraform in circle ci, sequentially.
     - Refer to [CircleCI doc: sharing data among jobs](https://circleci.com/docs/2.0/workflows/#using-workspaces-to-share-data-among-jobs).
+
+Check out the issue page for ongoing progress.
 
 ## Pitfalls
 
