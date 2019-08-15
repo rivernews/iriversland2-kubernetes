@@ -1,5 +1,6 @@
 locals {
   app_deployed_domain = "${var.app_container_image_tag}.${var.managed_k8_external_dns_domain}"
+  app_deployed_rx_domain = "${var.managed_k8_external_dns_domain}"
 }
 
 # code based: https://medium.com/@stepanvrany/terraforming-dok8s-helm-and-traefik-included-7ac42b5543dc
@@ -68,6 +69,11 @@ resource "helm_release" "project-nginx-ingress" {
   ]
 }
 
+
+
+
+
+
 # based on SO answer: https://stackoverflow.com/a/55968709/9814131
 # format for `set` refer to official repo README: https://github.com/helm/charts/tree/master/stable/external-dns
 # data "aws_route53_zone" "selected" {
@@ -131,6 +137,12 @@ resource "helm_release" "project-external-dns" {
   ]
 }
 
+
+
+
+
+
+
 # template copied from terraform official doc: https://www.terraform.io/docs/providers/kubernetes/r/ingress.html
 # modified based on SO answer: https://stackoverflow.com/a/55968709/9814131
 resource "kubernetes_ingress" "project-ingress-resource" {
@@ -161,11 +173,33 @@ resource "kubernetes_ingress" "project-ingress-resource" {
       }
     }
 
+    
+    # for rx name domain (root domain) replica
+    rule {
+      host = "${local.app_deployed_rx_domain}"
+      http {
+
+        path {
+          backend {
+            service_name = "${kubernetes_service.app.metadata.0.name}"
+            service_port = "${var.app_exposed_port}"
+          }
+
+          path = "/"
+        }
+      }
+    }
+
     # tls {
     #   secret_name = "tls-secret"
     # }
   }
 }
+
+
+
+
+
 
 resource "kubernetes_service" "app-static-assets" {
   metadata {
@@ -194,6 +228,11 @@ resource "kubernetes_service" "app-static-assets" {
   }
 }
 
+
+
+
+
+
 # based on https://github.com/kubernetes/ingress-nginx/issues/1120#issuecomment-491258422
 # and https://liet.me/2019/06/26/kubernetes-nginx-ingress-and-s3-bucket/
 resource "kubernetes_ingress" "project-app-static-assets-ingress-resource" {
@@ -213,6 +252,23 @@ resource "kubernetes_ingress" "project-app-static-assets-ingress-resource" {
   spec {
     rule {
       host = "${local.app_deployed_domain}"
+      http {
+
+        path {
+          backend {
+            service_name = "${kubernetes_service.app-static-assets.metadata.0.name}"
+            service_port = "80"
+          }
+
+          path = "/static(/|$)(.*)"
+        }
+      }
+    }
+
+
+    # for rx name domain replica
+    rule {
+      host = "${local.app_deployed_rx_domain}"
       http {
 
         path {

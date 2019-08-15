@@ -18,6 +18,10 @@ output "planned_app_deployed_domain____please_allow_1min_before_access" {
   value = "http://${local.app_deployed_domain}"
 }
 
+output "planned_app_deployed_rx_domain____please_allow_1min_before_access" {
+  value = "http://${local.app_deployed_rx_domain}"
+}
+
 output "check_django-health" {
   value = "http://${local.app_deployed_domain}/django-health-check/"
 }
