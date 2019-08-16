@@ -154,6 +154,7 @@ resource "kubernetes_ingress" "project-ingress-resource" {
     annotations = {
       "kubernetes.io/ingress.class" = "nginx"
     #   "ingress.kubernetes.io/ssl-redirect" = "false"
+        "nginx.ingress.kubernetes.io/use-regex" = "true"
     }
   }
 
@@ -168,7 +169,7 @@ resource "kubernetes_ingress" "project-ingress-resource" {
             service_port = "${var.app_exposed_port}"
           }
 
-          path = "/"
+          path = "/.+"
         }
       }
     }
@@ -185,7 +186,7 @@ resource "kubernetes_ingress" "project-ingress-resource" {
             service_port = "${var.app_exposed_port}"
           }
 
-          path = "/"
+          path = "/.+"
         }
       }
     }
@@ -278,6 +279,59 @@ resource "kubernetes_ingress" "project-app-static-assets-ingress-resource" {
           }
 
           path = "/static(/|$)(.*)"
+        }
+      }
+    }
+
+    # tls {
+    #   secret_name = "tls-secret"
+    # }
+  }
+}
+
+resource "kubernetes_ingress" "project-app-index-ingress-resource" {
+  metadata {
+    name      = "${var.project_name}-app-index-ingress-resource"
+    namespace = "${kubernetes_service.app.metadata.0.namespace}"
+
+    annotations = {
+      "kubernetes.io/ingress.class"                      = "nginx"
+      "nginx.ingress.kubernetes.io/rewrite-target"       = "/index.html"
+      "nginx.ingress.kubernetes.io/upstream-vhost"       = "${var.app_frontend_static_assets_dns_name}"
+      "nginx.ingress.kubernetes.io/from-to-www-redirect" = "true"
+      "nginx.ingress.kubernetes.io/use-regex"            = "true"
+    }
+  }
+
+  spec {
+    rule {
+      host = "${local.app_deployed_domain}"
+      http {
+
+        path {
+          backend {
+            service_name = "${kubernetes_service.app-static-assets.metadata.0.name}"
+            service_port = "80"
+          }
+
+          path = "/"
+        }
+      }
+    }
+
+
+    # for rx name domain replica
+    rule {
+      host = "${local.app_deployed_rx_domain}"
+      http {
+
+        path {
+          backend {
+            service_name = "${kubernetes_service.app-static-assets.metadata.0.name}"
+            service_port = "80"
+          }
+
+          path = "/"
         }
       }
     }
