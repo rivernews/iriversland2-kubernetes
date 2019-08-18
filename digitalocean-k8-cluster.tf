@@ -106,4 +106,12 @@ resource "digitalocean_firewall" "project-cluster-firewall" {
     source_addresses = ["0.0.0.0/0", "::/0"]
     # source_tags = ["${digitalocean_tag.project-cluster.id}"]
   }
+
+  inbound_rule {
+    protocol   = "tcp"
+    port_range = "22"
+
+    source_addresses = ["0.0.0.0/0", "::/0"]
+    # source_tags = ["${digitalocean_tag.project-cluster.id}"]
+  }
 }

@@ -15,7 +15,11 @@ variable "app_name" {}
 variable "app_exposed_port" {}
 
 variable "managed_route53_zone_name" {}
-variable "managed_k8_external_dns_domain" {}
+variable "managed_k8_rx_domain" {}
+
+variable "letsencrypt_env" {
+  description = "Either `staging` or `prod`. When using staging, the browser will still recognize as insecure, however you can check if issuer and certificates are correctly provisioned on K8. If everything looks good, switch to prod. See https://letsencrypt.org/docs/staging-environment/"
+}
 
 variable "app_frontend_static_assets_dns_name" {}
 

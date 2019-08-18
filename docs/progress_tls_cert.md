@@ -1,0 +1,39 @@
+# Debug and troubleshooting TLS
+
+- Look at nginx logging, in realtime
+
+`. ./my-kubectl.sh logs --follow ds/nginx-ingress-controller -n kube-system`
+
+- Look at cert manager logging, in realtime
+
+`. ./my-kubectl.sh logs --follow  $(. ./my-kubectl.sh get pods -n cert-manager | grep cert-manager --max-count=1 | awk '{print $1}') -n cert-manager`
+
+
+- Check out certificate
+
+`. ./my-kubectl.sh describe certificate letsencrypt-prod-secret -n cicd-django`
+
+- Check out issuer
+
+`. ./my-kubectl.sh describe clusterissuer letsencrypt-prod`
+
+- To flush out all the cert
+
+    1. `terraform destroy -target=helm_release.project_cert_manager`
+
+    1. `. ./my-kubectl.sh delete certificate letsencrypt-prod-secret && . ./my-kubectl.sh delete clusterissuer letsencrypt-prod-issuer`
+    1. You may also need to delete secrets created by cert-manager. List `. ./my-kubectl.sh get secrets -n cert-manager`, then delete like `. ./my-kubectl.sh delete secrets letsencrypt-prod-secret  -n cert-manager`.
+    1. `terraform apply`.
+
+
+# Debug ingress
+
+- Get all the ingresses resources
+
+`. ./my-kubectl.sh get ingress -n cicd-django`
+
+- Get the ingress resources for django
+
+`. ./my-kubectl.sh get ingress project-shaungc-digitalocean-ingress-resource -n cicd-django -o yaml`
+
+Because an issue [about get and describe](https://github.com/kubernetes/kubectl/issues/675#issuecomment-509686523), you might not be able to use `describe ingress <ingress namw>`, even you sepcify the correct namespace, will still get `Error from server (NotFound): ingresses.extensions <ingress name> not found`.

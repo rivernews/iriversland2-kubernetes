@@ -1,7 +1,3 @@
-# output "cluster-id" {
-#   value = "${digitalocean_kubernetes_cluster.project_digitalocean_cluster.id}"
-# }
-
 output "do_cluster_token_endpoint" {
   value = "${digitalocean_kubernetes_cluster.project_digitalocean_cluster.endpoint}"
 }
@@ -19,7 +15,7 @@ output "planned_app_deployed_domain____please_allow_1min_before_access" {
 }
 
 output "planned_app_deployed_rx_domain____please_allow_1min_before_access" {
-  value = "http://${local.app_deployed_rx_domain}"
+  value = "http://${var.managed_k8_rx_domain}"
 }
 
 output "check_django-health" {

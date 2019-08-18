@@ -1,6 +1,5 @@
 locals {
-  app_deployed_domain = "${var.app_container_image_tag}.${var.managed_k8_external_dns_domain}"
-  app_deployed_rx_domain = "${var.managed_k8_external_dns_domain}"
+  app_deployed_domain    = "${var.app_container_image_tag}.${var.managed_k8_rx_domain}"
 }
 
 # code based: https://medium.com/@stepanvrany/terraforming-dok8s-helm-and-traefik-included-7ac42b5543dc
@@ -8,7 +7,7 @@ locals {
 # https://www.terraform.io/docs/providers/helm/release.html
 # `helm_release` is similar to `helm install ...`
 resource "helm_release" "project-nginx-ingress" {
-  name = "nginx-ingress"
+  name      = "nginx-ingress"
   namespace = "${kubernetes_service_account.tiller.metadata.0.namespace}"
 
   # or chart = "stable/nginx-ingress"
@@ -21,10 +20,12 @@ resource "helm_release" "project-nginx-ingress" {
   # helm chart values (equivalent to yaml)
   # https://github.com/terraform-providers/terraform-provider-helm/issues/145
 
+
+
   # `set` below refer to SO answer
   # https://stackoverflow.com/a/55968709/9814131
 
-  # nginx-ingress-controller spec: https://github.com/bitnami/charts/tree/master/bitnami/nginx-ingress-controller
+  # `set` spec: https://github.com/bitnami/charts/tree/master/bitnami/nginx-ingress-controller
 
   set {
     name  = "controller.kind"
@@ -56,12 +57,18 @@ resource "helm_release" "project-nginx-ingress" {
     value = true
   }
 
-    set {
-        # based on: https://github.com/helm/charts/tree/master/stable/nginx-ingress
-        # and nginx debugging: https://github.com/kubernetes/ingress-nginx/blob/master/docs/troubleshooting.md#troubleshooting
-        name = "controller.extraArgs.v"
-        value = "5"
-    }
+  set {
+    # nginx debugging: https://github.com/kubernetes/ingress-nginx/blob/master/docs/troubleshooting.md#debug-logging
+    name  = "controller.extraArgs.v"
+    value = "3"
+  }
+  
+  # in order to let terraform reflect update of this nginx controller, have to set to RollingUpdate; otherwise changes in tf won't take effect on k8
+  # see https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/#updating-a-daemonset
+  set {
+      name = "updateStrategy.type"
+      value = "RollingUpdate"
+  }
 
   depends_on = [
     "kubernetes_cluster_role_binding.tiller",
@@ -110,16 +117,16 @@ resource "helm_release" "project-external-dns" {
   # see terraform official blog: https://www.hashicorp.com/blog/using-the-kubernetes-and-helm-providers-with-terraform-0-12
   set {
     name  = "domainFilters[0]"
-    value = "${var.managed_k8_external_dns_domain}"
+    value = "${var.managed_k8_rx_domain}"
   }
-#   set {
-#     name  = "registry"
-#     value = "txt"
-#   }
-#     set {
-#       name  = "txt-owner-id"
-#       value = "google-site-verification=E0yvL3DSuVCidTSdHUHMQWONt1iZYWXVqCVRkn4gQTQ"
-#     }
+  #   set {
+  #     name  = "registry"
+  #     value = "txt"
+  #   }
+  #     set {
+  #       name  = "txt-owner-id"
+  #       value = "google-site-verification=E0yvL3DSuVCidTSdHUHMQWONt1iZYWXVqCVRkn4gQTQ"
+  #     }
 
   set {
     name  = "policy"
@@ -153,12 +160,27 @@ resource "kubernetes_ingress" "project-ingress-resource" {
     # annotation spec: https://github.com/kubernetes/ingress-nginx/blob/master/docs/user-guide/nginx-configuration/annotations.md#annotations
     annotations = {
       "kubernetes.io/ingress.class" = "nginx"
-    #   "ingress.kubernetes.io/ssl-redirect" = "false"
-        "nginx.ingress.kubernetes.io/use-regex" = "true"
+      #   "ingress.kubernetes.io/ssl-redirect" = "false"
+      "nginx.ingress.kubernetes.io/use-regex" = "true"
+      
+      "kubernetes.io/tls-acme" = "true"
+      "certmanager.k8s.io/cluster-issuer" = "${local.cert_cluster_issuer_name}"
     }
   }
 
   spec {
+    
+    # do not put this same tls in other ingress resources spec
+    # if you want to share the tls domain, just place tls in one of the ingress resource
+    # see https://github.com/jetstack/cert-manager/issues/841#issuecomment-414299467
+    tls {
+        # hosts       = ["${local.app_deployed_domain}", "${var.managed_k8_rx_domain}"]
+      hosts       = ["${var.managed_k8_rx_domain}"]
+    #   hosts       = ["${var.managed_k8_rx_domain}", "*.${var.managed_k8_rx_domain}"]
+    #   hosts       = ["${var.managed_k8_rx_domain}", "${local.app_deployed_domain}", "*.${var.managed_k8_rx_domain}"]
+      secret_name = "${local.cert_cluster_issuer_k8_secret_name}"
+    }
+
     rule {
       host = "${local.app_deployed_domain}"
       http {
@@ -174,10 +196,10 @@ resource "kubernetes_ingress" "project-ingress-resource" {
       }
     }
 
-    
+
     # for rx name domain (root domain) replica
     rule {
-      host = "${local.app_deployed_rx_domain}"
+      host = "${var.managed_k8_rx_domain}"
       http {
 
         path {
@@ -191,10 +213,15 @@ resource "kubernetes_ingress" "project-ingress-resource" {
       }
     }
 
-    # tls {
-    #   secret_name = "tls-secret"
-    # }
   }
+
+  depends_on = [
+    # do not run cert-manager before creating this ingress resource
+    # ingress resource must be created first
+    # see "4. Create ingress with tls-acme annotation and tls spec":
+    # https://medium.com/asl19-developers/use-lets-encrypt-cert-manager-and-external-dns-to-publish-your-kubernetes-apps-to-your-website-ff31e4e3badf
+    # DON't -> "helm_release.project-cert-manager",
+  ]
 }
 
 
@@ -269,7 +296,7 @@ resource "kubernetes_ingress" "project-app-static-assets-ingress-resource" {
 
     # for rx name domain replica
     rule {
-      host = "${local.app_deployed_rx_domain}"
+      host = "${var.managed_k8_rx_domain}"
       http {
 
         path {
@@ -322,7 +349,7 @@ resource "kubernetes_ingress" "project-app-index-ingress-resource" {
 
     # for rx name domain replica
     rule {
-      host = "${local.app_deployed_rx_domain}"
+      host = "${var.managed_k8_rx_domain}"
       http {
 
         path {
