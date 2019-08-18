@@ -1,5 +1,10 @@
 locals {
-  app_deployed_domain    = "${var.app_container_image_tag}.${var.managed_k8_rx_domain}"
+  app_deployed_domain = "${var.app_container_image_tag}.${var.managed_k8_rx_domain}"
+  
+  deployed_domain_list = [
+    "${local.app_deployed_domain}",
+    "${var.managed_k8_rx_domain}",
+  ]
 }
 
 # code based: https://medium.com/@stepanvrany/terraforming-dok8s-helm-and-traefik-included-7ac42b5543dc
@@ -62,12 +67,12 @@ resource "helm_release" "project-nginx-ingress" {
     name  = "controller.extraArgs.v"
     value = "3"
   }
-  
+
   # in order to let terraform reflect update of this nginx controller, have to set to RollingUpdate; otherwise changes in tf won't take effect on k8
   # see https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/#updating-a-daemonset
   set {
-      name = "updateStrategy.type"
-      value = "RollingUpdate"
+    name  = "updateStrategy.type"
+    value = "RollingUpdate"
   }
 
   depends_on = [
@@ -162,46 +167,46 @@ resource "kubernetes_ingress" "project-ingress-resource" {
       "kubernetes.io/ingress.class" = "nginx"
       #   "ingress.kubernetes.io/ssl-redirect" = "false"
       "nginx.ingress.kubernetes.io/use-regex" = "true"
-      
-      "kubernetes.io/tls-acme" = "true"
+
+      "kubernetes.io/tls-acme"            = "true"
       "certmanager.k8s.io/cluster-issuer" = "${local.cert_cluster_issuer_name}"
     }
   }
 
   spec {
-    
+
     # do not put this same tls in other ingress resources spec
     # if you want to share the tls domain, just place tls in one of the ingress resource
     # see https://github.com/jetstack/cert-manager/issues/841#issuecomment-414299467
     tls {
-        # hosts       = ["${local.app_deployed_domain}", "${var.managed_k8_rx_domain}"]
-      hosts       = ["${var.managed_k8_rx_domain}"]
-    #   hosts       = ["${var.managed_k8_rx_domain}", "*.${var.managed_k8_rx_domain}"]
-    #   hosts       = ["${var.managed_k8_rx_domain}", "${local.app_deployed_domain}", "*.${var.managed_k8_rx_domain}"]
+      # hosts       = ["${local.app_deployed_domain}", "${var.managed_k8_rx_domain}"]
+      #   hosts       = ["${var.managed_k8_rx_domain}"]
+      hosts = ["${var.managed_k8_rx_domain}", "*.${var.managed_k8_rx_domain}"]
+      #   hosts       = ["${var.managed_k8_rx_domain}", "${local.app_deployed_domain}", "*.${var.managed_k8_rx_domain}"]
       secret_name = "${local.cert_cluster_issuer_k8_secret_name}"
     }
 
-    rule {
-      host = "${local.app_deployed_domain}"
-      http {
+    dynamic "rule" {
+      for_each = local.deployed_domain_list
+      content {
+        host = rule.value
+        http {
+          path {
+            backend {
+              service_name = "${kubernetes_service.app.metadata.0.name}"
+              service_port = "${var.app_exposed_port}"
+            }
 
-        path {
-          backend {
-            service_name = "${kubernetes_service.app.metadata.0.name}"
-            service_port = "${var.app_exposed_port}"
+            path = "/.+"
           }
-
-          path = "/.+"
         }
       }
     }
 
-
-    # for rx name domain (root domain) replica
+    # for registering wildcard tls certificate
     rule {
-      host = "${var.managed_k8_rx_domain}"
+      host = "*.${var.managed_k8_rx_domain}"
       http {
-
         path {
           backend {
             service_name = "${kubernetes_service.app.metadata.0.name}"
@@ -278,41 +283,22 @@ resource "kubernetes_ingress" "project-app-static-assets-ingress-resource" {
   }
 
   spec {
-    rule {
-      host = "${local.app_deployed_domain}"
-      http {
+    dynamic "rule" {
+      for_each = local.deployed_domain_list
+      content {
+        host = rule.value
+        http {
+          path {
+            backend {
+              service_name = "${kubernetes_service.app-static-assets.metadata.0.name}"
+              service_port = "80"
+            }
 
-        path {
-          backend {
-            service_name = "${kubernetes_service.app-static-assets.metadata.0.name}"
-            service_port = "80"
+            path = "/static(/|$)(.*)"
           }
-
-          path = "/static(/|$)(.*)"
         }
       }
     }
-
-
-    # for rx name domain replica
-    rule {
-      host = "${var.managed_k8_rx_domain}"
-      http {
-
-        path {
-          backend {
-            service_name = "${kubernetes_service.app-static-assets.metadata.0.name}"
-            service_port = "80"
-          }
-
-          path = "/static(/|$)(.*)"
-        }
-      }
-    }
-
-    # tls {
-    #   secret_name = "tls-secret"
-    # }
   }
 }
 
@@ -331,40 +317,21 @@ resource "kubernetes_ingress" "project-app-index-ingress-resource" {
   }
 
   spec {
-    rule {
-      host = "${local.app_deployed_domain}"
-      http {
+    dynamic "rule" {
+      for_each = local.deployed_domain_list
+      content {
+        host = rule.value
+        http {
+          path {
+            backend {
+              service_name = "${kubernetes_service.app-static-assets.metadata.0.name}"
+              service_port = "80"
+            }
 
-        path {
-          backend {
-            service_name = "${kubernetes_service.app-static-assets.metadata.0.name}"
-            service_port = "80"
+            path = "/"
           }
-
-          path = "/"
         }
       }
     }
-
-
-    # for rx name domain replica
-    rule {
-      host = "${var.managed_k8_rx_domain}"
-      http {
-
-        path {
-          backend {
-            service_name = "${kubernetes_service.app-static-assets.metadata.0.name}"
-            service_port = "80"
-          }
-
-          path = "/"
-        }
-      }
-    }
-
-    # tls {
-    #   secret_name = "tls-secret"
-    # }
   }
 }

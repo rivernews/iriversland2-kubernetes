@@ -1,7 +1,7 @@
 # terraform-provisioning
 This terraform script provisions infra resources for other projects.
 
-[![CircleCI](https://circleci.com/gh/rivernews/terraform-provisioning.svg?style=svg)](https://circleci.com/gh/rivernews/terraform-provisioning)
+[![CircleCI](https://circleci.com/gh/rivernews/terraform-provisioning.svg?style=shield)](https://circleci.com/gh/rivernews/terraform-provisioning)
 
 
 ## Prerequisites

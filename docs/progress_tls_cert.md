@@ -11,18 +11,18 @@
 
 - Check out certificate
 
-`. ./my-kubectl.sh describe certificate letsencrypt-prod-secret -n cicd-django`
+`. ./my-kubectl.sh describe certificate letsencrypt-staging-secret -n cicd-django`
 
 - Check out issuer
 
-`. ./my-kubectl.sh describe clusterissuer letsencrypt-prod`
+`. ./my-kubectl.sh describe clusterissuer letsencrypt-staging`
 
-- To flush out all the cert
+- ⚡To flush out all the cert, just run ⚡️ `. ./flush_cert_resources.sh`, specify LETSENCRYPT_ENV if needed (`staging` by default).
 
-    1. `terraform destroy -target=helm_release.project_cert_manager`
+    1. ⚡️ `terraform destroy -target=helm_release.project_cert_manager -target=helm_release.project-nginx-ingress -target=kubernetes_secret.tls_route53_secret`
 
-    1. `. ./my-kubectl.sh delete certificate letsencrypt-prod-secret && . ./my-kubectl.sh delete clusterissuer letsencrypt-prod-issuer`
-    1. You may also need to delete secrets created by cert-manager. List `. ./my-kubectl.sh get secrets -n cert-manager`, then delete like `. ./my-kubectl.sh delete secrets letsencrypt-prod-secret  -n cert-manager`.
+        - The above should already delete the custom resources together, but just to make sure you can run these command to verify that they are deleted: `. ./my-kubectl.sh delete certificate letsencrypt-staging-secret && . ./my-kubectl.sh delete clusterissuer letsencrypt-staging-issuer`
+    1. You may also need to delete secrets created by cert-manager. List `. ./my-kubectl.sh get secrets -n cert-manager`, then delete like ⚡️ `. ./my-kubectl.sh delete secrets letsencrypt-staging-secret  -n cert-manager`.
     1. `terraform apply`.
 
 
