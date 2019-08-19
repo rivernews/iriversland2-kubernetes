@@ -99,7 +99,7 @@ resource "null_resource" "crd_cert_resources_install" {
   # Terraform provisioners: https://www.terraform.io/docs/provisioners/index.html
   # (CRD) Creation-Time Provisioners
   provisioner "local-exec" {
-    command = "echo INFO: installing CRD... && bash ./my-kubectl.sh apply -f https://raw.githubusercontent.com/jetstack/cert-manager/${local.jetstack_cert_crd_version}/deploy/manifests/00-crds.yaml && echo INFO: complete CRD installation, sleeping 10 sec... && sleep 10"
+    command = "echo INFO: installing CRD... && sleep 5 && bash ./my-kubectl.sh apply -f https://raw.githubusercontent.com/jetstack/cert-manager/${local.jetstack_cert_crd_version}/deploy/manifests/00-crds.yaml && echo INFO: complete CRD installation, sleeping 10 sec... && sleep 10"
   }
 
 
@@ -173,7 +173,7 @@ EOT
   # (CRD) Destroy-Time Provisioners
   provisioner "local-exec" {
     when    = "destroy"
-    command = "bash ./my-kubectl.sh delete customresourcedefinitions.apiextensions.k8s.io certificates.certmanager.k8s.io clusterissuers.certmanager.k8s.io issuers.certmanager.k8s.io orders.certmanager.k8s.io && sleep 10"
+    command = "bash ./my-kubectl.sh delete customresourcedefinitions.apiextensions.k8s.io certificates.certmanager.k8s.io clusterissuers.certmanager.k8s.io issuers.certmanager.k8s.io orders.certmanager.k8s.io certificaterequests.certmanager.k8s.io challenges.certmanager.k8s.io && sleep 10"
   }
   # (Issuer Cert Secret)
   provisioner "local-exec" {
