@@ -65,6 +65,7 @@ else
     echo "Is the \"issuer\" something like \"C=US; O=Let's Encrypt; CN=Let's Encrypt Authority X3?\" "
 fi
 echo "You can also open browser to check: ${URL_TO_CHECK}"
+echo "INFO: if you don't see the right issuer, please be patient to wait for a while like 10 minutes and retry https request again, it might be still propagating certificates."
 echo "Enter anything to continue."
 read
 

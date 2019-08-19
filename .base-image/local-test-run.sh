@@ -1,0 +1,1 @@
+docker run --rm -d --name terraform-kubectl-container shaungc/terraform-kubectl-image

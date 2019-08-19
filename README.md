@@ -43,7 +43,7 @@ app_container_image_tag = "the-tag-when-you-docker-build"
 
 ### If changes involve TLS or certificate
 
-- Please run the script `. ./cert_resources_reset_interactive.sh`
+- Please run the script `. ./cert_resources_reset_interactive.sh` and avoid manually running `terraform apply`.
 
 ### No TLS or certificate related resources changed
 
@@ -73,7 +73,7 @@ Two phases:
 - We setup certificate for the rx domain name, using helm, Jetstack cert-manager and letsencrypt. For ingress resources we use nginx ingress.
 - For useful K8 commands debugging for TLS and `cert-manager` issues, see [the TLS Debug README](docs/progress_tls_cert.md).
     - Includes commands to monitor ingress and `cert-manager` controller logs in realtime.
-- Next milestone is to use dns01 challenge, so we can register a wildcard certificate, and don't have to worry about certificate when creating other apps/services on this K8 cluster.
+- Configured to use dns01 challenge, so we can register a wildcard certificate, and don't have to worry about certificate when creating other apps/services on subdomain on this K8 cluster.
 
 ## Pitfalls
 

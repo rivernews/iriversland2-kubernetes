@@ -1,17 +1,15 @@
 version: 2.1
 
 # yaml basic and advance: https://circleci.com/docs/2.0/writing-yaml/#section=configuration
-
 jobs:
-  build:
+  apply:
     docker:
-      - image: hashicorp/terraform:light
+      - image: shaungc/terraform-kubectl-image
     # environment:
     #   IMAGE_NAME: shaungc/iriversland2-django
     working_directory: ~/terraform
     steps:
       - checkout # retrieves the code from GitHub
-      - setup_remote_docker # sets up a remote, isolated environment for each build. This is required before you use any docker command inside a job step.
       # - run:
       #     name: Setup dynamic environment variables 
       #     # circleci dynammic env, see https://circleci.com/docs/2.0/env-vars/#interpolating-environment-variables-to-set-other-environment-variables
@@ -37,7 +35,7 @@ workflows:
   version: 2
   build-master:
     jobs:
-      - build:
+      - apply:
           filters:
             branches:
               only: master
