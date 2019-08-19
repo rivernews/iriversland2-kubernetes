@@ -49,6 +49,12 @@ jobs:
           name: Test Kubectl
           command: |
             bash my-kubectl.sh version --client
+      - run:
+          name: Test Terraform Apply
+          command: |
+            export TF_VAR_letsencrypt_env=prod
+            export TF_VAR_app_container_image_tag=ed0eb72f35c92a65cc2e39549f0ec883cbf02a27
+            terraform apply -auto-approve
 
 workflows:
   version: 2
