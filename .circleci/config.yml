@@ -2,14 +2,34 @@ version: 2.1
 
 # yaml basic and advance: https://circleci.com/docs/2.0/writing-yaml/#section=configuration
 jobs:
+  build:
+    docker:
+      - image: circleci/buildpack-deps:stretch
+    environment:
+      IMAGE_NAME: shaungc/terraform-kubectl-image
+    working_directory: ~/terraform
+    steps:
+      - checkout # retrieves the code from GitHub
+      - setup_remote_docker # sets up a remote, isolated environment for each build. This is required before you use any docker command inside a job step.
+      - run:
+          name: Build Docker image
+          command: |
+            docker build -f ./dockerize/Dockerfile -t $IMAGE_NAME:latest .
+      - run:
+          name: Push Docker Image
+          command: |
+            echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+            docker tag $IMAGE_NAME:latest $IMAGE_NAME:$CIRCLE_SHA1
+            docker push $IMAGE_NAME:latest
+            docker push $IMAGE_NAME:$CIRCLE_SHA1
   apply:
     docker:
       - image: shaungc/terraform-kubectl-image
     # environment:
     #   IMAGE_NAME: shaungc/iriversland2-django
-    working_directory: ~/terraform
+    working_directory: /terraform
     steps:
-      - checkout # retrieves the code from GitHub
+      # - checkout # retrieves the code from GitHub
       # - run:
       #     name: Setup dynamic environment variables 
       #     # circleci dynammic env, see https://circleci.com/docs/2.0/env-vars/#interpolating-environment-variables-to-set-other-environment-variables
@@ -23,10 +43,10 @@ jobs:
             sh ./init-backend-cicd.sh
             
       - run:
-          name: Apply Terraform
+          name: Plan Terraform
           command: |
-            terraform apply -auto-approve
-            
+            terraform plan
+
 workflows:
   version: 2
   build-master:

@@ -34,4 +34,6 @@ RUN set -x && \
 
 USER kubectl
 
+ADD . /terraform
+
 ENTRYPOINT ["/usr/local/bin/kubectl"]
