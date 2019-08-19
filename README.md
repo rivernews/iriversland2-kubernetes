@@ -40,7 +40,14 @@ app_container_image_tag = "the-tag-when-you-docker-build"
 ```
 
 2. Run `init-backend-local.sh`. Avoid running terraform init yourself.
-3. Run `terraform plan` to check. If everything seems good, run `terraform apply`. It will double check with you again. Remember the state would be stored on remote postgres, which means that it is persistent regardless of where you run this terraform script.
+
+### If changes involve TLS or certificate
+
+- Please run the script `. ./cert_resources_reset_interactive.sh`
+
+### No TLS or certificate related resources changed
+
+1. Run `terraform plan` to check. If everything seems good, run `terraform apply`. It will double check with you again. Remember the state would be stored on remote postgres, which means that it is persistent regardless of where you run this terraform script.
 
 
 ## Goal 
