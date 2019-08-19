@@ -36,4 +36,6 @@ USER kubectl
 
 ADD . /terraform
 
+RUN chmod +x /terraform
+
 ENTRYPOINT ["/usr/local/bin/kubectl"]
