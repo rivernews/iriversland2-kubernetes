@@ -45,10 +45,10 @@ jobs:
           name: Plan Terraform
           command: |
             terraform plan
-      # - run:
-      #     name: Test Kubectl
-      #     command: |
-      #       kubectl
+      - run:
+          name: Test Kubectl
+          command: |
+            bash my-kubectl.sh version --client
 
 workflows:
   version: 2
