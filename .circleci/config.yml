@@ -27,7 +27,7 @@ jobs:
       - image: shaungc/terraform-kubectl-image
     # environment:
     #   IMAGE_NAME: shaungc/iriversland2-django
-    working_directory: /terraform
+    working_directory: ~/terraform
     steps:
       # - checkout # retrieves the code from GitHub
       # - run:
