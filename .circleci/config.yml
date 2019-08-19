@@ -41,18 +41,22 @@ jobs:
           command: |
             chmod +x init-backend-cicd.sh
             sh ./init-backend-cicd.sh
-      # - run:
-      #     name: Plan Terraform
-      #     command: |
-      #       terraform plan -var="letsencrypt_env=prod" -var="app_container_image_tag=ed0eb72f35c92a65cc2e39549f0ec883cbf02a27"
+      - run:
+          name: Plan Terraform
+          command: |
+            terraform plan -var="letsencrypt_env=prod" -var="app_container_image_tag=latest"
       - run:
           name: Test Kubectl
           command: |
             bash my-kubectl.sh version --client
-      - run:
-          name: Test Terraform Apply
-          command: |
-            terraform apply -var="letsencrypt_env=prod" -var="app_container_image_tag=ed0eb72f35c92a65cc2e39549f0ec883cbf02a27" -auto-approve
+      
+      # only run this block if you want to provision infra here instead of the iriversland2-public circleci.
+      #
+      #
+      # - run:
+      #     name: Test Terraform Apply
+      #     command: |
+      #       terraform apply -var="letsencrypt_env=prod" -var="app_container_image_tag=ed0eb72f35c92a65cc2e39549f0ec883cbf02a27" -auto-approve
 
 workflows:
   version: 2
