@@ -10,9 +10,9 @@ The CircleCI for this repo dockerizes this repo as image and is for use of other
 
 - Install `brew install terraform`
 - Install `brew install kubernetes-cli` for `kubectl`
-- Install `brew install doctl`, the cli tool for digitalocean.
-    - Initialize auths for do, like `doctl auth init`
-- Run `export KUBECONFIG=kubeconfig.yaml`.
+- ~~Install `brew install doctl`, the cli tool for digitalocean.~~
+    - ~~Initialize auths for do, like `doctl auth init`~~
+- ~~Run `export KUBECONFIG=kubeconfig.yaml`.~~
 
 ## How to use
 

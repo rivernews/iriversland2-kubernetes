@@ -41,15 +41,14 @@ jobs:
           command: |
             chmod +x init-backend-cicd.sh
             sh ./init-backend-cicd.sh
-            
       - run:
           name: Plan Terraform
           command: |
             terraform plan
-      - run:
-          name: Test Kubectl
-          command: |
-            kubectl
+      # - run:
+      #     name: Test Kubectl
+      #     command: |
+      #       kubectl
 
 workflows:
   version: 2
