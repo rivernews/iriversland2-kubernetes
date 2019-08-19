@@ -46,6 +46,10 @@ jobs:
           name: Plan Terraform
           command: |
             terraform plan
+      - run:
+          name: Test Kubectl
+          command: |
+            . ./my-kubectl cluster-info
 
 workflows:
   version: 2
