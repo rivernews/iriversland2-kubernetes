@@ -31,7 +31,7 @@ jobs:
             docker push $IMAGE_NAME:$CIRCLE_SHA1
 
 
-  plan:
+  exec_terraform:
     docker:
       - image: shaungc/terraform-kubectl-image
     working_directory: /terraform
@@ -49,7 +49,7 @@ jobs:
           name: Test Kubectl
           command: |
             bash my-kubectl.sh version --client
-      
+
 
       # only run this block if you want to provision infra here instead of the iriversland2-public circleci.
       #
@@ -61,7 +61,7 @@ jobs:
 
 
       - slack/status:
-          mentions: 'D7J537NF9,'
+          mentions: 'here,'
           success_message: "*Build & Test Terraform Complete*\nThe Terraform base image `shaungc/terraform-kubectl-image` is ready to be used!"
 
 
@@ -72,6 +72,6 @@ workflows:
         filters:
             branches:
               only: master
-      - plan:
+      - exec_terraform:
           requires:
             - build
