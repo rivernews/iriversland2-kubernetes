@@ -9,7 +9,7 @@ echo "INFO: will now run terraform destroy and delete all tls secrets ..."
 terraform destroy -target=helm_release.project_cert_manager -target=helm_release.project-nginx-ingress -target=kubernetes_secret.tls_route53_secret -auto-approve
 
 
-. ./my-kubectl.sh delete secrets letsencrypt-${LETSENCRYPT_ENV}-secret  -n cert-manager
+bash ./my-kubectl.sh delete secrets letsencrypt-${LETSENCRYPT_ENV}-secret  -n cert-manager
 
 echo "\n\nINFO: reset done, will now terraform apply to re-create everything.\nEnter anything to continue."
 read
@@ -28,7 +28,7 @@ read
 #
 #
 
-. ./my-kubectl.sh get ingress project-shaungc-digitalocean-ingress-resource -n cicd-django -o yaml
+bash ./my-kubectl.sh get ingress project-shaungc-digitalocean-ingress-resource -n cicd-django -o yaml
 echo "\nINFO: check the ingress resource:"
 echo "Is it using cluster issuer annotation?"
 echo "Does the tls domain names seem right?"
@@ -37,7 +37,7 @@ read
 
 
 
-. ./my-kubectl.sh describe clusterissuer letsencrypt-${LETSENCRYPT_ENV}
+bash ./my-kubectl.sh describe clusterissuer letsencrypt-${LETSENCRYPT_ENV}
 echo "\nINFO: check the cluster issuer:"
 echo "Is it using environment ${LETSENCRYPT_ENV}?"
 echo "Does the acme challenge config seem right?"
@@ -45,7 +45,7 @@ echo "Enter anything to continue."
 read
 
 
-. ./my-kubectl.sh describe certificate letsencrypt-${LETSENCRYPT_ENV}-secret -n cicd-django
+bash ./my-kubectl.sh describe certificate letsencrypt-${LETSENCRYPT_ENV}-secret -n cicd-django
 echo "\nINFO: check the certificate:"
 echo "Is it using environment ${LETSENCRYPT_ENV}?"
 echo "Is it created successfully?"

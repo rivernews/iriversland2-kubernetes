@@ -78,14 +78,14 @@ resource "null_resource" "crd_cert_resources_install" {
       # Terraform provisioners: https://www.terraform.io/docs/provisioners/index.html
   # (CRD) Creation-Time Provisioners
   provisioner "local-exec" {
-    command = "echo INFO: installing CRD... && . ./my-kubectl.sh apply -f https://raw.githubusercontent.com/jetstack/cert-manager/${local.jetstack_cert_crd_version}/deploy/manifests/00-crds.yaml && echo INFO: complete CRD installation, sleeping 10 sec... && sleep 10"
+    command = "echo INFO: installing CRD... && bash ./my-kubectl.sh apply -f https://raw.githubusercontent.com/jetstack/cert-manager/${local.jetstack_cert_crd_version}/deploy/manifests/00-crds.yaml && echo INFO: complete CRD installation, sleeping 10 sec... && sleep 10"
   }
   
 
   # (Issuer) Creation-Time Provisioners
   provisioner "local-exec" {
     command = <<EOT
-echo INFO: creating issuer... && cat <<EOF | . ./my-kubectl.sh apply -f -
+echo INFO: creating issuer... && cat <<EOF | bash ./my-kubectl.sh apply -f -
 apiVersion: certmanager.k8s.io/v1alpha1
 kind: ClusterIssuer
 metadata:
@@ -153,13 +153,13 @@ EOT
 
 # resource "null_resource" "certcrdinstall" {
 #   provisioner "local-exec" {
-#     command = ". ./my-kubectl.sh apply -f https://raw.githubusercontent.com/jetstack/cert-manager/${local.jetstack_cert_crd_version}/deploy/manifests/00-crds.yaml && sleep 30"
+#     command = "bash ./my-kubectl.sh apply -f https://raw.githubusercontent.com/jetstack/cert-manager/${local.jetstack_cert_crd_version}/deploy/manifests/00-crds.yaml && sleep 30"
 #   }
 # }
 
 # resource "null_resource" "certcrddestroy" {
 #   provisioner "local-exec" {
-#       command = ". ./my-kubectl.sh delete customresourcedefinitions.apiextensions.k8s.io certificates.certmanager.k8s.io clusterissuers.certmanager.k8s.io issuers.certmanager.k8s.io"
+#       command = "bash ./my-kubectl.sh delete customresourcedefinitions.apiextensions.k8s.io certificates.certmanager.k8s.io clusterissuers.certmanager.k8s.io issuers.certmanager.k8s.io"
 #   }
 # }
 
@@ -212,7 +212,7 @@ resource "helm_release" "project_cert_manager" {
   # (CRD) Destroy-Time Provisioners
   provisioner "local-exec" {
     when    = "destroy"
-    command = ". ./my-kubectl.sh delete customresourcedefinitions.apiextensions.k8s.io certificates.certmanager.k8s.io clusterissuers.certmanager.k8s.io issuers.certmanager.k8s.io orders.certmanager.k8s.io && sleep 10"
+    command = "bash ./my-kubectl.sh delete customresourcedefinitions.apiextensions.k8s.io certificates.certmanager.k8s.io clusterissuers.certmanager.k8s.io issuers.certmanager.k8s.io orders.certmanager.k8s.io && sleep 10"
   }
 
 
@@ -247,7 +247,7 @@ resource "helm_release" "project_cert_manager" {
 # resource "null_resource" "create_cert_issuer" {
 #   provisioner "local-exec" {
 #     command = <<EOT
-# cat <<EOF | . ./my-kubectl.sh create -f -
+# cat <<EOF | bash ./my-kubectl.sh create -f -
 # apiVersion: certmanager.k8s.io/v1alpha1
 # kind: ClusterIssuer
 # metadata:
