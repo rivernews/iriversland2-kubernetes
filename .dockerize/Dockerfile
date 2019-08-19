@@ -6,7 +6,7 @@ RUN apk --no-cache add curl bash ca-certificates sudo
 
 # install kubectl
 # https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-on-linux
-RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/1.15.2/bin/linux/amd64/kubectl
+RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.15.2/bin/linux/amd64/kubectl
 RUN sudo mv ./kubectl /bin/kubectl
 RUN sudo chmod +x /bin/kubectl
 
