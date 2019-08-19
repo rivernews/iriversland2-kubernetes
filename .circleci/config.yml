@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  slack: circleci/slack@3.3.0
+
 # yaml basic and advance: https://circleci.com/docs/2.0/writing-yaml/#section=configuration
 jobs:
   build:
@@ -48,15 +51,17 @@ jobs:
             bash my-kubectl.sh version --client
       
       # only run this block if you want to provision infra here instead of the iriversland2-public circleci.
-      #
-      #
+      
+      
       - run:
           name: Test Terraform Apply
           command: |
-            terraform apply -var="letsencrypt_env=staging" -var="app_container_image_tag=ed0eb72f35c92a65cc2e39549f0ec883cbf02a27" -auto-approve
+            terraform apply -var="letsencrypt_env=prod" -var="app_container_image_tag=ed0eb72f35c92a65cc2e39549f0ec883cbf02a27" -auto-approve
 
+      - slack/status:
+          mentions: 'D7J537NF9,'
+          success_message: "*Build & Test Terraform Complete*\nThe Terraform base image `shaungc/terraform-kubectl-image` is ready to be used!"
 workflows:
-  version: 2
   build-master:
     jobs:
       - build:
