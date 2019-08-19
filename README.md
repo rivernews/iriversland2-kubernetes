@@ -3,6 +3,8 @@ This terraform script provisions infra resources for other projects.
 
 [![CircleCI](https://circleci.com/gh/rivernews/terraform-provisioning.svg?style=shield)](https://circleci.com/gh/rivernews/terraform-provisioning)
 
+The CircleCI for this repo build the dockerized image for other projects to use as a base image to run terraform and k8 commands.
+
 
 ## Prerequisites
 

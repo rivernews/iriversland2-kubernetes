@@ -49,7 +49,7 @@ jobs:
       - run:
           name: Test Kubectl
           command: |
-            . ./my-kubectl cluster-info
+            . ./my-kubectl.sh cluster-info
 
 workflows:
   version: 2
