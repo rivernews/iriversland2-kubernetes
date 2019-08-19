@@ -7,7 +7,7 @@ jobs:
       - image: circleci/buildpack-deps:stretch
     environment:
       IMAGE_NAME: shaungc/terraform-kubectl-image
-    working_directory: /terraform
+    working_directory: ~/terraform
     steps:
       - checkout # retrieves the code from GitHub
       - setup_remote_docker # sets up a remote, isolated environment for each build. This is required before you use any docker command inside a job step.
