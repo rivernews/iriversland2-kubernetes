@@ -10,6 +10,10 @@ jobs:
     working_directory: ~/terraform
     steps:
       - checkout # retrieves the code from GitHub
+      
+      # only run blocks below if you updated Dockerfile or terraform script in this repo
+      #
+      #
       - setup_remote_docker # sets up a remote, isolated environment for each build. This is required before you use any docker command inside a job step.
       - run:
           name: Build Docker image
@@ -22,20 +26,13 @@ jobs:
             docker tag $IMAGE_NAME:latest $IMAGE_NAME:$CIRCLE_SHA1
             docker push $IMAGE_NAME:latest
             docker push $IMAGE_NAME:$CIRCLE_SHA1
+
+
   plan:
     docker:
       - image: shaungc/terraform-kubectl-image
-    # environment:
-    #   IMAGE_NAME: shaungc/iriversland2-django
     working_directory: /terraform
     steps:
-      # - checkout # retrieves the code from GitHub
-      # - run:
-      #     name: Setup dynamic environment variables 
-      #     # circleci dynammic env, see https://circleci.com/docs/2.0/env-vars/#interpolating-environment-variables-to-set-other-environment-variables
-      #     # terraform env, see https://www.terraform.io/docs/configuration/variables.html#environment-variables
-      #     command: |
-      #       echo 'export TF_VAR_app_container_image="${IMAGE_NAME}"' >> $BASH_ENV
       - run:
           name: Initiate Terraform
           command: |
@@ -53,10 +50,10 @@ jobs:
       # only run this block if you want to provision infra here instead of the iriversland2-public circleci.
       #
       #
-      # - run:
-      #     name: Test Terraform Apply
-      #     command: |
-      #       terraform apply -var="letsencrypt_env=prod" -var="app_container_image_tag=ed0eb72f35c92a65cc2e39549f0ec883cbf02a27" -auto-approve
+      - run:
+          name: Test Terraform Apply
+          command: |
+            terraform apply -var="letsencrypt_env=staging" -var="app_container_image_tag=ed0eb72f35c92a65cc2e39549f0ec883cbf02a27" -auto-approve
 
 workflows:
   version: 2

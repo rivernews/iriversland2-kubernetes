@@ -178,13 +178,6 @@ resource "kubernetes_ingress" "project-ingress-resource" {
     # do not put this same tls in other ingress resources spec
     # if you want to share the tls domain, just place tls in one of the ingress resource
     # see https://github.com/jetstack/cert-manager/issues/841#issuecomment-414299467
-    tls {
-      # hosts       = ["${local.app_deployed_domain}", "${var.managed_k8_rx_domain}"]
-      #   hosts       = ["${var.managed_k8_rx_domain}"]
-      hosts = ["${var.managed_k8_rx_domain}", "*.${var.managed_k8_rx_domain}"]
-      #   hosts       = ["${var.managed_k8_rx_domain}", "${local.app_deployed_domain}", "*.${var.managed_k8_rx_domain}"]
-      secret_name = "${local.cert_cluster_issuer_k8_secret_name}"
-    }
 
     dynamic "rule" {
       for_each = local.deployed_domain_list
@@ -203,6 +196,15 @@ resource "kubernetes_ingress" "project-ingress-resource" {
       }
     }
 
+
+    tls {
+      # hosts       = ["${local.app_deployed_domain}", "${var.managed_k8_rx_domain}"]
+      #   hosts       = ["${var.managed_k8_rx_domain}"]
+      hosts = ["${var.managed_k8_rx_domain}", "*.${var.managed_k8_rx_domain}"]
+      #   hosts       = ["${var.managed_k8_rx_domain}", "${local.app_deployed_domain}", "*.${var.managed_k8_rx_domain}"]
+      secret_name = "${local.cert_cluster_issuer_k8_secret_name}"
+    }
+    
     # for registering wildcard tls certificate
     rule {
       host = "*.${var.managed_k8_rx_domain}"

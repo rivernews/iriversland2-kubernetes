@@ -1,25 +1,25 @@
 LETSENCRYPT_ENV=${1:-staging}
 DOMAIN_TO_CHECK=shaungc.com
 
-echo "INFO: Let's Encypt Environment:\n${LETSENCRYPT_ENV}\n\nEnter anything to continue."
-read
+# echo "INFO: Let's Encypt Environment:\n${LETSENCRYPT_ENV}\n\nEnter anything to continue."
+# read
 
-echo "INFO: will now run terraform destroy and delete all tls secrets ..."
+# echo "INFO: will now run terraform destroy and delete all tls secrets ..."
 
-terraform destroy -target=helm_release.project_cert_manager -target=helm_release.project-nginx-ingress -target=kubernetes_secret.tls_route53_secret -auto-approve
+# terraform destroy -target=helm_release.project_cert_manager -target=helm_release.project-nginx-ingress -target=kubernetes_secret.tls_route53_secret -auto-approve
 
 
-bash ./my-kubectl.sh delete secrets letsencrypt-${LETSENCRYPT_ENV}-secret  -n cert-manager
+# bash ./my-kubectl.sh delete secrets letsencrypt-${LETSENCRYPT_ENV}-secret  -n cert-manager
 
-echo "\n\nINFO: reset done, will now terraform apply to re-create everything.\nEnter anything to continue."
-read
+# echo "\n\nINFO: reset done, will now terraform apply to re-create everything.\nEnter anything to continue."
+# read
 
-terraform apply -var="letsencrypt_env=${LETSENCRYPT_ENV}" -auto-approve
+# terraform apply -var="letsencrypt_env=${LETSENCRYPT_ENV}" -auto-approve
 
-echo "terraform just finished provisioning, sleep for 10 sec..."  && sleep 10
+# echo "terraform just finished provisioning, sleep for 10 sec..."  && sleep 10
 
-echo "\n\nINFO: cert-manager, letsencypt, issuer, certifcate config complete. Ready to verify.\nEnter anything to continue."
-read
+# echo "\n\nINFO: cert-manager, letsencypt, issuer, certifcate config complete. Ready to verify.\nEnter anything to continue."
+# read
 
 
 

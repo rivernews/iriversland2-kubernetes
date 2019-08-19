@@ -58,7 +58,7 @@ resource "kubernetes_namespace" "cert_manager" {
 locals {
   jetstack_cert_crd_version = "release-0.9"
 
-  cert_cluster_issuer_name           = "letsencrypt-${var.letsencrypt_env}"
+  cert_cluster_issuer_name           = "hhletsencrypt-${var.letsencrypt_env}"
   cert_cluster_issuer_k8_secret_name = "letsencrypt-${var.letsencrypt_env}-secret"
 
   acme_server_url_prod    = "https://acme-v02.api.letsencrypt.org/directory"
@@ -69,18 +69,39 @@ locals {
 
 resource "null_resource" "crd_cert_resources_install" {
   triggers = {
-      # change this string whenever you want to rerun the provisioners
-      string_value = "const_value"
-      always_trigger = "${timestamp()}"
+    # change this string whenever you want to rerun the provisioners
+    # string_value = "const_value"
+    #   always_trigger = "${timestamp()}"
+    # always_trigger = "2019-08-19T06:38:14Z"
+
+
+
+    # list all dependencies here
+    #
+    #
+    jetstack_cert_crd_version = "${local.jetstack_cert_crd_version}"
+    cert_cluster_issuer_name = "${local.cert_cluster_issuer_name}"
+    
+    letsencrypt_env = "${var.letsencrypt_env}"
+    acme_server_url_prod = "${local.acme_server_url_prod}"
+    acme_server_url_staging = "${local.acme_server_url_staging}"
+
+    docker_email = "${var.docker_email}"
+    
+    cert_cluster_issuer_k8_secret_name = "${local.cert_cluster_issuer_k8_secret_name}"
+
+    aws_region = "${var.aws_region}"
+    aws_access_key = "${var.aws_access_key}"
+    tls_route53_secret_name = "${kubernetes_secret.tls_route53_secret.metadata.0.name}"
   }
 
 
-      # Terraform provisioners: https://www.terraform.io/docs/provisioners/index.html
+  # Terraform provisioners: https://www.terraform.io/docs/provisioners/index.html
   # (CRD) Creation-Time Provisioners
   provisioner "local-exec" {
     command = "echo INFO: installing CRD... && bash ./my-kubectl.sh apply -f https://raw.githubusercontent.com/jetstack/cert-manager/${local.jetstack_cert_crd_version}/deploy/manifests/00-crds.yaml && echo INFO: complete CRD installation, sleeping 10 sec... && sleep 10"
   }
-  
+
 
   # (Issuer) Creation-Time Provisioners
   provisioner "local-exec" {
@@ -90,10 +111,10 @@ apiVersion: certmanager.k8s.io/v1alpha1
 kind: ClusterIssuer
 metadata:
   name: ${local.cert_cluster_issuer_name}
-#   namespace: ${kubernetes_namespace.cert_manager.metadata.0.name}
+
 spec:
   acme:
-    server: ${ var.letsencrypt_env == "prod" ? local.acme_server_url_prod : local.acme_server_url_staging }
+    server: ${var.letsencrypt_env == "prod" ? local.acme_server_url_prod : local.acme_server_url_staging}
     email: ${var.docker_email}
     privateKeySecretRef:
       name: ${local.cert_cluster_issuer_k8_secret_name}
@@ -124,29 +145,41 @@ EOT
 
   # (Sleep)
   provisioner "local-exec" {
-      command = "echo INFO: complete installing CRD and clusterissuer, will sleep 15 sec... && sleep 15"
+    command = "echo INFO: complete installing CRD and clusterissuer, will sleep 15 sec... && sleep 15"
   }
   # other kinds of challenge:
   #   solvers:
-    #   - http01:
-    #     ingress:
-    #       class: nginx
+  #   - http01:
+  #     ingress:
+  #       class: nginx
 
   # http01: {}
   #
-#   dns01:
-#         providers:
-#           - name: route53
-#             route53:
-#                 region: ${var.aws_region}
-#                 accessKeyID: ${var.aws_access_key}
-#                 secretAccessKeySecretRef:
-#                     name: ${kubernetes_secret.tls_route53_secret.metadata.0.name}
-#                     key: secret-access-key
+  #   dns01:
+  #         providers:
+  #           - name: route53
+  #             route53:
+  #                 region: ${var.aws_region}
+  #                 accessKeyID: ${var.aws_access_key}
+  #                 secretAccessKeySecretRef:
+  #                     name: ${kubernetes_secret.tls_route53_secret.metadata.0.name}
+  #                     key: secret-access-key
   # https://blog.getambassador.io/using-jetstacks-kubernetes-cert-manager-to-automatically-renew-tls-certificates-in-the-ambassador-7db119ab34a4
 
   # solver based on 
-   # https://github.com/cloud-ark/kubeplus/blob/master/examples/cert-management/working-config/issuer.yaml referred from https://github.com/jetstack/cert-manager/issues/1148#issuecomment-499236255
+  # https://github.com/cloud-ark/kubeplus/blob/master/examples/cert-management/working-config/issuer.yaml referred from https://github.com/jetstack/cert-manager/issues/1148#issuecomment-499236255
+
+
+  # (CRD) Destroy-Time Provisioners
+  provisioner "local-exec" {
+    when    = "destroy"
+    command = "bash ./my-kubectl.sh delete customresourcedefinitions.apiextensions.k8s.io certificates.certmanager.k8s.io clusterissuers.certmanager.k8s.io issuers.certmanager.k8s.io orders.certmanager.k8s.io && sleep 10"
+  }
+  # (Issuer Cert Secret)
+  provisioner "local-exec" {
+    when    = "destroy"
+    command = "bash ./my-kubectl.sh delete secrets letsencrypt-${var.letsencrypt_env}-secret -n ${kubernetes_namespace.cert_manager.metadata.0.name} && sleep 3"
+  }
 }
 
 
@@ -186,20 +219,20 @@ resource "helm_release" "project_cert_manager" {
 
   #   namespace = "${kubernetes_service_account.tiller.metadata.0.namespace}"
   namespace = "${kubernetes_namespace.cert_manager.metadata.0.name}"
-    timeout   = "540"
+  timeout   = "540"
 
 
 
   # var: TODO
   # description = "Let's Encrypt server URL to which certificate requests will be sent"
-    values = [<<EOF
+  values = [<<EOF
     ingressShim:
       defaultIssuerName: ${local.cert_cluster_issuer_name}
       defaultIssuerKind: ClusterIssuer
       defaultACMEChallengeType: dns01
       defaultACMEDNS01ChallengeProvider: route53
   EOF
-    ]
+  ]
 
   # diable webhook to avoid error using stable/cert-manager: https://github.com/jetstack/cert-manager/issues/1255#issuecomment-465129995
   set {
@@ -207,13 +240,6 @@ resource "helm_release" "project_cert_manager" {
     value = "false"
   }
 
-
-
-  # (CRD) Destroy-Time Provisioners
-  provisioner "local-exec" {
-    when    = "destroy"
-    command = "bash ./my-kubectl.sh delete customresourcedefinitions.apiextensions.k8s.io certificates.certmanager.k8s.io clusterissuers.certmanager.k8s.io issuers.certmanager.k8s.io orders.certmanager.k8s.io && sleep 10"
-  }
 
 
   depends_on = [
