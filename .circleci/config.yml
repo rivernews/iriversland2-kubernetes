@@ -62,7 +62,7 @@ jobs:
 
       - slack/status:
           mentions: 'here,'
-          success_message: "*Build & Test Terraform Complete*\nThe Terraform base image `shaungc/terraform-kubectl-image` is ready to be used!"
+          success_message: "*Build & Test Terraform Complete*\nThe Terraform base image \"shaungc/terraform-kubectl-image\" is ready to be used!"
 
 
 workflows:

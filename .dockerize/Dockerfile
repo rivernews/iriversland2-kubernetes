@@ -10,30 +10,7 @@ RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.15.2/b
 RUN sudo mv ./kubectl /bin/kubectl
 RUN sudo chmod +x /bin/kubectl
 
-
-# RUN kubectl version --client
-
-
-# ENTRYPOINT [ "/bin/kubectl" ]
-
-
-
-# ADD https://storage.googleapis.com/kubernetes-release/release/v1.15.2/bin/linux/amd64/kubectl /usr/local/bin/kubectl
-
-# ENV HOME=/config
-
-# RUN set -x && \
-#     apk add --no-cache curl ca-certificates bash && \
-#     chmod +x /usr/local/bin/kubectl && \
-#     \
-#     # Create non-root user (with a randomly chosen UID/GUI).
-#     adduser kubectl -Du 2342 -h /config && \
-#     \
-#     # Basic check it works.
-#     kubectl version --client
-
-# USER kubectl
-
+# load terraform script code base into image
 RUN mkdir -p /terraform
 ADD . /terraform
 RUN sudo chmod +x /terraform
