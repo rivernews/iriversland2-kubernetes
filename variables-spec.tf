@@ -24,7 +24,7 @@ variable "letsencrypt_env" {
   default = "prod"
 }
 
-variable "app_frontend_static_assets_dns_name" {}
+# variable "app_frontend_static_assets_dns_name" {}
 
 
 
