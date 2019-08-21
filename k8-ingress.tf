@@ -2,7 +2,7 @@ locals {
   app_deployed_domain_hashed = "${var.app_container_image_tag}.${var.app_deployed_domain}"
   
   deployed_domain_list = [
-    "${var.app_deployed_domain_hashed}",
+    "${local.app_deployed_domain_hashed}",
     "${var.app_deployed_domain}",
   ]
 }

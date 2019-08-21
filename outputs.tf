@@ -11,19 +11,19 @@ output "k8_ingress_object" {
 }
 
 output "planned_app_deployed_domain____please_allow_1min_before_access" {
-  value = "http://${local.app_deployed_domain}"
+  value = "http://${var.app_deployed_domain}"
 }
 
-output "planned_app_deployed_rx_domain____please_allow_1min_before_access" {
-  value = "http://${var.managed_k8_rx_domain}"
+output "planned_app_deployed_hashed_domain____please_allow_1min_before_access" {
+  value = "http://${local.app_deployed_domain_hashed}"
 }
 
 output "check_django-health" {
-  value = "http://${local.app_deployed_domain}/django-health-check/"
+  value = "http://${local.app_deployed_domain_hashed}/django-health-check/"
 }
 
 output "check_django-fail-test" {
-  value = "http://${local.app_deployed_domain}/fail-test/"
+  value = "http://${local.app_deployed_domain_hashed}/fail-test/"
 }
 
 output "app_credentials" {
