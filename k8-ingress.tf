@@ -200,7 +200,7 @@ resource "kubernetes_ingress" "project-ingress-resource" {
     tls {
       # hosts       = ["${local.app_deployed_domain}", "${var.managed_k8_rx_domain}"]
     #   hosts = ["${var.managed_k8_rx_domain}", "*.${var.managed_k8_rx_domain}"]
-      hosts = ["*.${var.managed_k8_rx_domain}"]
+      hosts = ["*.${var.managed_k8_rx_domain}", "*.api.${var.managed_k8_rx_domain}"]
       #   hosts       = ["${var.managed_k8_rx_domain}", "${local.app_deployed_domain}", "*.${var.managed_k8_rx_domain}"]
       secret_name = "${local.cert_cluster_issuer_k8_secret_name}"
     }
