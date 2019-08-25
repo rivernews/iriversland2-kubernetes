@@ -1,9 +1,7 @@
 # Iriversland2 Kubernetes Infrastructure
-This terraform script provisions infra resources for other projects.
+This terraform script provisions infra resources for my personal website, as well as other projects.
 
 [![CircleCI](https://circleci.com/gh/rivernews/iriversland2-kubernetes.svg?style=shield)](https://circleci.com/gh/rivernews/iriversland2-kubernetes)
-
-The CircleCI for this repo dockerizes this repo as image and is for use of other projects as a base image (mainly in their CircleCI jobs) to run terraform and k8 commands.
 
 This repository is part of my personal website project. Also see other repositories:
 
@@ -11,6 +9,7 @@ This repository is part of my personal website project. Also see other repositor
 - **[Iriversland2 Backend API](https://github.com/rivernews/iriversland2-api)**: the backend RESTful API in Django.
 - **[Iriversland2 Kubernetes](https://github.com/rivernews/iriversland2-kubernetes)**: (this repository) infrastructure as code provisioning the Kubernetes cluster for the backend server.
 
+The CircleCI for this repo dockerizes this repo as image and is for use of other projects as a base image (mainly in their CircleCI jobs) to run terraform and k8 commands.
 
 ## Prerequisites
 
