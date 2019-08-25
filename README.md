@@ -24,7 +24,13 @@ This repository is part of my personal website project. Also see other repositor
 
 1. Provide the credentials, create the files below in the project root directory:
 
-Create `backend-credentials.tfvars`: specify `conn_str`, we use postgres for terraform remote state storage backend.
+Create `backend-credentials.tfvars`: we use S3 for terraform remote state storage backend, specify the following content in the file:
+
+```
+access_key = "XXXXXX"
+secret_key = "XXXXXXXXYYYYYYYYZZZZZZZ"
+region = "aws-region-x"
+```
 
 Create `credentials.auto.tfvars`: specify the following:
 
