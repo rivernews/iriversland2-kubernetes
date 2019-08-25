@@ -22,7 +22,6 @@ resource "kubernetes_cron_job" "db_backup_cron" {
         backoff_limit = 1 # no retry
 
         template {
-          metadata {}
           spec {
             container {
               name    = "db-backup-container"
