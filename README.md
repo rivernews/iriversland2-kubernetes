@@ -122,7 +122,7 @@ When Terraform error, remember that Terraform will keep all successfully created
 
 ## Contact
 
-If you need any help or have any question about this repo, feel free to shoot me a message by visiting [my website](shaungc.com) (hosted on K8 DO and provisioned by this repo's tf!) and fill out the contact form at the bottom of the home page.
+If you need any help or have any question about this repo, feel free to shoot me a message by visiting [my website](http://shaungc.com) (hosted on K8 DO and provisioned by this repo's tf!) and fill out the contact form at the bottom of the home page.
 
 ## Reference
 
