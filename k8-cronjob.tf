@@ -2,7 +2,7 @@
 # k8 spec: https://kubernetes.io/docs/tasks/job/automated-tasks-with-cron-jobs/
 resource "kubernetes_cron_job" "db_backup_cron" {
   metadata {
-    name = "db-backup-cronjob"
+    name      = "db-backup-cronjob"
     namespace = "${var.cicd_namespace}"
   }
   spec {
@@ -13,15 +13,21 @@ resource "kubernetes_cron_job" "db_backup_cron" {
     starting_deadline_seconds     = 5
 
     job_template {
+      # metadata block is required
+      metadata {}
+
       spec {
 
         # https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/#job-termination-and-cleanup
         active_deadline_seconds = 60 # max job alive time
-        
+
         # https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/#pod-backoff-failure-policy
         backoff_limit = 1 # no retry
 
         template {
+          # metadata block is required
+          metadata {}
+
           spec {
             container {
               name    = "db-backup-container"
