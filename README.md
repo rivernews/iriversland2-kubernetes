@@ -1,7 +1,7 @@
 # terraform-provisioning
 This terraform script provisions infra resources for other projects.
 
-[![CircleCI](https://circleci.com/gh/rivernews/terraform-provisioning.svg?style=shield)](https://circleci.com/gh/rivernews/terraform-provisioning)
+[![CircleCI](https://circleci.com/gh/rivernews/iriversland2-kubernetes.svg?style=shield)](https://circleci.com/gh/rivernews/iriversland2-kubernetes)
 
 The CircleCI for this repo dockerizes this repo as image and is for use of other projects as a base image (mainly in their CircleCI jobs) to run terraform and k8 commands.
 
