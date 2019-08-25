@@ -1,4 +1,4 @@
-# Iriversland2 Kubernetes
+# Iriversland2 Kubernetes Infrastructure
 This terraform script provisions infra resources for other projects.
 
 [![CircleCI](https://circleci.com/gh/rivernews/iriversland2-kubernetes.svg?style=shield)](https://circleci.com/gh/rivernews/iriversland2-kubernetes)
