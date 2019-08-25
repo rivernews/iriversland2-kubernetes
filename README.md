@@ -54,7 +54,7 @@ letsencrypt_env = "either prod or staging"
 app_container_image_tag = "the-tag-when-you-docker-build"
 ```
 
-2. Run `init-backend-local.sh` to initialize terraform. Avoid running terraform init yourself.
+2. Run `init-backend-local.sh` to initialize terraform. **Avoid running terraform init yourself**.
 
 3. Make some changes if needed
 4. If changes involve TLS / Cert Manager, please refer to the section `Terraform: Lifecycle of TLS / Cert Manager / Let's Encrypt Resources` under `Pitfalls and Known Issues` below.
