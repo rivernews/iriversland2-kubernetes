@@ -9,7 +9,8 @@ resource "kubernetes_cron_job" "db_backup_cron" {
     concurrency_policy            = "Replace"
     failed_jobs_history_limit     = 10
     successful_jobs_history_limit = 5
-    schedule                      = "0 0 * * *" # every day 00:00
+    # schedule                      = "0 7 * * *" # every day 00:00 PST
+    schedule                      = "0 * * * *" # every hour
     starting_deadline_seconds     = 5
 
     job_template {
