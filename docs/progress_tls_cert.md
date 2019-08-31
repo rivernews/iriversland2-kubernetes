@@ -17,6 +17,10 @@
 
 `bash ./my-kubectl.sh describe clusterissuer letsencrypt-staging`
 
+- Hit the website
+
+`curl -vkI https://shaungc.com`
+
 - ⚡To flush out all the cert, just run ⚡️ `. ./flush_cert_resources.sh`, specify LETSENCRYPT_ENV if needed (`staging` by default).
 
     1. ⚡️ `terraform destroy -target=helm_release.project_cert_manager -target=helm_release.project-nginx-ingress -target=kubernetes_secret.tls_route53_secret`

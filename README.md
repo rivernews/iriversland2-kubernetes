@@ -81,9 +81,7 @@ What we've done, and how we set it up. Two phases:
 ### Enable TLS (HTTPS) Protection for App on K8 Cluster
 
 - We setup certificate for the rx domain name, using helm, Jetstack cert-manager and letsencrypt. For ingress resources we use nginx ingress.
-- For useful K8 commands, and debugging for TLS or `cert-manager` issues, see [the TLS Debug README](docs/progress_tls_cert.md).
-    - The README includes commands to monitor ingress and `cert-manager` controller logs in realtime.
-    - The script `. ./cert_resources_reset_interactive.sh` provides an interactive way to verify the TLS is correctly set up. The script is deprecated. **Do not run the script** w/o inspecting what the script does first.
+
 - Configured to use dns01 challenge, so we can register a wildcard certificate, and don't have to worry about certificate when creating other apps/services on subdomains on this K8 cluster.
 
 ## Pitfalls and Known Issues
@@ -99,6 +97,10 @@ Due to the lack of support for CRD (K8 custom resource) in Terraform, we are usi
 However, Let's Encrypt, the certificate issuer, has a pretty strict rate limit on requesting production certificate. Changes like `ClusterIssuer`'s name are defintely not worth of requesting a new certificate, and should just run the creation provisioners (`kubectl apply`) w/o running the destroy provisioners (`kubectl delete`) beforehand. These changes should be avoid, or at least one has to be aware of Let's Encrypt rate limit. You can always [check how many certificate you have requested so far](https://crt.sh).
 
 Still, there are changes that indeed need a certificate renewal. e.g., changes in Let's Encrypt API endpoint (most likely due to version update), tls block in ingress resource, as well as aws credentials for the route53 dns challenge. Luckily, these changes are not likely to happen frequently. Using the current approach, you will change the variable values, then the `local-exec` will handle the rest for you.
+
+- For useful K8 commands, and debugging for TLS or `cert-manager` issues, see [the TLS Debug README](docs/progress_tls_cert.md).
+    - The README includes commands to monitor ingress and `cert-manager` controller logs in realtime.
+    - ~~The script `. ./cert_resources_reset_interactive.sh` provides an interactive way to verify the TLS is correctly set up.~~ The script is deprecated. **Do not run the script** w/o inspecting what the script does first.
 
 ### The Role of CircleCI in this terraform repository
 
