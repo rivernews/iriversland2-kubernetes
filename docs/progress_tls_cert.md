@@ -85,6 +85,10 @@ If the failure reason has something to do with order, look into order resources:
 
 `. ./my-kubectl.sh get order --all-namespaces`
 
+Particularly, look at if any failure or error present; if so, look at the reason.
+
+- If you see reason is `Error finalizing order :: certificate public key must be different than account key`, check if `ClusterIssuer.spec.privateKeySecretRef` and `IngressResource.spec.tls.secretName` are not the same.
+
 ### Debug the ingress resources
 
 - Get all the ingresses resources
@@ -109,9 +113,9 @@ Because an issue [about get and describe](https://github.com/kubernetes/kubectl/
 
 Before doing this, try to read from logs above to find out what cause the error.
 
-- ⚡To flush out all the cert, just run ⚡️ `. ./flush_cert_resources.sh`, specify LETSENCRYPT_ENV if needed (`staging` by default).
+- ⚡ ~~To flush out all the cert, just run ⚡️ `. ./flush_cert_resources.sh`, specify LETSENCRYPT_ENV if needed (`staging` by default).~~
 
-    1. ⚡️ `terraform destroy -target=helm_release.project_cert_manager -target=helm_release.project-nginx-ingress -target=kubernetes_secret.tls_route53_secret`
+    1. ⚡️ This may be the most useful after you made changes to tf: **`terraform destroy -target=helm_release.project_cert_manager -target=helm_release.project-nginx-ingress`**
 
         - The above should already delete the custom resources together, but just to make sure you can run these command to verify that they are deleted: `bash ./my-kubectl.sh delete certificate letsencrypt-staging-secret && bash ./my-kubectl.sh delete clusterissuer letsencrypt-staging-issuer`
     1. You may also need to delete secrets created by cert-manager. List `bash ./my-kubectl.sh get secrets -n cert-manager`, then delete like ⚡️ `bash ./my-kubectl.sh delete secrets letsencrypt-staging-secret  -n cert-manager`.

@@ -101,6 +101,8 @@ Still, there are changes that indeed need a certificate renewal. e.g., changes i
 - For useful K8 commands, and debugging for TLS or `cert-manager` issues, see [the TLS Debug README](docs/progress_tls_cert.md).
     - The README includes commands to monitor ingress and `cert-manager` controller logs in realtime.
     - ~~The script `. ./cert_resources_reset_interactive.sh` provides an interactive way to verify the TLS is correctly set up.~~ The script is deprecated. **Do not run the script** w/o inspecting what the script does first.
+    - [The issue where we add TLS to our domain](https://github.com/rivernews/iriversland2-api/issues/11).
+    - [The issue where we add another micro service domain in](https://github.com/rivernews/appl-tracky-api/issues/6).
 
 ### The Role of CircleCI in this terraform repository
 

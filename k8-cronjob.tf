@@ -3,7 +3,7 @@
 resource "kubernetes_cron_job" "db_backup_cron" {
   metadata {
     name      = "db-backup-cronjob"
-    namespace = "${var.cicd_namespace}"
+    namespace = "${module.iriversland2_api.microservice_namespace}"
   }
   spec {
     concurrency_policy            = "Replace"
@@ -31,11 +31,11 @@ resource "kubernetes_cron_job" "db_backup_cron" {
           spec {
             container {
               name    = "db-backup-container"
-              image   = "${var.app_container_image}:${var.app_container_image_tag}"
+              image   = "${module.iriversland2_api.app_container_image}:${module.iriversland2_api.app_container_image_tag}"
               command = ["/bin/sh", "-c", "echo Starting cron job... && sleep 5 && cd /usr/src/backend && echo Finish CD && python manage.py backup_db && echo Finish dj command"]
 
               dynamic "env" {
-                for_each = local.app_secret_key_value_pairs
+                for_each = module.iriversland2_api.microservice_runtime_env_vars
                 content {
                   name  = env.key
                   value = env.value

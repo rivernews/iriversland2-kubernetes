@@ -1,30 +1,32 @@
 # https://www.terraform.io/docs/configuration/variables.html#variable-definitions-tfvars-files
 variable "project_name" {}
 
-variable "app_container_image" {}
+# variable "app_container_image" {}
 variable "app_container_image_tag" {
     description = "Lookup the image tags here: https://hub.docker.com/r/shaungc/iriversland2-django/tags"
 }
 
-variable "cicd_namespace" {}
+# variable "cicd_namespace" {}
 
-variable "app_label" {}
+# variable "app_label" {}
 
-variable "app_name" {}
+# variable "app_name" {}
 
-variable "app_exposed_port" {}
+# variable "app_exposed_port" {}
 
 variable "managed_route53_zone_name" {}
 variable "managed_k8_rx_domain" {}
 
-variable "app_deployed_domain" {}
+# variable "app_deployed_domain" {}
 
 variable "letsencrypt_env" {
   description = "Either `staging` or `prod`. When using staging, the browser will still recognize as insecure, however you can check if issuer and certificates are correctly provisioned on K8. If everything looks good, switch to prod. See https://letsencrypt.org/docs/staging-environment/"
-  default = "prod"
 }
 
-# variable "app_frontend_static_assets_dns_name" {}
+
+variable "appl_tracky_api_image_tag" {
+    description = "Lookup the image tags here: https://hub.docker.com/r/shaungc/appl-tracky-api/tags"
+}
 
 
 

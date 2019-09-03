@@ -30,54 +30,61 @@ resource "kubernetes_cluster_role_binding" "tiller" {
   }
 }
 
+# resource "kubernetes_namespace" "cicd" {
+#   metadata {
+#     name = "${var.cicd_namespace}"
+#   }
+# }
+
 # service account for deploying app (cicd, e.g. circleci)
 #
 #
-resource "kubernetes_service_account" "cicd" {
-    # https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
-#   automount_service_account_token = true
 
-  metadata {
+# resource "kubernetes_service_account" "cicd" {
+#     # https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+# #   automount_service_account_token = true
 
-    name      = "cicd-service-account"
-    namespace = "${kubernetes_namespace.cicd.metadata.0.name}"
-  }
+#   metadata {
 
-}
+#     name      = "cicd-service-account"
+#     namespace = "${kubernetes_namespace.cicd.metadata.0.name}"
+#   }
+
+# }
 
 
-resource "kubernetes_role" "cicd" {
-  metadata {
-    name      = "cicd-role"
-    namespace = "${kubernetes_service_account.cicd.metadata.0.namespace}"
-  }
+# resource "kubernetes_role" "cicd" {
+#   metadata {
+#     name      = "cicd-role"
+#     namespace = "${kubernetes_service_account.cicd.metadata.0.namespace}"
+#   }
 
-  rule {
-    api_groups = ["", "apps", "batch", "extensions"]
-    resources  = ["deployments", "services", "replicasets", "pods", "jobs", "cronjobs"]
-    verbs      = ["*"]
-  }
-}
+#   rule {
+#     api_groups = ["", "apps", "batch", "extensions"]
+#     resources  = ["deployments", "services", "replicasets", "pods", "jobs", "cronjobs"]
+#     verbs      = ["*"]
+#   }
+# }
 
-resource "kubernetes_role_binding" "cicd" {
-  metadata {
-    name      = "cicd-cluster-rule"
-    namespace = "${kubernetes_service_account.cicd.metadata.0.namespace}"
-  }
+# resource "kubernetes_role_binding" "cicd" {
+#   metadata {
+#     name      = "cicd-cluster-rule"
+#     namespace = "${kubernetes_service_account.cicd.metadata.0.namespace}"
+#   }
 
-  role_ref {
-    api_group = "rbac.authorization.k8s.io"
-    kind      = "Role"
-    name      = "${kubernetes_role.cicd.metadata.0.name}"
-  }
+#   role_ref {
+#     api_group = "rbac.authorization.k8s.io"
+#     kind      = "Role"
+#     name      = "${kubernetes_role.cicd.metadata.0.name}"
+#   }
 
-  subject {
-    kind      = "ServiceAccount"
-    name      = "${kubernetes_service_account.cicd.metadata.0.name}"
-    api_group = ""
-    namespace = "${kubernetes_service_account.cicd.metadata.0.namespace}"
-  }
-}
+#   subject {
+#     kind      = "ServiceAccount"
+#     name      = "${kubernetes_service_account.cicd.metadata.0.name}"
+#     api_group = ""
+#     namespace = "${kubernetes_service_account.cicd.metadata.0.namespace}"
+#   }
+# }
 
 locals {
     dockercfg = {
@@ -94,10 +101,11 @@ locals {
 
 # k8 official doc on dockerconfigjson: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#create-a-secret-by-providing-credentials-on-the-command-line
 # terraform doc: https://www.terraform.io/docs/providers/kubernetes/r/secret.html
+# only for iriversland2 (secret only available in same namespace)
 resource "kubernetes_secret" "dockerhub_secret" {
   metadata {
-    name = "dockerhub-secret"
-    namespace = "${kubernetes_service_account.cicd.metadata.0.namespace}"
+    name = "iriversland2-dockerhub-secret"
+    namespace = "${module.iriversland2_api.microservice_namespace}"
   }
 
   data = {

@@ -9,7 +9,6 @@
 - (Clean up code)
 - (Documentation)
 
----
 
 ## Disable HSTS
 
@@ -25,8 +24,6 @@ Attempts to disable server hsts header
     - Nothing related to hsts showing up in `nginx.conf`.
     - Adding more entry, and actually enable it - so that is more [likely to gen sth in `nginx.conf`](https://serverfault.com/questions/874936/adding-hsts-to-nginx-config).
     - 🎉 Bingo! Got strings `Strict-Transport-Security` in `nginx.conf` And this is an effective way to verify our configmap change is honored.
-
---- 
 
 ## Move to letsencrypt prod
 

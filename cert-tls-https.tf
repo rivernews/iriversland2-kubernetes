@@ -29,7 +29,6 @@ resource "kubernetes_secret" "tls_route53_secret" {
 
 
 
-
 # cert-manager
 #
 #
@@ -48,19 +47,26 @@ resource "kubernetes_namespace" "cert_manager" {
       "certmanager.k8s.io/disable-validation" = "true"
     }
   }
-
-  depends_on = [
-    #   "null_resource.certmanager_namespace_config"
-  ]
 }
 
 
 locals {
-  jetstack_cert_crd_version = "release-0.9"
+  jetstack_cert_crd_version = "release-0.10"
 
-  cert_cluster_issuer_name           = "hhletsencrypt-${var.letsencrypt_env}"
-  cert_cluster_issuer_k8_secret_name = "letsencrypt-${var.letsencrypt_env}-secret"
+  cert_cluster_issuer_name           = "letsencrypt-${var.letsencrypt_env}"
 
+  cert_cluster_issuer_k8_secret_name = "${var.letsencrypt_env == "prod" ? local.cert_cluster_issuer_secret_name_prod : local.cert_cluster_issuer_secret_name_staging}"
+
+  # cert-manager will look for ing w/ annotation `cluster-issuer`, and use that cluster issuer to create a certificate for the ing you are using this secret name in.
+  # this should be used in `ing.spec.tls.secretName`.
+  # the certificate data will be stored in this secret.
+  # this secret, and the certificate created will be in the same namespace as the ingress.
+  # since we are using wildcard and cluster issuer, we will only need one central TLS ing to generate certificate to cover all domains used in all microservices.
+  central_tls_ing_certificate_secret_name = "wilcard-tls-ing-certificate-secret"
+  
+  # constant values
+  cert_cluster_issuer_secret_name_prod = "letsencrypt-prod-secret"
+  cert_cluster_issuer_secret_name_staging = "letsencrypt-staging-secret"
   acme_server_url_prod    = "https://acme-v02.api.letsencrypt.org/directory"
   acme_server_url_staging = "https://acme-staging-v02.api.letsencrypt.org/directory"
 }
@@ -69,30 +75,28 @@ locals {
 
 resource "null_resource" "crd_cert_resources_install" {
   triggers = {
-    # change this string whenever you want to rerun the provisioners
-    # string_value = "const_value"
-    #   always_trigger = "${timestamp()}"
-    # always_trigger = "2019-08-19T06:38:14Z"
-
-
-
     # list all dependencies here
     #
     #
     jetstack_cert_crd_version = "${local.jetstack_cert_crd_version}"
-    cert_cluster_issuer_name = "${local.cert_cluster_issuer_name}"
-    
-    letsencrypt_env = "${var.letsencrypt_env}"
-    acme_server_url_prod = "${local.acme_server_url_prod}"
+    cert_cluster_issuer_name  = "${local.cert_cluster_issuer_name}"
+
+    letsencrypt_env         = "${var.letsencrypt_env}"
+    acme_server_url_prod    = "${local.acme_server_url_prod}"
     acme_server_url_staging = "${local.acme_server_url_staging}"
 
     docker_email = "${var.docker_email}"
-    
+
     cert_cluster_issuer_k8_secret_name = "${local.cert_cluster_issuer_k8_secret_name}"
 
-    aws_region = "${var.aws_region}"
-    aws_access_key = "${var.aws_access_key}"
-    tls_route53_secret_name = "${kubernetes_secret.tls_route53_secret.metadata.0.name}"
+    aws_region                   = "${var.aws_region}"
+    aws_access_key               = "${var.aws_access_key}"
+    tls_route53_secret_name      = "${kubernetes_secret.tls_route53_secret.metadata.0.name}"
+    tls_cert_covered_domain_list = "${join(";", local.tls_cert_covered_domain_list)}"
+
+    # ingress controller
+    # ingress_controller = "${helm_release.project-nginx-ingress.metadata.0.values}"
+    # ingress_controller_revision = "${helm_release.project-nginx-ingress.metadata.0.revision}"
   }
 
 
@@ -173,12 +177,46 @@ EOT
   # (CRD) Destroy-Time Provisioners
   provisioner "local-exec" {
     when    = "destroy"
-    command = "bash ./my-kubectl.sh delete customresourcedefinitions.apiextensions.k8s.io certificates.certmanager.k8s.io clusterissuers.certmanager.k8s.io issuers.certmanager.k8s.io orders.certmanager.k8s.io certificaterequests.certmanager.k8s.io challenges.certmanager.k8s.io && sleep 10"
+    # command = "bash ./my-kubectl.sh delete customresourcedefinitions.apiextensions.k8s.io certificates.certmanager.k8s.io clusterissuers.certmanager.k8s.io issuers.certmanager.k8s.io orders.certmanager.k8s.io certificaterequests.certmanager.k8s.io challenges.certmanager.k8s.io \n echo \n echo \n echo \n echo INFO: delete certificate resources complete, will sleep for 10 sec... \n sleep 10"
+
+    # based on jetstack/cert-manager doc: 
+    # http://docs.cert-manager.io/en/latest/tasks/upgrading/upgrading-0.5-0.6.html#upgrading-from-older-versions-using-helm
+    command = "bash ./my-kubectl.sh delete crd certificates.certmanager.k8s.io clusterissuers.certmanager.k8s.io issuers.certmanager.k8s.io \n echo \n echo \n echo \n echo INFO: delete certificate resources complete, will sleep for 10 sec... \n sleep 10"
   }
+  # delete 
+  # customresourcedefinitions.apiextensions.k8s.io 
+  # > certificates.certmanager.k8s.io 
+  # > clusterissuers.certmanager.k8s.io 
+  # > issuers.certmanager.k8s.io 
+  # orders.certmanager.k8s.io 
+  # certificaterequests.certmanager.k8s.io 
+  # challenges.certmanager.k8s.io
+
   # (Issuer Cert Secret)
   provisioner "local-exec" {
     when    = "destroy"
-    command = "bash ./my-kubectl.sh delete secrets letsencrypt-${var.letsencrypt_env}-secret -n ${kubernetes_namespace.cert_manager.metadata.0.name} && sleep 3"
+    command = "${join("\n", [
+        # delete cluster issuer private key secret, for letsencrypt api call, can differ for prod or staging.
+        # no need to delete if you didn't make any change to CLusterIssuer.spec.acme
+        # "bash ./my-kubectl.sh delete secrets ${local.cert_cluster_issuer_secret_name_prod} ${local.cert_cluster_issuer_secret_name_staging} -n ${kubernetes_namespace.cert_manager.metadata.0.name}",
+
+        # delete ing tls certificate secret (if the ing is in cert-manager namespace. If ing is in microservices' own namespace, this command is useless)
+        "bash ./my-kubectl.sh delete secrets ${local.central_tls_ing_certificate_secret_name} -n ${kubernetes_namespace.cert_manager.metadata.0.name}",
+
+        # delete ing tls certificate secret in each microservice namespace, if microservices are deployed in their own namespace (hence having their own certificates in their namespaces)
+        #
+        # "bash ./my-kubectl.sh delete secrets ${local.cert_cluster_issuer_secret_name_prod} ${local.cert_cluster_issuer_secret_name_staging} -n ${module.iriversland2_api.microservice_namespace}",
+        # "bash ./my-kubectl.sh delete secrets ${local.cert_cluster_issuer_secret_name_prod} ${local.cert_cluster_issuer_secret_name_staging} -n ${module.appl_tracky_api.microservice_namespace}",
+
+        "echo",
+        "echo",
+        "echo INFO: delete secrets complete, will sleep for 5 sec...",
+        "sleep 5"
+    ])}"
+    # command = "bash ./my-kubectl.sh delete secrets ${local.cert_cluster_issuer_secret_name_prod} ${local.cert_cluster_issuer_secret_name_staging} -n ${kubernetes_namespace.cert_manager.metadata.0.name} && \
+    # bash ./my-kubectl.sh delete secrets ${local.cert_cluster_issuer_secret_name_prod} ${local.cert_cluster_issuer_secret_name_staging} -n ${module.iriversland2_api.microservice_namespace} && \
+    # bash ./my-kubectl.sh delete secrets ${local.cert_cluster_issuer_secret_name_prod} ${local.cert_cluster_issuer_secret_name_staging} -n ${module.appl_tracky_api.microservice_namespace} && \
+    # sleep 3"
   }
 }
 
@@ -213,18 +251,18 @@ resource "helm_release" "project_cert_manager" {
   // Since v0.6.0, cert-manager Helm chart doesn't provide
   // a good way of installing the cert-manager CRDs
   #   version = "v0.5.2"
-  version = "v0.9.1"
+#   version = "v0.9.1"
+  version = "v0.10.0-alpha.0"
 
 
 
   #   namespace = "${kubernetes_service_account.tiller.metadata.0.namespace}"
   namespace = "${kubernetes_namespace.cert_manager.metadata.0.name}"
   timeout   = "540"
-
-
-
-  # var: TODO
-  # description = "Let's Encrypt server URL to which certificate requests will be sent"
+  
+  # ingressShim 
+  # cert-manager doc
+  # https://github.com/jetstack/cert-manager/blob/master/docs/tasks/issuing-certificates/ingress-shim.rst#configuration
   values = [<<EOF
     ingressShim:
       defaultIssuerName: ${local.cert_cluster_issuer_name}

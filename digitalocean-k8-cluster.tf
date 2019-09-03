@@ -42,8 +42,14 @@ resource "digitalocean_kubernetes_cluster" "project_digitalocean_cluster" {
 # https://medium.com/@stepanvrany/terraforming-dok8s-helm-and-traefik-included-7ac42b5543dc
 #
 #
+
+provider "local" {
+  version = "~> 1.3"
+}
+
+# tf doc: https://www.terraform.io/docs/providers/local/r/file.html
 resource "local_file" "kubeconfig" {
-    content     = "${digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.raw_config}"
+    sensitive_content     = "${digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.raw_config}"
     filename = "kubeconfig.yaml"
 }
 # https://github.com/terraform-providers/terraform-provider-digitalocean/issues/234#issuecomment-493375811
@@ -77,12 +83,6 @@ provider "kubernetes" {
   client_certificate     = "${base64decode(digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.client_certificate)}"
   client_key             = "${base64decode(digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.client_key)}"
   cluster_ca_certificate = "${base64decode(digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.cluster_ca_certificate)}"
-}
-
-resource "kubernetes_namespace" "cicd" {
-  metadata {
-    name = "${var.cicd_namespace}"
-  }
 }
 
 resource "digitalocean_firewall" "project-cluster-firewall" {
