@@ -3,9 +3,9 @@
 - ✅ HSTS disable for development purpose
 - ✅ Verify letsencrypt staging is working
 - ✅ Move to letsencrypt prod
-- Debug appl tracky app itself
-- (Database backup for appl-tracky)
-- (Think about CI/CD for appl-tacky)
+- Debug appl tracky app itself --> delegated to issue
+- (Database backup for appl-tracky) --> delegated to issue
+- (Think about CI/CD for appl-tacky) --> delegated to issue
 - (Clean up code)
 - (Documentation)
 
