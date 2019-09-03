@@ -2,7 +2,7 @@
 
 - ✅ HSTS disable for development purpose
 - ✅ Verify letsencrypt staging is working
-- 🔥 Move to letsencrypt prod
+- ✅ Move to letsencrypt prod
 - Debug appl tracky app itself
 - (Database backup for appl-tracky)
 - (Think about CI/CD for appl-tacky)
@@ -24,6 +24,11 @@ Attempts to disable server hsts header
     - Nothing related to hsts showing up in `nginx.conf`.
     - Adding more entry, and actually enable it - so that is more [likely to gen sth in `nginx.conf`](https://serverfault.com/questions/874936/adding-hsts-to-nginx-config).
     - 🎉 Bingo! Got strings `Strict-Transport-Security` in `nginx.conf` And this is an effective way to verify our configmap change is honored.
+
+How to verify configmap change applied?
+1. Get the pod of ingress controller.
+1. Dump the `nginx.conf` by `. ./my-kubectl.sh exec -it -n kube-system nginx-ingress-controller-controller-6p5sz cat /etc/nginx/nginx.conf > nginx.conf`, where `nginx-ingress-controller-controller-6p5sz` is the pod name.
+1. Search in the `nginx.conf` for keywords that related to your change in configmap.
 
 ## Move to letsencrypt prod
 
