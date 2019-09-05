@@ -111,6 +111,16 @@ resource "helm_release" "project-nginx-ingress" {
     value = "false"
   }
 
+  # pass over the real request scheme (http or https) from client
+  # https://djangodeployment.com/2017/01/24/fix-djangos-https-redirects-nginx/
+  values = [<<-EOF
+    controller:
+        config:
+            location-snippet: |
+                # add custom nginx config here
+  EOF
+  ]
+
 
 
   #   set {
@@ -256,7 +266,7 @@ resource "kubernetes_ingress" "project-ingress-resource" {
       # do we need this? because of dns01 challenge?
       # see https://github.com/jetstack/cert-manager/blob/master/docs/tutorials/acme/quick-start/index.rst#step-7---deploy-a-tls-ingress-resource
       "kubernetes.io/tls-acme" = "true"
-    
+
       # if want to share single TLS certificate, then only one ing should contain this annotation
       # https://github.com/jetstack/cert-manager/issues/841#issuecomment-414299467
       "certmanager.k8s.io/cluster-issuer" = "${local.cert_cluster_issuer_name}"

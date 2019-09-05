@@ -62,6 +62,11 @@ resource "kubernetes_deployment" "app" {
               }
           }
 
+          env {
+              name = "DEPLOYED_DOMAIN"
+              value = "${var.app_deployed_domain}"
+          }
+
           #   resources {
           #     limits {
           #       cpu    = "0.5"
