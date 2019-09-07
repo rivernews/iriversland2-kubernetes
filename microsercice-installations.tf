@@ -14,6 +14,10 @@ module "iriversland2_api" {
   app_container_image     = "shaungc/iriversland2-django"
   app_container_image_tag = "${var.app_container_image_tag}"
   app_secret_name_list = [
+    "/provider/aws/account/iriversland2-15pro/AWS_REGION",
+    "/provider/aws/account/iriversland2-15pro/AWS_ACCESS_KEY_ID",
+    "/provider/aws/account/iriversland2-15pro/AWS_SECRET_ACCESS_KEY",
+
     "/app/iriversland2/DJANGO_SECRET_KEY",
     "/app/iriversland2/IPINFO_API_TOKEN",
     "/app/iriversland2/IPSTACK_API_TOKEN",
@@ -25,10 +29,6 @@ module "iriversland2_api" {
     "/database/heroku_iriversland2/RDS_HOSTNAME",
     "/database/heroku_iriversland2/RDS_PORT",
 
-    "/provider/aws/account/iriversland2-15pro/AWS_REGION",
-    "/provider/aws/account/iriversland2-15pro/AWS_ACCESS_KEY_ID",
-    "/provider/aws/account/iriversland2-15pro/AWS_SECRET_ACCESS_KEY",
-
     "/service/gmail/EMAIL_HOST",
     "/service/gmail/EMAIL_HOST_USER",
     "/service/gmail/EMAIL_HOST_PASSWORD",
@@ -37,8 +37,7 @@ module "iriversland2_api" {
   kubernetes_cron_jobs = [
       {
           name = "db-backup-cronjob",
-        #   cron_schedule = "0 7 * * *", # every day 00:00 PST
-          cron_schedule = "* * * * *", # every day 00:00 PST
+          cron_schedule = "0 7 * * *", # every day 00:00 PST
           command = ["/bin/sh", "-c", "echo Starting cron job... && sleep 5 && cd /usr/src/backend && echo Finish CD && python manage.py backup_db && echo Finish dj command"]
       },
   ]
@@ -61,6 +60,10 @@ module "appl_tracky_api" {
   app_container_image     = "shaungc/appl-tracky-api"
   app_container_image_tag = "${var.appl_tracky_api_image_tag}"
   app_secret_name_list = [
+    "/provider/aws/account/iriversland2-15pro/AWS_REGION",
+    "/provider/aws/account/iriversland2-15pro/AWS_ACCESS_KEY_ID",
+    "/provider/aws/account/iriversland2-15pro/AWS_SECRET_ACCESS_KEY",
+
     "/app/appl-tracky/DJANGO_SECRET_KEY",
     "/app/appl-tracky/ADMINS",
 
@@ -78,5 +81,12 @@ module "appl_tracky_api" {
 
     "/service/google-social-auth/SOCIAL_AUTH_GOOGLE_OAUTH2_KEY",
     "/service/google-social-auth/SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET",
+  ]
+  kubernetes_cron_jobs = [
+      {
+          name = "db-backup-cronjob",
+          cron_schedule = "0 7 * * *", # every day 00:00 PST
+          command = ["/bin/sh", "-c", "echo Starting cron job... && sleep 5 && cd /usr/src/django && echo Finish CD && python manage.py backup_db && echo Finish dj command"]
+      },
   ]
 }
