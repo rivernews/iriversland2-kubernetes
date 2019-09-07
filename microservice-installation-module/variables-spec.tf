@@ -38,3 +38,8 @@ variable "cert_cluster_issuer_k8_secret_name" {
 variable "tls_cert_covered_domain_list" {
   description = "..."
 }
+
+variable "kubernetes_cron_jobs" {
+    default = []
+    type = list
+}

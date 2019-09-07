@@ -74,4 +74,12 @@ module "iriversland2_api" {
     "/service/gmail/EMAIL_HOST_PASSWORD",
     "/service/gmail/EMAIL_PORT",
   ]
+  kubernetes_cron_jobs = [
+      {
+          name = "db-backup-cronjob",
+        #   cron_schedule = "0 7 * * *", # every day 00:00 PST
+          cron_schedule = "* * * * *", # every day 00:00 PST
+          command = ["/bin/sh", "-c", "echo Starting cron job... && sleep 5 && cd /usr/src/backend && echo Finish CD && python manage.py backup_db && echo Finish dj command"]
+      },
+  ]
 }

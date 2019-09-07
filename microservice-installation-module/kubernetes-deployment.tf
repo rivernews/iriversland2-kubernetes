@@ -47,24 +47,24 @@ resource "kubernetes_deployment" "app" {
             # name = "http"
           }
 
-          # refer to env in kubernetes_secret: https://gist.github.com/troyharvey/4506472732157221e04c6b15e3b3f094
-        #   env_from {
-        #     secret_ref {
-        #       name = kubernetes_secret.app_credentials.metadata.0.name
-        #     }
-        #   }
+          #   dynamic "env" {
+          #     for_each = "${local.app_secret_key_value_pairs}"
+          #     content {
+          #       name  = "${env.key}"
+          #       value = "${env.value}"
+          #     }
+          #   }
 
-          dynamic "env" {
-              for_each = "${local.app_secret_key_value_pairs}"
-              content {
-                  name = "${env.key}"
-                  value = "${env.value}"
-              }
+          # see `env_from` example at: https://www.michielsikkes.com/managing-and-deploying-app-secrets-at-firmhouse/
+          env_from {
+            secret_ref {
+              name = "${kubernetes_secret.app_credentials.metadata.0.name}"
+            }
           }
 
           env {
-              name = "DEPLOYED_DOMAIN"
-              value = "${var.app_deployed_domain}"
+            name  = "DEPLOYED_DOMAIN"
+            value = "${var.app_deployed_domain}"
           }
 
           #   resources {
@@ -115,14 +115,14 @@ data "aws_ssm_parameter" "app_credentials" {
 }
 
 # terraform doc: https://www.terraform.io/docs/providers/kubernetes/r/secret.html
-# resource "kubernetes_secret" "app_credentials" {
-#   metadata {
-#     name = "${var.app_label}-credentials"
-#     namespace = "${kubernetes_service_account.app.metadata.0.namespace}"
-#   }
-#   # k8 doc: https://github.com/kubernetes/community/blob/c7151dd8dd7e487e96e5ce34c6a416bb3b037609/contributors/design-proposals/auth/secrets.md#secret-api-resource
-#   # default type is opaque, which represents arbitrary user-owned data.
-#   type = "Opaque"
+resource "kubernetes_secret" "app_credentials" {
+  metadata {
+    name      = "${var.app_label}-credentials"
+    namespace = "${kubernetes_service_account.app.metadata.0.namespace}"
+  }
+  # k8 doc: https://github.com/kubernetes/community/blob/c7151dd8dd7e487e96e5ce34c6a416bb3b037609/contributors/design-proposals/auth/secrets.md#secret-api-resource
+  # default type is opaque, which represents arbitrary user-owned data.
+  type = "Opaque"
 
-#   data = local.app_secret_key_value_pairs
-# }
+  data = local.app_secret_key_value_pairs
+}

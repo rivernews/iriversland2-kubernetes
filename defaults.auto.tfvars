@@ -18,6 +18,3 @@ managed_k8_rx_domain = "shaungc.com"
 
 
 letsencrypt_env = "prod"
-app_container_image_tag = "latest"
-appl_tracky_api_image_tag = "latest"
-
