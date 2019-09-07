@@ -37,7 +37,7 @@ module "iriversland2_api" {
   kubernetes_cron_jobs = [
       {
           name = "db-backup-cronjob",
-          cron_schedule = "0 7 * * *", # every day 00:00 PST
+          cron_schedule = "0 7 * * *", # every day 01:00 PST
           command = ["/bin/sh", "-c", "echo Starting cron job... && sleep 5 && cd /usr/src/backend && echo Finish CD && python manage.py backup_db && echo Finish dj command"]
       },
   ]
@@ -85,7 +85,7 @@ module "appl_tracky_api" {
   kubernetes_cron_jobs = [
       {
           name = "db-backup-cronjob",
-          cron_schedule = "0 7 * * *", # every day 00:00 PST
+          cron_schedule = "0 7 * * *", # every day 01:00 PST
           command = ["/bin/sh", "-c", "echo Starting cron job... && sleep 5 && cd /usr/src/django && echo Finish CD && python manage.py backup_db && echo Finish dj command"]
       },
   ]
