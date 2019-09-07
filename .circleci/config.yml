@@ -44,7 +44,7 @@ jobs:
       - run:
           name: Plan Terraform
           command: |
-            terraform plan -var="letsencrypt_env=prod" -var="app_container_image_tag=latest"
+            terraform plan -var="letsencrypt_env=prod" -var="app_container_image_tag=latest" -var="appl_tracky_api_image_tag=latest"
       - run:
           name: Test Kubectl
           command: |
