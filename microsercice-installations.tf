@@ -1,16 +1,17 @@
 module "iriversland2_api" {
   source = "./microservice-installation-module"
-  
+
   # cluster-wise config (shared resources across different microservices)
-  dockerhub_kubernetes_secret_name = "${kubernetes_secret.dockerhub_secret.metadata.0.name}"
-  cert_cluster_issuer_name = "${local.cert_cluster_issuer_name}"
-  tls_cert_covered_domain_list = local.tls_cert_covered_domain_list
+  dockerhub_kubernetes_secret_name   = "${kubernetes_secret.dockerhub_secret.metadata.0.name}"
+  cert_cluster_issuer_name           = "${local.cert_cluster_issuer_name}"
+  tls_cert_covered_domain_list       = local.tls_cert_covered_domain_list
   cert_cluster_issuer_k8_secret_name = "${local.cert_cluster_issuer_k8_secret_name}"
-  
+
   # app-specific config (microservice)
   app_label               = "iriversland2-api"
   app_exposed_port        = 8000
   app_deployed_domain     = "api.shaungc.com"
+  cors_domain_whitelist   = ["shaungc.com"]
   app_container_image     = "shaungc/iriversland2-django"
   app_container_image_tag = "${var.app_container_image_tag}"
   app_secret_name_list = [
@@ -35,28 +36,29 @@ module "iriversland2_api" {
     "/service/gmail/EMAIL_PORT",
   ]
   kubernetes_cron_jobs = [
-      {
-          name = "db-backup-cronjob",
-          cron_schedule = "0 7 * * *", # every day 01:00 PST
-          command = ["/bin/sh", "-c", "echo Starting cron job... && sleep 5 && cd /usr/src/backend && echo Finish CD && python manage.py backup_db && echo Finish dj command"]
-      },
+    {
+      name          = "db-backup-cronjob",
+      cron_schedule = "0 7 * * *", # every day 01:00 PST
+      command       = ["/bin/sh", "-c", "echo Starting cron job... && sleep 5 && cd /usr/src/backend && echo Finish CD && python manage.py backup_db && echo Finish dj command"]
+    },
   ]
 }
 
 
 module "appl_tracky_api" {
   source = "./microservice-installation-module"
-  
+
   # cluster-wise config (shared resources across different microservices)
-  dockerhub_kubernetes_secret_name = "${kubernetes_secret.dockerhub_secret.metadata.0.name}"
-  cert_cluster_issuer_name = "${local.cert_cluster_issuer_name}"
-  tls_cert_covered_domain_list = local.tls_cert_covered_domain_list
+  dockerhub_kubernetes_secret_name   = "${kubernetes_secret.dockerhub_secret.metadata.0.name}"
+  cert_cluster_issuer_name           = "${local.cert_cluster_issuer_name}"
+  tls_cert_covered_domain_list       = local.tls_cert_covered_domain_list
   cert_cluster_issuer_k8_secret_name = "${local.cert_cluster_issuer_k8_secret_name}"
-  
+
   # app-specific config (microservice)
   app_label               = "appl-tracky-api"
   app_exposed_port        = 8001
   app_deployed_domain     = "appl-tracky.api.shaungc.com"
+  cors_domain_whitelist   = ["rivernews.github.io"]
   app_container_image     = "shaungc/appl-tracky-api"
   app_container_image_tag = "${var.appl_tracky_api_image_tag}"
   app_secret_name_list = [
@@ -83,10 +85,10 @@ module "appl_tracky_api" {
     "/service/google-social-auth/SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET",
   ]
   kubernetes_cron_jobs = [
-      {
-          name = "db-backup-cronjob",
-          cron_schedule = "0 7 * * *", # every day 01:00 PST
-          command = ["/bin/sh", "-c", "echo Starting cron job... && sleep 5 && cd /usr/src/django && echo Finish CD && python manage.py backup_db && echo Finish dj command"]
-      },
+    {
+      name          = "db-backup-cronjob",
+      cron_schedule = "0 7 * * *", # every day 01:00 PST
+      command       = ["/bin/sh", "-c", "echo Starting cron job... && sleep 5 && cd /usr/src/django && echo Finish CD && python manage.py backup_db && echo Finish dj command"]
+    },
   ]
 }

@@ -27,6 +27,11 @@ variable "app_deployed_domain" {
   description = "The exact domain name to deploy the microservice on"
 }
 
+variable "cors_domain_whitelist" {
+    description = "Allows restricted methods like POST to be sent to the microservice from the domains in the whiltelist, usually this means the frontend site that talks to the microservice."
+    type = list
+}
+
 variable "cert_cluster_issuer_name" {
   description = "The issuer name of TLS certificate, cluster-wise"
 }

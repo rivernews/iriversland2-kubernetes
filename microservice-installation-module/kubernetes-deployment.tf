@@ -67,6 +67,11 @@ resource "kubernetes_deployment" "app" {
             value = "${var.app_deployed_domain}"
           }
 
+          env {
+              name = "CORS_DOMAIN_WHITELIST"
+              value = "${join(",", var.cors_domain_whitelist)}"
+          }
+
           #   resources {
           #     limits {
           #       cpu    = "0.5"
