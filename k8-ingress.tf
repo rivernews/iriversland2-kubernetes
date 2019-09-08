@@ -90,32 +90,44 @@ resource "helm_release" "project-nginx-ingress" {
   # setting is global across all ing resources
   # avoiding bool parsing error in configmap
   # see https://github.com/helm/charts/issues/9586#issuecomment-461117432
-  set_string {
-    name  = "controller.config.ssl-redirect"
-    value = "false"
-  }
-  set_string {
-    name  = "controller.config.hsts"
-    value = "true"
-  }
-  set_string {
-    name  = "controller.config.hsts-include-subdomains"
-    value = "true"
-  }
-  set_string {
-    name  = "controller.config.hsts-max-age"
-    value = "0"
-  }
-  set_string {
-    name  = "controller.config.hsts-preload"
-    value = "false"
-  }
-
-  # pass over the real request scheme (http or https) from client
-  # https://djangodeployment.com/2017/01/24/fix-djangos-https-redirects-nginx/
+#   set_string {
+#     name  = "controller.config.ssl-redirect"
+#     value = "false"
+#   }
+#   set_string {
+#     name  = "controller.config.hsts"
+#     value = "true"
+#   }
+#   set_string {
+#     name  = "controller.config.hsts-include-subdomains"
+#     value = "true"
+#   }
+#   set_string {
+#     name  = "controller.config.hsts-max-age"
+#     value = "0"
+#   }
+#   set_string {
+#     name  = "controller.config.hsts-preload"
+#     value = "false"
+#   }
+  
+  
   values = [<<-EOF
     controller:
+        # global nginx settings for all ingress rules
         config:
+            ssl-redirect: "false"
+
+            # hsts config
+            hsts: "true"
+            hsts-include-subdomains: "true"
+            hsts-max-age: "0"
+            hsts-preload: "false"
+
+            # set the upload file size limit
+            # k8 nginx ingress doc: https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#proxy-body-size
+            proxy-body-size: "1m" # default is 1m
+
             location-snippet: |
                 # add custom nginx config here
   EOF
