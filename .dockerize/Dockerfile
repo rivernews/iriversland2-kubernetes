@@ -2,7 +2,8 @@ FROM hashicorp/terraform:0.12.6
 
 # install curl
 # https://stackoverflow.com/a/51209115/9814131
-RUN apk --no-cache add curl bash ca-certificates sudo
+# new curl release issue: https://stackoverflow.com/a/57982728/9814131
+RUN apk --upgrade --no-cache add curl && apk --no-cache add bash ca-certificates sudo
 
 # install kubectl
 # https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-on-linux
