@@ -24,7 +24,7 @@ resource "kubernetes_cron_job" "simple_cmd_job" {
         active_deadline_seconds = 60 # max job alive time
 
         # https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/#pod-backoff-failure-policy
-        backoff_limit = 1 # no retry
+        backoff_limit = 2 # 1 retry (at pod-recreation level)
 
         template {
           # metadata block is required
@@ -45,6 +45,10 @@ resource "kubernetes_cron_job" "simple_cmd_job" {
               env {
                 name  = "DEPLOYED_DOMAIN"
                 value = "${var.app_deployed_domain}"
+              }
+              env {
+                name  = "CORS_DOMAIN_WHITELIST"
+                value = "${join(",", var.cors_domain_whitelist)}"
               }
             }
 

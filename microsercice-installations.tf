@@ -38,9 +38,9 @@ module "iriversland2_api" {
   kubernetes_cron_jobs = [
     {
       name          = "db-backup-cronjob",
-    #   cron_schedule = "0 7 * * *", # every day 01:00 PST
-      cron_schedule = "0 * * * *",
-      command       = ["/bin/sh", "-c", "echo Starting cron job... && sleep 5 && cd /usr/src/backend && echo Finish CD && python manage.py backup_db && echo Finish dj command"]
+      cron_schedule = "0 6 * * *", # every day 11:00pm PST, to avoid the maintenance windown of digitalocean in 12-4am
+      #   cron_schedule = "0 * * * *",
+      command = ["/bin/sh", "-c", "echo Starting cron job... && sleep 5 && cd /usr/src/backend && echo Finish CD && python manage.py backup_db && echo Finish dj command"]
     },
   ]
 }
@@ -59,7 +59,7 @@ module "appl_tracky_api" {
   app_label               = "appl-tracky-api"
   app_exposed_port        = 8001
   app_deployed_domain     = "appl-tracky.api.shaungc.com"
-  cors_domain_whitelist   = ["rivernews.github.io"]
+  cors_domain_whitelist   = ["rivernews.github.io", "appl-tracky.shaungc.com"]
   app_container_image     = "shaungc/appl-tracky-api"
   app_container_image_tag = "${var.appl_tracky_api_image_tag}"
   app_secret_name_list = [
@@ -88,9 +88,9 @@ module "appl_tracky_api" {
   kubernetes_cron_jobs = [
     {
       name          = "db-backup-cronjob",
-    #   cron_schedule = "0 7 * * *", # every day 01:00 PST
-      cron_schedule = "0 * * * *",
-      command       = ["/bin/sh", "-c", "echo Starting cron job... && sleep 5 && cd /usr/src/django && echo Finish CD && python manage.py backup_db && echo Finish dj command"]
+      cron_schedule = "0 6 * * *", # every day 11:00pm PST, to avoid the maintenance windown of digitalocean in 12-4am
+      #   cron_schedule = "0 * * * *",
+      command = ["/bin/sh", "-c", "echo Starting cron job... && sleep 5 && cd /usr/src/django && echo Finish CD && python manage.py backup_db && echo Finish dj command"]
     },
   ]
 }
