@@ -59,6 +59,11 @@ app_container_image_tag = "the-tag-when-you-docker-build"
 4. If changes involve TLS / Cert Manager, please refer to the section `Terraform: Lifecycle of TLS / Cert Manager / Let's Encrypt Resources` under `Pitfalls and Known Issues` below.
 5. Run `terraform plan` to check. If everything seems good, run `terraform apply`. It will double check with you again. Remember the state would be stored on remote postgres, which means that it is persistent regardless of where you run this terraform script.
 
+### Update / Deploy microservice
+
+Use `python release.py ...` to update microservice deployment using the docker build hash.
+
+For example, to update a new build for appl tracky, run `python release.py -at <new hash here>`.
 
 ## Purpose
 
