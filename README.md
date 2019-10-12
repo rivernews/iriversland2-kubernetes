@@ -65,6 +65,8 @@ Use `python release.py ...` to update microservice deployment using the docker b
 
 For example, to update a new build for appl tracky, run `python release.py -at <new hash here>`.
 
+To add a new microservice to be supported by the release script, add a new entry in `MANIFEST_IMAGE_TAGS` in `release.py`.
+
 ## Purpose
 
 Check out the issue page for ongoing progress. Below talks about the achieved goals.
