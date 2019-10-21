@@ -24,11 +24,11 @@ module "iriversland2_api" {
     "/app/iriversland2/IPSTACK_API_TOKEN",
     "/app/iriversland2/RECAPTCHA_SECRET",
 
-    "/database/heroku_iriversland2/RDS_DB_NAME",
-    "/database/heroku_iriversland2/RDS_USERNAME",
-    "/database/heroku_iriversland2/RDS_PASSWORD",
-    "/database/heroku_iriversland2/RDS_HOSTNAME",
-    "/database/heroku_iriversland2/RDS_PORT",
+    "/database/kubernetes_iriversland2/RDS_DB_NAME",
+    "/database/kubernetes_iriversland2/RDS_USERNAME",
+    "/database/kubernetes_iriversland2/RDS_PASSWORD",
+    "/database/kubernetes_iriversland2/RDS_HOSTNAME",
+    "/database/kubernetes_iriversland2/RDS_PORT",
 
     "/service/gmail/EMAIL_HOST",
     "/service/gmail/EMAIL_HOST_USER",
