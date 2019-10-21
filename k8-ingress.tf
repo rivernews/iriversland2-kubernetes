@@ -90,28 +90,28 @@ resource "helm_release" "project-nginx-ingress" {
   # setting is global across all ing resources
   # avoiding bool parsing error in configmap
   # see https://github.com/helm/charts/issues/9586#issuecomment-461117432
-#   set_string {
-#     name  = "controller.config.ssl-redirect"
-#     value = "false"
-#   }
-#   set_string {
-#     name  = "controller.config.hsts"
-#     value = "true"
-#   }
-#   set_string {
-#     name  = "controller.config.hsts-include-subdomains"
-#     value = "true"
-#   }
-#   set_string {
-#     name  = "controller.config.hsts-max-age"
-#     value = "0"
-#   }
-#   set_string {
-#     name  = "controller.config.hsts-preload"
-#     value = "false"
-#   }
-  
-  
+  #   set_string {
+  #     name  = "controller.config.ssl-redirect"
+  #     value = "false"
+  #   }
+  #   set_string {
+  #     name  = "controller.config.hsts"
+  #     value = "true"
+  #   }
+  #   set_string {
+  #     name  = "controller.config.hsts-include-subdomains"
+  #     value = "true"
+  #   }
+  #   set_string {
+  #     name  = "controller.config.hsts-max-age"
+  #     value = "0"
+  #   }
+  #   set_string {
+  #     name  = "controller.config.hsts-preload"
+  #     value = "false"
+  #   }
+
+
   values = [<<-EOF
     controller:
         # global nginx settings for all ingress rules
@@ -367,7 +367,8 @@ resource "kubernetes_ingress" "project-ingress-resource" {
       }
     }
 
-
+    # Add more ingest service here
+    # ...
 
   }
 

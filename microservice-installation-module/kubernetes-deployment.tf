@@ -98,6 +98,33 @@ resource "kubernetes_deployment" "app" {
           #     period_seconds        = 3
           #   }
         }
+        
+        # persistent volume setup
+        # based on https://www.digitalocean.com/docs/kubernetes/how-to/add-volumes/
+        dynamic "init_container" {
+            for_each = var.is_persistent_volume_claim ? [true] : []
+            content {
+                name = "${var.app_label}-initial-container-${init_container.key}"
+                image = "busybox"
+                command = ["/bin/chmod","-R","777", var.volume_mount_path]
+                volume_mount {
+                    name = "${var.app_label}-volume-${init_container.key}"
+                    mount_path = var.volume_mount_path
+                }
+            }
+        }
+
+        dynamic "volume" {
+            for_each = var.is_persistent_volume_claim ? [true] : []
+            content {
+                name = "${var.app_label}-volume-${volume.key}"
+                persistent_volume_claim {
+                    claim_name = kubernetes_persistent_volume_claim.app_digitalocean_pvc.0.metadata.0.name
+                }
+            }
+        }
+
+
       }
     }
   }

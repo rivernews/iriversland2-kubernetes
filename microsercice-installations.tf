@@ -70,12 +70,12 @@ module "appl_tracky_api" {
     "/app/appl-tracky/DJANGO_SECRET_KEY",
     "/app/appl-tracky/ADMINS",
 
-    "/database/heroku_appl-tracky/SQL_ENGINE",
-    "/database/heroku_appl-tracky/SQL_DATABASE",
-    "/database/heroku_appl-tracky/SQL_USER",
-    "/database/heroku_appl-tracky/SQL_PASSWORD",
-    "/database/heroku_appl-tracky/SQL_HOST",
-    "/database/heroku_appl-tracky/SQL_PORT",
+    "/database/kubernetes_appl-tracky/SQL_ENGINE",
+    "/database/kubernetes_appl-tracky/SQL_DATABASE",
+    "/database/kubernetes_appl-tracky/SQL_USER",
+    "/database/kubernetes_appl-tracky/SQL_PASSWORD",
+    "/database/kubernetes_appl-tracky/SQL_HOST",
+    "/database/kubernetes_appl-tracky/SQL_PORT",
 
     "/service/gmail/EMAIL_HOST",
     "/service/gmail/EMAIL_HOST_USER",
@@ -93,4 +93,33 @@ module "appl_tracky_api" {
       command = ["/bin/sh", "-c", "echo Starting cron job... && sleep 5 && cd /usr/src/django && echo Finish CD && python manage.py backup_db && echo Finish dj command"]
     },
   ]
+}
+
+
+module "postgres_cluster" {
+  source = "./microservice-installation-module"
+
+  # cluster-wise config (shared resources across different microservices)
+  dockerhub_kubernetes_secret_name   = "${kubernetes_secret.dockerhub_secret.metadata.0.name}"
+  cert_cluster_issuer_name           = "${local.cert_cluster_issuer_name}"
+  tls_cert_covered_domain_list       = local.tls_cert_covered_domain_list
+  cert_cluster_issuer_k8_secret_name = "${local.cert_cluster_issuer_k8_secret_name}"
+
+  # app-specific config (microservice)
+  app_label               = "postgres-cluster"
+  app_exposed_port        = 5432
+  app_deployed_domain     = ""
+
+  app_container_image     = "postgres"
+  app_container_image_tag = var.postgres_cluster_image_tag
+
+  app_secret_name_list = [
+    "/database/postgres_cluster_kubernetes/POSTGRES_DB",
+    "/database/postgres_cluster_kubernetes/POSTGRES_USER",
+    "/database/postgres_cluster_kubernetes/POSTGRES_PASSWORD",
+    "/database/postgres_cluster_kubernetes/PGDATA",
+  ]
+
+    is_persistent_volume_claim = true
+    volume_mount_path = "/data"
 }

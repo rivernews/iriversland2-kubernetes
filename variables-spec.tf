@@ -29,6 +29,10 @@ variable "appl_tracky_api_image_tag" {
 }
 
 
+variable "postgres_cluster_image_tag" {
+    description = "Lookup the image tags here: https://hub.docker.com/_/postgres?tab=tags"
+}
+
 
 # CREDENTIALS
 #

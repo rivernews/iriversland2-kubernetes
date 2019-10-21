@@ -29,6 +29,7 @@ variable "app_deployed_domain" {
 
 variable "cors_domain_whitelist" {
     description = "Allows restricted methods like POST to be sent to the microservice from the domains in the whiltelist, usually this means the frontend site that talks to the microservice."
+    default = []
     type = list
 }
 
@@ -47,4 +48,14 @@ variable "tls_cert_covered_domain_list" {
 variable "kubernetes_cron_jobs" {
     default = []
     type = list
+}
+
+variable "is_persistent_volume_claim" {
+    default = false
+    type = bool
+}
+
+variable "volume_mount_path" {
+    default = ""
+    type = string
 }
