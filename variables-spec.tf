@@ -34,6 +34,11 @@ variable "postgres_cluster_image_tag" {
 }
 
 
+variable "redis_cluster_image_tag" {
+    description = "Lookup the image tags here: https://hub.docker.com/_/redis?tab=description"
+}
+
+
 # CREDENTIALS
 #
 #

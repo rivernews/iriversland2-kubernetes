@@ -77,6 +77,10 @@ module "appl_tracky_api" {
     "/database/kubernetes_appl-tracky/SQL_HOST",
     "/database/kubernetes_appl-tracky/SQL_PORT",
 
+    "/database/redis_cluster_kubernetes/REDIS_HOST",
+    "/database/redis_cluster_kubernetes/REDIS_PORT",
+    "/app/appl-tracky/CACHEOPS_REDIS_DB",
+
     "/service/gmail/EMAIL_HOST",
     "/service/gmail/EMAIL_HOST_USER",
     "/service/gmail/EMAIL_HOST_PASSWORD",
@@ -106,9 +110,9 @@ module "postgres_cluster" {
   cert_cluster_issuer_k8_secret_name = "${local.cert_cluster_issuer_k8_secret_name}"
 
   # app-specific config (microservice)
-  app_label               = "postgres-cluster"
-  app_exposed_port        = 5432
-  app_deployed_domain     = ""
+  app_label           = "postgres-cluster"
+  app_exposed_port    = 5432
+  app_deployed_domain = ""
 
   app_container_image     = "postgres"
   app_container_image_tag = var.postgres_cluster_image_tag
@@ -120,6 +124,27 @@ module "postgres_cluster" {
     "/database/postgres_cluster_kubernetes/PGDATA",
   ]
 
-    is_persistent_volume_claim = true
-    volume_mount_path = "/data"
+  is_persistent_volume_claim = true
+  volume_mount_path          = "/data"
+}
+
+
+module "redis_cluster" {
+  source = "./microservice-installation-module"
+
+  # cluster-wise config (shared resources across different microservices)
+  dockerhub_kubernetes_secret_name   = "${kubernetes_secret.dockerhub_secret.metadata.0.name}"
+  cert_cluster_issuer_name           = "${local.cert_cluster_issuer_name}"
+  tls_cert_covered_domain_list       = local.tls_cert_covered_domain_list
+  cert_cluster_issuer_k8_secret_name = "${local.cert_cluster_issuer_k8_secret_name}"
+
+  # app-specific config (microservice)
+  app_label           = "redis-cluster"
+  app_exposed_port    = 6379
+  app_deployed_domain = ""
+
+  app_container_image     = "redis"
+  app_container_image_tag = var.redis_cluster_image_tag
+
+  app_secret_name_list = []
 }

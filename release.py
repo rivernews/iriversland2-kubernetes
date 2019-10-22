@@ -17,11 +17,20 @@ MANIFEST_IMAGE_TAGS = [{
     'arg_name_full': 'postgres_cluster_image_tag',
     'arg_name_short': 'pg',
     'project name': 'postgres db'
+},{
+    'arg_name_full': 'redis_cluster_image_tag',
+    'arg_name_short': 'rd',
+    'project name': 'redis db'
 }]
 
 def validate_tag(docker_build_hash):
     if docker_build_hash.lower().strip() == 'latest':
         return 'latest'
+    
+    # check by version number
+    version_pattern = re.compile(r'[0-9]+\.[0-9]+\.[0-9]+')
+    if version_pattern.match(docker_build_hash):
+        return docker_build_hash
 
     # check by hash
     pattern = re.compile(r'[a-z0-9]{40}')
