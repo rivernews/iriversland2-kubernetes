@@ -42,9 +42,13 @@ jobs:
             chmod +x init-backend-cicd.sh
             sh ./init-backend-cicd.sh
       - run:
-          name: Plan Terraform
+          name: Validate Terraform
           command: |
-            terraform plan -var="letsencrypt_env=prod" -var="app_container_image_tag=latest" -var="appl_tracky_api_image_tag=latest"
+            terraform validate
+      # - run:
+      #     name: Plan Terraform
+      #     command: |
+      #       terraform plan -var="letsencrypt_env=prod" -var="app_container_image_tag=latest" -var="appl_tracky_api_image_tag=latest"
       - run:
           name: Test Kubectl
           command: |
