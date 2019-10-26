@@ -30,6 +30,10 @@ module "iriversland2_api" {
     "/database/kubernetes_iriversland2/RDS_HOSTNAME",
     "/database/kubernetes_iriversland2/RDS_PORT",
 
+    "/database/redis_cluster_kubernetes/REDIS_HOST",
+    "/database/redis_cluster_kubernetes/REDIS_PORT",
+    "/app/iriversland2/CACHEOPS_REDIS_DB",
+
     "/service/gmail/EMAIL_HOST",
     "/service/gmail/EMAIL_HOST_USER",
     "/service/gmail/EMAIL_HOST_PASSWORD",

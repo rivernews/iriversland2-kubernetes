@@ -11,6 +11,12 @@ This repository is part of my personal website project. Also see other repositor
 
 The CircleCI for this repo dockerizes this repo as image and is for use of other projects as a base image (mainly in their CircleCI jobs) to run terraform and k8 commands.
 
+## What we are trying to achieve?
+
+This repository provisions the entire Kubernetes cluster as below in the image. We use Terraform to do so, and this repository serves as the big "Terraform" base in the image. It creates the infrastructure for other projects, and forms an ecosystem on the cloud, enabling me to quickly deploy production-ready, highly available, scalable services.
+
+![platform](/docs/img/platform-rev02.jpg)
+
 ## Prerequisites
 
 - Install `brew install terraform` (version 0.12.6)
