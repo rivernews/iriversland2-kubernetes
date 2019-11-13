@@ -43,6 +43,8 @@ def terraform_deploy():
 
     parser.add_argument('-f', '--force', action='store_true', help="force run terraform command even if no change in release. Useful when terraform script changed except microservice installation does not.")
 
+    parser.add_argument('-p', '--plan', action='store_true', help="run a plan terraform command to do a dry run.")
+
     parser.add_argument('-d', '--delete', action='store_true', help="perform a terraform delete command instead of apply")
     parser.add_argument('-t', '--target', action='append', help="specify resource(s) to be deleted. You can specify multiple times.")
 
@@ -84,18 +86,21 @@ def terraform_deploy():
             ))
     
     if args_data.delete:
-        terraform_base_command = ['terraform', 'destroy']
+        targets_command = [' '.join([f'-target={target}' for target in args_data.target ])]
+        terraform_base_command = ['terraform', 'destroy', '-auto-approve'] + targets_command
+    elif args_data.plan:
+        terraform_base_command = ['terraform', 'plan']
     else:
-        terraform_base_command = ['terraform', 'apply']
+        terraform_base_command = ['terraform', 'apply', '-auto-approve']
 
-    terraform_command = terraform_base_command + ['-var={}={}'.format(env_name, hash_value) for env_name, hash_value in apply_release.items()] + ['-auto-approve']
+    terraform_command = terraform_base_command + ['-var={}={}'.format(env_name, hash_value) for env_name, hash_value in apply_release.items()]
+    
     s = input("\nTerraform command:\n{}\n\nPlease review the change above.\n".format(' '.join(terraform_command)))
 
     # run terraform here
-    if args_data.delete:
-        targets_command = [' '.join([f'-target {target}' for target in args_data.target ])]
-        subprocess.run(terraform_command + targets_command, check=True)
-    elif changed_release or args_data.force:
+    if args_data.delete:  
+        subprocess.run(terraform_command, check=True)
+    elif changed_release or args_data.force or args_data.plan:
         print('INFO: running terraform...')
         try:
             subprocess.run(terraform_command, check=True)
