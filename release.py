@@ -43,6 +43,9 @@ def terraform_deploy():
 
     parser.add_argument('-f', '--force', action='store_true', help="force run terraform command even if no change in release. Useful when terraform script changed except microservice installation does not.")
 
+    parser.add_argument('-d', '--delete', action='store_true', help="perform a terraform delete command instead of apply")
+    parser.add_argument('-t', '--target', action='append', help="specify resource(s) to be deleted. You can specify multiple times.")
+
     for manifest in MANIFEST_IMAGE_TAGS:
     
         # action=store - just store the value of the arg as a string
@@ -80,11 +83,19 @@ def terraform_deploy():
                 hash_value
             ))
     
-    terraform_command = ['terraform', 'apply'] + ['-var={}={}'.format(env_name, hash_value) for env_name, hash_value in apply_release.items()] + ['-auto-approve']
+    if args_data.delete:
+        terraform_base_command = ['terraform', 'destroy']
+    else:
+        terraform_base_command = ['terraform', 'apply']
+
+    terraform_command = terraform_base_command + ['-var={}={}'.format(env_name, hash_value) for env_name, hash_value in apply_release.items()] + ['-auto-approve']
     s = input("\nTerraform command:\n{}\n\nPlease review the change above.\n".format(' '.join(terraform_command)))
 
     # run terraform here
-    if changed_release or args_data.force:
+    if args_data.delete:
+        targets_command = [' '.join([f'-target {target}' for target in args_data.target ])]
+        subprocess.run(terraform_command + targets_command, check=True)
+    elif changed_release or args_data.force:
         print('INFO: running terraform...')
         try:
             subprocess.run(terraform_command, check=True)
