@@ -1,30 +1,17 @@
+# based on tutorial: https://logz.io/blog/deploying-the-elk-stack-on-kubernetes-with-helm/
+
 data "helm_repository" "elasticsearch" {
-  name = "stable"
-  url  = "https://kubernetes-charts.storage.googleapis.com"
+  name = "elasticsearch"
+  url  = "https://Helm.elastic.co"
 }
 
 resource "helm_release" "elasticsearch" {
-  name       = "my-redis-release"
+  name       = "elasticsearch-release"
   repository = data.helm_repository.stable.metadata[0].name
-  chart      = "redis"
-  version    = "6.0.1"
+  chart      = "elastic/elasticsearch"
+  # version    = "6.0.1" # TODO: lock down version after this release works
 
   values = [
-    "${file("values.yaml")}"
+    "${file("https://raw.githubusercontent.com/elastic/Helm-charts/master/elasticsearch/examples/minikube/values.yaml")}"
   ]
-
-  set {
-    name  = "cluster.enabled"
-    value = "true"
-  }
-
-  set {
-    name  = "metrics.enabled"
-    value = "true"
-  }
-
-  set_string {
-    name  = "service.annotations.prometheus\\.io/port"
-    value = "9127"
-  }
 }
