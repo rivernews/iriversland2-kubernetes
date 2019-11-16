@@ -20,10 +20,15 @@ This repository provisions the entire Kubernetes cluster as below in the image. 
 ## Prerequisites
 
 - Install `brew install terraform` (version 0.12.6)
-- Install `brew install kubernetes-cli` for `kubectl` (version v1.15.2)
-- ~~Install `brew install doctl`, the cli tool for digitalocean.~~
-    - ~~Initialize auths for do, like `doctl auth init`~~
-- ~~Run `export KUBECONFIG=kubeconfig.yaml`.~~
+- Install `brew install kubernetes-cli` for `kubectl` (version v1.15.2) for kubernetes CRD resources management support
+- Install `brew install kubernetes-helm` for `helm` (version v2.16.1) for helm release resources management support
+- Run `export KUBECONFIG=kubeconfig.yaml`
+
+Optional, nice to have (useful for debug):
+
+- Install `brew install doctl`, the cli tool for digitalocean.
+    - Initialize auths for do, like `doctl auth init`
+    - See [DigitalOcean  Doc: download the k8 credential (yaml)](https://www.digitalocean.com/docs/kubernetes/how-to/connect-to-cluster/).
 
 ## How to use
 
@@ -143,6 +148,7 @@ If you need any help or have any question about this repo, feel free to shoot me
 
 ## Reference
 
+- [Our migrating database guide](https://github.com/rivernews/appl-tracky-api/issues/13#issuecomment-544344575)
 - Kubernetes and `kubectl`
     - Setting `--kubeconfig`. ([K8 official](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/))
 - [Route53 Console](https://console.aws.amazon.com/route53/home?region=us-east-2)

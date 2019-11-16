@@ -43,6 +43,16 @@ def terraform_deploy():
 
     parser.add_argument('-f', '--force', action='store_true', help="force run terraform command even if no change in release. Useful when terraform script changed except microservice installation does not.")
 
+    parser.add_argument('-p', '--plan', action='store_true', help="run a plan terraform command to do a dry run.")
+
+    parser.add_argument('-d', '--delete', action='store_true', help="perform a terraform delete command instead of apply")
+    parser.add_argument('-t', '--target', action='append', help="specify resource(s) to be deleted. You can specify multiple times.")
+
+    parser.add_argument('-r', '--refresh', action='store_true', help="update local state file against real resources.")
+
+    parser.add_argument('-rm', '--remove', action='store_true', help="remove items from the Terraform state: https://www.terraform.io/docs/commands/state/rm.html")
+    parser.add_argument('-dry', '--dryrun', action='store_true', help="If set, prints out what would've been removed but doesn't actually remove anything.")
+
     for manifest in MANIFEST_IMAGE_TAGS:
     
         # action=store - just store the value of the arg as a string
@@ -80,11 +90,32 @@ def terraform_deploy():
                 hash_value
             ))
     
-    terraform_command = ['terraform', 'apply'] + ['-var={}={}'.format(env_name, hash_value) for env_name, hash_value in apply_release.items()] + ['-auto-approve']
+    if args_data.delete:
+        terraform_base_command = ['terraform', 'destroy', '-auto-approve']
+    elif args_data.plan:
+        terraform_base_command = ['terraform', 'plan']
+    elif args_data.refresh:
+        terraform_base_command = ['terraform', 'refresh']
+    elif args_data.remove:
+        terraform_base_command = ['terraform', 'state', 'rm']
+        terraform_base_command += ['-dry-run'] if args_data.dryrun else []
+    else:
+        terraform_base_command = ['terraform', 'apply', '-auto-approve']
+    
+    if not args_data.remove:
+        terraform_command = terraform_base_command + ['-var={}={}'.format(env_name, hash_value) for env_name, hash_value in apply_release.items()]
+    else:
+        terraform_command = terraform_base_command
+
+    if args_data.target:
+        terraform_command += [' '.join([f'-target={target}' for target in args_data.target ])]
+    
     s = input("\nTerraform command:\n{}\n\nPlease review the change above.\n".format(' '.join(terraform_command)))
 
     # run terraform here
-    if changed_release or args_data.force:
+    if args_data.delete or args_data.plan or args_data.refresh or args_data.remove:  
+        subprocess.run(terraform_command, check=True)
+    elif changed_release or args_data.force:
         print('INFO: running terraform...')
         try:
             subprocess.run(terraform_command, check=True)

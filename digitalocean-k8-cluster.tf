@@ -3,7 +3,7 @@
 # Set TF_VAR_do_token to use your Digital Ocean token automatically
 provider "digitalocean" {
   token   = "${var.do_token}"
-  version = "~> 1.5"
+  version = "~> 1.11"
 }
 
 # Terraform officials: https://www.terraform.io/docs/providers/do/r/tag.html
@@ -15,13 +15,11 @@ resource "digitalocean_tag" "project-cluster" {
 resource "digitalocean_kubernetes_cluster" "project_digitalocean_cluster" {
   name    = "${var.project_name}-cluster"
   region  = "sfo2"
-  version = "1.13.8-do.1"
-#   version = "1.14.4-do.1"
+  version = "1.14.8-do.1"
 
   node_pool {
     name       = "${var.project_name}-node-pool"
-    size       = "s-1vcpu-2gb"
-    # size       = "s-2vcpu-4gb"
+    size       = "s-2vcpu-4gb" # do not easily change this, as this will cause the entire k8 cluster to vanish
     node_count = 1
     tags       = ["${digitalocean_tag.project-cluster.id}"]
   }
@@ -75,14 +73,17 @@ provider "null" {
 # }
 
 # initialize Kubernetes provider
+# https://www.terraform.io/docs/providers/do/r/kubernetes_cluster.html
 provider "kubernetes" {
-  version = "~> 1.8"
+#   version = "~> 1.8"
+  version = "~> 1.10"
 
   host = "${digitalocean_kubernetes_cluster.project_digitalocean_cluster.endpoint}"
 
-  client_certificate     = "${base64decode(digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.client_certificate)}"
-  client_key             = "${base64decode(digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.client_key)}"
-  cluster_ca_certificate = "${base64decode(digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.cluster_ca_certificate)}"
+  token = digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config[0].token
+  cluster_ca_certificate = base64decode(
+    digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config[0].cluster_ca_certificate
+  )
 }
 
 resource "digitalocean_firewall" "project-cluster-firewall" {
