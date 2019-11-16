@@ -3,7 +3,6 @@
 # Set TF_VAR_do_token to use your Digital Ocean token automatically
 provider "digitalocean" {
   token   = "${var.do_token}"
-#   version = "~> 1.5"
   version = "~> 1.11"
 }
 
@@ -20,7 +19,6 @@ resource "digitalocean_kubernetes_cluster" "project_digitalocean_cluster" {
 
   node_pool {
     name       = "${var.project_name}-node-pool"
-    # size       = "s-1vcpu-2gb"
     size       = "s-2vcpu-4gb" # do not easily change this, as this will cause the entire k8 cluster to vanish
     node_count = 1
     tags       = ["${digitalocean_tag.project-cluster.id}"]
@@ -86,9 +84,6 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(
     digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config[0].cluster_ca_certificate
   )
-
-#   client_certificate     = "${base64decode(digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.client_certificate)}"
-#   client_key             = "${base64decode(digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.client_key)}"
 }
 
 resource "digitalocean_firewall" "project-cluster-firewall" {

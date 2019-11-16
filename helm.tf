@@ -6,7 +6,6 @@ provider "helm" {
   install_tiller  = true
   service_account = "${kubernetes_service_account.tiller.metadata.0.name}"
   namespace       = "${kubernetes_service_account.tiller.metadata.0.namespace}"
-#   tiller_image    = "gcr.io/kubernetes-helm/tiller:v2.11.0"
   tiller_image    = "gcr.io/kubernetes-helm/tiller:v2.16.1"
 
   debug = true
@@ -20,9 +19,6 @@ provider "helm" {
     host                   = "${digitalocean_kubernetes_cluster.project_digitalocean_cluster.endpoint}"
 
     token = digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config[0].token
-
-    # client_certificate     = "${base64decode(digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.client_certificate)}"
-    # client_key             = "${base64decode(digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.client_key)}"
 
     cluster_ca_certificate = "${base64decode(digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.cluster_ca_certificate)}"
   }
