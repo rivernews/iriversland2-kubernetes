@@ -201,7 +201,15 @@ resource "helm_release" "project-external-dns" {
   name      = "external-dns"
   chart     = "stable/external-dns"
   namespace = "${kubernetes_service_account.tiller.metadata.0.namespace}"
-  # version = ""
+
+  # see available version by `. ./my-helm.sh search -l stable/external-dns`
+  # app version refer to: https://github.com/kubernetes-sigs/external-dns/blob/master/CHANGELOG.md
+  #
+  # currenlty latest is not working, but app version 0.5.16 is confirm working so locking down here
+  # https://github.com/kubernetes-sigs/external-dns/issues/1262#issuecomment-551912180
+  version = "v2.6.1"
+
+  force_update = true
 
   set {
     name  = "provider"
@@ -247,6 +255,11 @@ resource "helm_release" "project-external-dns" {
   set {
     name  = "rbac.create"
     value = true
+  }
+
+  provisioner "local-exec" {
+    when    = "destroy"
+    command = ". ./my-helm.sh delete external-dns && . ./my-helm.sh del --purge external-dns"
   }
 
   depends_on = [

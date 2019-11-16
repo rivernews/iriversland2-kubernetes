@@ -50,6 +50,11 @@ variable "kubernetes_cron_jobs" {
     type = list
 }
 
+variable "kubeconfig_raw" {
+    default = ""
+    type = string
+}
+
 variable "is_persistent_volume_claim" {
     default = false
     type = bool

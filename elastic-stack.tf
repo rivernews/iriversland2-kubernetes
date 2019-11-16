@@ -18,7 +18,7 @@ data "http" "elasticsearch_helm_chart_values" {
 
 # this release will create 3 pods running elasticsearch
 # you can verify by running `kubectl get pods --namespace=default -l app=elasticsearch-master -w`
-# do port forwarding by `kubectl port-forward svc/elasticsearch-master 9200`
+# do port forwarding by `. ./my-kubectl.sh port-forward svc/elasticsearch-master -n kube-system 9200`
 resource "helm_release" "elasticsearch" {
   name      = "elasticsearch-release"
   namespace = "${kubernetes_service_account.tiller.metadata.0.namespace}"
@@ -40,16 +40,18 @@ resource "helm_release" "elasticsearch" {
     antiAffinity: "soft"
 
     # Shrink default JVM heap.
+    # mx and ms value must be the same, otherwise will give error
+    # initial heap size [268435456] not equal to maximum heap size [536870912]; this can cause resize pauses and prevents mlockall from locking the entire heap
     esJavaOpts: "-Xmx256m -Xms256m"
 
     # Allocate smaller chunks of memory per pod.
     resources:
         requests:
             cpu: "100m"
-            memory: "256M"
+            memory: "400M"
         limits:
             cpu: "1000m"
-            memory: "512M"
+            memory: "768M"
 
     # Request smaller persistent volumes.
     volumeClaimTemplate:
@@ -77,7 +79,7 @@ resource "helm_release" "elasticsearch" {
             name: elasticsearch-master
   EOF
   ]
-  
+
   # terraform helm provider is buggy and will fail even if successfully installed resources: https://github.com/terraform-providers/terraform-provider-helm/issues/138
   # 
   # use below commands instead to inspect the pod readiness and logs
@@ -95,10 +97,25 @@ resource "helm_release" "elasticsearch" {
     name  = "replicas"
     value = "1"
   }
+
+  # this will be run before terraform delete resource
+  # which will cause terraform error because when terraform 
+  # tries to destroy resource, the helm release is already
+  # delete, which will cause not found error
+  #   provisioner "local-exec" {
+  #     when    = "destroy"
+  #     command = ". ./my-helm.sh delete elasticsearch-release && . ./my-helm.sh del --purge elasticsearch-release"
+  #   }
+
+  depends_on = [
+    "kubernetes_cluster_role_binding.tiller",
+    "kubernetes_service_account.tiller"
+  ]
 }
 
+
 # this release will create 1 pod running kibana
-# do port forwarding by `kubectl port-forward deployment/kibana-kibana 5601`
+# do port forwarding by `. ./my-kubectl.sh port-forward deployment/kibana-release-kibana 5601 -n kube-system`
 # you'll be able to access kibana via browser at http://localhost:5601
 resource "helm_release" "kibana" {
   name      = "kibana-release"
@@ -106,20 +123,29 @@ resource "helm_release" "kibana" {
 
   force_update = true
 
+  # don't rely on terraform helm provider to check on resource created successfully or not
+  wait = false
+
   repository = data.helm_repository.elastic_stack.metadata[0].name
   chart      = "kibana"
   # version    = "6.0.1" # TODO: lock down version after this release works
 
   # all available configurations: https://github.com/elastic/helm-charts/tree/master/kibana
-    set_string {
-      name  = "resources.requests.memory"
-      value = "128Mi"
-    }
+  set_string {
+    name  = "resources.requests.memory"
+    value = "400Mi"
+  }
 
-    set_string {
-      name  = "resources.limits.memory"
-      value = "256Mi"
-    }
+  set_string {
+    name  = "resources.limits.memory"
+    value = "512Mi"
+  }
+
+  # do not use local-exec to do helm delete, see elasticsearch helm_release for reason
+  #   provisioner "local-exec" {
+  #     when    = "destroy"
+  #     command = ". ./my-helm.sh delete kibana-release && . ./my-helm.sh del --purge kibana-release"
+  #   }
 }
 
 # # this release will create 3 pod running metricbeat

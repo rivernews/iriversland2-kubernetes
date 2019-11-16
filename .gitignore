@@ -12,3 +12,5 @@ kubeconfig.yaml
 # .tfvars files
 # *.tfvars
 **local**.tfvars
+
+.DS_Store

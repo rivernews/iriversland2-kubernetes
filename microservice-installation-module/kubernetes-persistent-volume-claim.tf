@@ -22,4 +22,9 @@ resource "kubernetes_persistent_volume_claim" "app_digitalocean_pvc" {
 
     storage_class_name = "do-block-storage"
   }
+
+  provisioner "local-exec" {
+    when    = "destroy"
+    command = ". ./my-kubectl.sh delete pvc -n ${kubernetes_service_account.app.metadata.0.namespace} ${var.app_label}-persistent-volume-claim"
+  }
 }
