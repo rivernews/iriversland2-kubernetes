@@ -4,15 +4,8 @@ FROM bitnami/kafka:2.3.1-debian-9-r0
 # version follows k8's helm chart: https://github.com/bitnami/charts/blob/master/bitnami/kafka/values.yaml
 
 # default ENV values: https://vsupalov.com/docker-arg-env-variable-guide/#setting-env-values
-ENV BOOTSTRAP_SERVERS=kafka-stack-release-0.kafka-stack-release-headless.kube-system.svc.cluster.local:9092
-ENV GROUP_ID=1
-ENV CONFIG_STORAGE_TOPIC=kafka_connect_configs
-ENV OFFSET_STORAGE_TOPIC=kafka_connect_offsets
-ENV STATUS_STORAGE_TOPIC=my_connect_statuses
-
 ENV KAFKA_HEAP_OPTS='-Xmx256m -Xms256m'
 ENV ALLOW_PLAINTEXT_LISTENER=yes
-
 
 
 # using confluent cli: https://docs.confluent.io/current/connect/managing/extending.html#create-a-docker-image-containing-c-hub-connectors

@@ -108,7 +108,7 @@ module "postgres_cluster" {
   source = "./microservice-installation-module"
 
   # cluster-wise config (shared resources across different microservices)
-  kubeconfig_raw = "${digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.raw_config}"
+  kubeconfig_raw                     = "${digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.raw_config}"
   dockerhub_kubernetes_secret_name   = "${kubernetes_secret.dockerhub_secret.metadata.0.name}"
   cert_cluster_issuer_name           = "${local.cert_cluster_issuer_name}"
   tls_cert_covered_domain_list       = local.tls_cert_covered_domain_list
@@ -172,5 +172,10 @@ module "kafka_connect" {
   app_container_image     = "????"
   app_container_image_tag = var.redis_cluster_image_tag
 
-  app_secret_name_list = []
+  app_secret_name_list = [
+    "/database/kubernetes_appl-tracky/SQL_DATABASE",
+    "/database/kubernetes_appl-tracky/SQL_USER",
+    "/database/kubernetes_appl-tracky/SQL_PASSWORD",
+    "/database/kubernetes_appl-tracky/SQL_HOST",
+  ]
 }
