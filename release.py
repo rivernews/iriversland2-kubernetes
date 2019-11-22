@@ -97,7 +97,7 @@ def terraform_deploy():
     elif args_data.refresh:
         terraform_base_command = ['terraform', 'refresh']
     elif args_data.remove:
-        terraform_base_command = ['terraform', 'state', 'rm']
+        terraform_base_command = ['terraform', 'state', 'rm', '""']
         terraform_base_command += ['-dry-run'] if args_data.dryrun else []
     else:
         terraform_base_command = ['terraform', 'apply', '-auto-approve']
@@ -122,7 +122,7 @@ def terraform_deploy():
 
             release_history.append(apply_release)
             with open('release.json', 'w') as f:
-                json.dump(release_history, f)
+                json.dump(release_history, f, indent=4)
         except subprocess.CalledProcessError as e:
             raise
     else:

@@ -90,7 +90,7 @@ resource "helm_release" "elasticsearch" {
   # all available configurations: https://github.com/elastic/helm-charts/tree/master/elasticsearch#configuration
   set_string {
     name  = "imageTag"
-    value = "7.4.1" # lock down to version 7.4.1 of Elasticsearch
+    value = "7.4.1" # lock down to version 7.4.1 of Elasticsearch --> TODO: 6.X (e.g., latest 6.8.4 as of 11/20/2019) is recommended for better compatibility with other components
   }
 
   set_string {

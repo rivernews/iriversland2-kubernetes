@@ -1,8 +1,8 @@
 provider "local" {
-    version = "~> 1.4"
+    version = "~> 1.3"
 }
 
 resource "local_file" "kubeconfig" {
     sensitive_content     = "${var.kubeconfig_raw}"
-    filename = "kubeconfig.yaml"
+    filename = "${path.module}/kubeconfig.yaml"
 }

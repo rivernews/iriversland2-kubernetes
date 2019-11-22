@@ -15,16 +15,32 @@ resource "digitalocean_tag" "project-cluster" {
 resource "digitalocean_kubernetes_cluster" "project_digitalocean_cluster" {
   name    = "${var.project_name}-cluster"
   region  = "sfo2"
-  version = "1.14.8-do.1"
+  # Grab the latest version slug from `doctl kubernetes options versions`
+  version = "1.15.5-do.1"
 
   node_pool {
     name       = "${var.project_name}-node-pool"
     size       = "s-2vcpu-4gb" # do not easily change this, as this will cause the entire k8 cluster to vanish
-    node_count = 1
+    min_nodes  = 1
+    max_nodes  = 2
+    auto_scale = true
     tags       = ["${digitalocean_tag.project-cluster.id}"]
   }
 
   # tags = ["${digitalocean_tag.project-cluster.id}"]
+}
+
+# tf doc: https://www.terraform.io/docs/providers/do/r/kubernetes_node_pool.html
+# k8 will spread pods across nodes based on available free resources: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+resource "digitalocean_kubernetes_node_pool" "secondary_node_pool" {
+  cluster_id = digitalocean_kubernetes_cluster.project_digitalocean_cluster.id
+
+  name       = "secondary-node-pool"
+  size       = "s-1vcpu-2gb"
+  min_nodes  = 1
+  max_nodes  = 2
+  auto_scale = true
+  tags       = ["${digitalocean_tag.project-cluster.id}"]
 }
 
 # resource "null_resource" "pull_kubeconfig" {

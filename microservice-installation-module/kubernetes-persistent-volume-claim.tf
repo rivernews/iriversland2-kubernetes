@@ -8,7 +8,7 @@ resource "kubernetes_persistent_volume_claim" "app_digitalocean_pvc" {
 
   metadata {
     # for digitalocean - must be lowercase alphanumeric values and dashes (hyphen) only
-    name = "${var.app_label}-persistent-volume-claim"
+    name      = "${var.app_label}-persistent-volume-claim"
     namespace = "${kubernetes_service_account.app.metadata.0.namespace}"
   }
   spec {
@@ -23,8 +23,13 @@ resource "kubernetes_persistent_volume_claim" "app_digitalocean_pvc" {
     storage_class_name = "do-block-storage"
   }
 
-  provisioner "local-exec" {
-    when    = "destroy"
-    command = ". ./my-kubectl.sh delete pvc -n ${kubernetes_service_account.app.metadata.0.namespace} ${var.app_label}-persistent-volume-claim"
-  }
+  # no need to delete pvc, tf will clean up for you
+#   provisioner "local-exec" {
+#     when    = "destroy"
+#     command = "kubectl --kubeconfig ${path.module}/kubeconfig.yaml delete pvc -n ${kubernetes_service_account.app.metadata.0.namespace} ${var.app_label}-persistent-volume-claim"
+#   }
+
+  depends_on = [
+    "local_file.kubeconfig"
+  ]
 }

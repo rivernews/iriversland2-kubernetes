@@ -119,8 +119,8 @@ module "postgres_cluster" {
   app_exposed_port    = 5432
   app_deployed_domain = ""
 
-  app_container_image     = "postgres"
-  app_container_image_tag = var.postgres_cluster_image_tag
+  app_container_image     = "shaungc/postgres-cdc"
+  app_container_image_tag = var.postgres_cluster_image_tag # 12.0 is latest, but 11 or 10 is recommended
 
   app_secret_name_list = [
     "/database/postgres_cluster_kubernetes/POSTGRES_DB",
@@ -149,6 +149,27 @@ module "redis_cluster" {
   app_deployed_domain = ""
 
   app_container_image     = "redis"
+  app_container_image_tag = var.redis_cluster_image_tag
+
+  app_secret_name_list = []
+}
+
+
+module "kafka_connect" {
+  source = "./microservice-installation-module"
+
+  # cluster-wise config (shared resources across different microservices)
+  dockerhub_kubernetes_secret_name   = "${kubernetes_secret.dockerhub_secret.metadata.0.name}"
+  cert_cluster_issuer_name           = "${local.cert_cluster_issuer_name}"
+  tls_cert_covered_domain_list       = local.tls_cert_covered_domain_list
+  cert_cluster_issuer_k8_secret_name = "${local.cert_cluster_issuer_k8_secret_name}"
+
+  # app-specific config (microservice)
+  app_label           = "kafka-connect"
+  app_exposed_port    = 8083 # exposes kafka connect REST API on port 8083
+  app_deployed_domain = ""
+
+  app_container_image     = "????"
   app_container_image_tag = var.redis_cluster_image_tag
 
   app_secret_name_list = []

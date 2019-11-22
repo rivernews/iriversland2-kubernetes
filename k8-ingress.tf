@@ -257,11 +257,6 @@ resource "helm_release" "project-external-dns" {
     value = true
   }
 
-  provisioner "local-exec" {
-    when    = "destroy"
-    command = ". ./my-helm.sh delete external-dns && . ./my-helm.sh del --purge external-dns"
-  }
-
   depends_on = [
     "kubernetes_cluster_role_binding.tiller",
     "kubernetes_service_account.tiller"
