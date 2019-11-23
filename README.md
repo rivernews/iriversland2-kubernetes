@@ -19,9 +19,11 @@ This repository provisions the entire Kubernetes cluster as below in the image. 
 
 ## Prerequisites
 
-- Install `brew install terraform` (version 0.12.6)
-- Install `brew install kubernetes-cli` for `kubectl` (version v1.15.2) for kubernetes CRD resources management support
-- Install `brew install kubernetes-helm` for `helm` (version v2.16.1) for helm release resources management support
+- Install `brew terraform kubernetes-cli helm`
+    - Terraform (version 0.12.6)
+    - Kubernetes CLI (version v1.15.2) for kubernetes CRD resources management support
+    - Helm CLI (version v2.16.1) for helm release resources management support
+- Optionally install `brew install doctl` for the digitalocean cli tool
 - Run `export KUBECONFIG=kubeconfig.yaml`
 
 Optional, nice to have (useful for debug):
