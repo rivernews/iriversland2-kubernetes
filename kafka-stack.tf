@@ -23,7 +23,8 @@ resource "helm_release" "kafka_stack" {
     global:
       storageClass: "do-block-storage"
     persistence:
-      size: "2Gi"
+      enabled: false # TODO: change this in production
+      size: "1Gi"
     volumePermissions:
       enabled: true
     resources:
@@ -33,6 +34,10 @@ resource "helm_release" "kafka_stack" {
       limits:
         cpu: "600m"
         memory: "1024Mi"
+    zookeeper:
+      persistence:
+        enabled: false # TODO: change this in production
+        size: "1Gi"
   EOF
   ]
 }

@@ -3,6 +3,8 @@
 #
 # other cloud provider may have different convention, i.e., needing to create a `kubernetes_persistent_volume` before creating a claim
 #
+#
+# tf doc: https://www.terraform.io/docs/providers/kubernetes/r/persistent_volume_claim.html
 resource "kubernetes_persistent_volume_claim" "app_digitalocean_pvc" {
   count = var.is_persistent_volume_claim ? 1 : 0
 

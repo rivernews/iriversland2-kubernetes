@@ -21,14 +21,18 @@ MANIFEST_IMAGE_TAGS = [{
     'arg_name_full': 'redis_cluster_image_tag',
     'arg_name_short': 'rd',
     'project name': 'redis db'
+},{
+    'arg_name_full': 'kafka_connect_image_tag',
+    'arg_name_short': 'kc',
+    'project name': 'kafka connect cdc'
 }]
 
 def validate_tag(docker_build_hash):
     if docker_build_hash.lower().strip() == 'latest':
         return 'latest'
     
-    # check by version number
-    version_pattern = re.compile(r'[0-9]+\.[0-9]+\.[0-9]+')
+    # check by version number (X.X.X)-rX
+    version_pattern = re.compile(r'[0-9]+\.[0-9]+.*')
     if version_pattern.match(docker_build_hash):
         return docker_build_hash
 

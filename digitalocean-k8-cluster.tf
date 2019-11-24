@@ -36,7 +36,7 @@ resource "digitalocean_kubernetes_node_pool" "secondary_node_pool" {
   cluster_id = digitalocean_kubernetes_cluster.project_digitalocean_cluster.id
 
   name       = "secondary-node-pool"
-  size       = "s-1vcpu-2gb"
+  size       = "s-2vcpu-4gb"
   min_nodes  = 1
   max_nodes  = 2
   auto_scale = true

@@ -169,13 +169,14 @@ module "kafka_connect" {
   app_exposed_port    = 8083 # exposes kafka connect REST API on port 8083
   app_deployed_domain = ""
 
-  app_container_image     = "????"
-  app_container_image_tag = var.redis_cluster_image_tag
+  app_container_image     = "shaungc/kafka-connectors-cdc"
+  app_container_image_tag = var.kafka_connect_image_tag
 
   app_secret_name_list = [
     "/database/kubernetes_appl-tracky/SQL_DATABASE",
     "/database/kubernetes_appl-tracky/SQL_USER",
     "/database/kubernetes_appl-tracky/SQL_PASSWORD",
     "/database/kubernetes_appl-tracky/SQL_HOST",
+    "/database/kubernetes_appl-tracky/SQL_PORT",
   ]
 }

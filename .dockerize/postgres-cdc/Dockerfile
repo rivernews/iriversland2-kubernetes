@@ -11,5 +11,9 @@ COPY postgresql.conf.sample /usr/share/postgresql/postgresql.conf.sample
 
 COPY init-permissions.sh /docker-entrypoint-initdb.d/init-permissions.sh
 
+# add (merge) additional scripts to initdb directory
+# https://stackoverflow.com/a/56941391/9814131
+COPY ./docker-entrypoint-initdb.d/. /docker-entrypoint-initdb.d/
+
 RUN mkdir /data
 COPY pg_hba.conf /data/pg_hba.conf

@@ -42,16 +42,16 @@ resource "helm_release" "elasticsearch" {
     # Shrink default JVM heap.
     # mx and ms value must be the same, otherwise will give error
     # initial heap size [268435456] not equal to maximum heap size [536870912]; this can cause resize pauses and prevents mlockall from locking the entire heap
-    esJavaOpts: "-Xmx256m -Xms256m"
+    esJavaOpts: "-Xmx768m -Xms768m" # TODO: set this if using too much resources
 
     # Allocate smaller chunks of memory per pod.
     resources:
         requests:
             cpu: "100m"
-            memory: "400M"
+            memory: "768M"
         limits:
             cpu: "1000m"
-            memory: "768M"
+            memory: "1280M"
 
     # Request smaller persistent volumes.
     volumeClaimTemplate:

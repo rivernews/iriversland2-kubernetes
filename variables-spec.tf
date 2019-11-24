@@ -38,6 +38,10 @@ variable "redis_cluster_image_tag" {
     description = "Lookup the image tags here: https://hub.docker.com/_/redis?tab=description"
 }
 
+variable "kafka_connect_image_tag" {
+    description = "Look up the image tags here: https://hub.docker.com/repository/docker/shaungc/kafka-connectors-cdc/general"
+}
+
 
 # CREDENTIALS
 #
