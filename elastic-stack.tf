@@ -42,16 +42,16 @@ resource "helm_release" "elasticsearch" {
     # Shrink default JVM heap.
     # mx and ms value must be the same, otherwise will give error
     # initial heap size [268435456] not equal to maximum heap size [536870912]; this can cause resize pauses and prevents mlockall from locking the entire heap
-    esJavaOpts: "-Xmx768m -Xms768m" # TODO: set this if using too much resources
+    esJavaOpts: "-Xmx1024m -Xms1024m" # TODO: set this if using too much resources
 
     # Allocate smaller chunks of memory per pod.
     resources:
         requests:
             cpu: "100m"
-            memory: "768M"
+            memory: "1024M"
         limits:
             cpu: "1000m"
-            memory: "1280M"
+            memory: "1536M"
 
     # Request smaller persistent volumes.
     volumeClaimTemplate:
@@ -146,6 +146,10 @@ resource "helm_release" "kibana" {
   #     when    = "destroy"
   #     command = ". ./my-helm.sh delete kibana-release && . ./my-helm.sh del --purge kibana-release"
   #   }
+
+  depends_on = [
+    helm_release.elasticsearch
+  ]
 }
 
 # # this release will create 3 pod running metricbeat

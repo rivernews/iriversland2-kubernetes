@@ -65,6 +65,8 @@ COPY kafka-connect.properties ${KAFKA_CONFIG}/
 COPY postgres-connector.properties ${KAFKA_CONFIG}/
 COPY elasticsearch-connector.properties ${KAFKA_CONFIG}/
 
+RUN apt-get update -y && apt-get install -y jq
+
 # standalone mode args: https://docs.confluent.io/5.1.2/connect/userguide.html#standalone-mode
 # RUN mkdir -p /tmp
 COPY entrypoint.sh /tmp/entrypoint.sh

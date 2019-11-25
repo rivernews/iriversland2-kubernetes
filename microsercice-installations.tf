@@ -47,6 +47,11 @@ module "iriversland2_api" {
       command = ["/bin/sh", "-c", "echo Starting cron job... && sleep 5 && cd /usr/src/backend && echo Finish CD && python manage.py backup_db && echo Finish dj command"]
     },
   ]
+
+  depend_on = [
+    module.postgres_cluster.app_container_image,
+    module.redis_cluster.app_container_image
+  ]
 }
 
 
@@ -100,6 +105,11 @@ module "appl_tracky_api" {
       #   cron_schedule = "0 * * * *",
       command = ["/bin/sh", "-c", "echo Starting cron job... && sleep 5 && cd /usr/src/django && echo Finish CD && python manage.py backup_db && echo Finish dj command"]
     },
+  ]
+
+  depend_on = [
+    module.postgres_cluster.app_container_image,
+    module.redis_cluster.app_container_image
   ]
 }
 
@@ -178,5 +188,11 @@ module "kafka_connect" {
     "/database/kubernetes_appl-tracky/SQL_PASSWORD",
     "/database/kubernetes_appl-tracky/SQL_HOST",
     "/database/kubernetes_appl-tracky/SQL_PORT",
+  ]
+
+  depend_on = [
+    helm_release.kafka_stack.id,
+    module.postgres_cluster.app_container_image,
+    helm_release.elasticsearch.id
   ]
 }

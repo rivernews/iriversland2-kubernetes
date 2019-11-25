@@ -64,3 +64,8 @@ variable "volume_mount_path" {
     default = ""
     type = string
 }
+
+variable "depend_on" {
+    default = []
+    type = list
+}
