@@ -20,7 +20,7 @@ data "http" "elasticsearch_helm_chart_values" {
 # you can verify by running `kubectl get pods --namespace=default -l app=elasticsearch-master -w`
 # do port forwarding by `. ./my-kubectl.sh port-forward svc/elasticsearch-master -n kube-system 9200`
 resource "helm_release" "elasticsearch" {
-  name      = "elasticsearch-release"
+  name      = "my-elasticsearch-release"
   namespace = "${kubernetes_service_account.tiller.metadata.0.namespace}"
 
   force_update = true
@@ -34,6 +34,7 @@ resource "helm_release" "elasticsearch" {
   #   ]
 
   # https://github.com/elastic/helm-charts/blob/master/elasticsearch/examples/kubernetes-kind/values.yaml
+  # defaults: https://github.com/elastic/helm-charts/blob/master/elasticsearch/values.yaml
   values = [<<-EOF
     ---
     # Permit co-located instances for solitary minikube virtual machines.
@@ -42,16 +43,19 @@ resource "helm_release" "elasticsearch" {
     # Shrink default JVM heap.
     # mx and ms value must be the same, otherwise will give error
     # initial heap size [268435456] not equal to maximum heap size [536870912]; this can cause resize pauses and prevents mlockall from locking the entire heap
-    esJavaOpts: "-Xmx1024m -Xms1024m" # TODO: set this if using too much resources
+    esJavaOpts: "-Xmx512m -Xms512m" # TODO: set this if using too much resources
+
+    # Kubernetes replica count for the statefulset (i.e. how many pods) ~= Data node replicas (statefulset)
+    replicas: "1"
 
     # Allocate smaller chunks of memory per pod.
     resources:
         requests:
             cpu: "100m"
-            memory: "1024M"
+            memory: "512M"
         limits:
             cpu: "1000m"
-            memory: "1536M"
+            memory: "1024M"
 
     # Request smaller persistent volumes.
     volumeClaimTemplate:
@@ -59,7 +63,7 @@ resource "helm_release" "elasticsearch" {
         storageClassName: "do-block-storage"
         resources:
             requests:
-                storage: "1Gi"
+                storage: "2Gi"
     extraInitContainers: |
         - name: create
           image: busybox:1.28
@@ -93,10 +97,10 @@ resource "helm_release" "elasticsearch" {
     value = "7.4.1" # lock down to version 7.4.1 of Elasticsearch --> TODO: 6.X (e.g., latest 6.8.4 as of 11/20/2019) is recommended for better compatibility with other components
   }
 
-  set_string {
-    name  = "replicas"
-    value = "1"
-  }
+#   set_string {
+#     name  = "replicas"
+#     value = "1"
+#   }
 
   # this will be run before terraform delete resource
   # which will cause terraform error because when terraform 

@@ -201,7 +201,9 @@ EOT
         # "bash ./my-kubectl.sh delete secrets ${local.cert_cluster_issuer_secret_name_prod} ${local.cert_cluster_issuer_secret_name_staging} -n ${kubernetes_namespace.cert_manager.metadata.0.name}",
 
         # delete ing tls certificate secret (if the ing is in cert-manager namespace. If ing is in microservices' own namespace, this command is useless)
-        "bash ./my-kubectl.sh delete secrets ${local.central_tls_ing_certificate_secret_name} -n ${kubernetes_namespace.cert_manager.metadata.0.name}",
+        # as our deployment gets stable, we'll not delete the secret and rather reuse it,
+        # so we can avoid exceeding the letsencrypt api limit
+        # "bash ./my-kubectl.sh delete secrets ${local.central_tls_ing_certificate_secret_name} -n ${kubernetes_namespace.cert_manager.metadata.0.name}",
 
         # delete ing tls certificate secret in each microservice namespace, if microservices are deployed in their own namespace (hence having their own certificates in their namespaces)
         #
@@ -210,7 +212,7 @@ EOT
 
         "echo",
         "echo",
-        "echo INFO: delete secrets complete, will sleep for 5 sec...",
+        # "echo INFO: delete secrets complete, will sleep for 5 sec...",
         "sleep 5"
     ])}"
     # command = "bash ./my-kubectl.sh delete secrets ${local.cert_cluster_issuer_secret_name_prod} ${local.cert_cluster_issuer_secret_name_staging} -n ${kubernetes_namespace.cert_manager.metadata.0.name} && \
