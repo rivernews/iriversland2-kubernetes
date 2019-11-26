@@ -62,6 +62,8 @@ provider "local" {
 }
 
 # tf doc: https://www.terraform.io/docs/providers/local/r/file.html
+# to use `doctl` to generate this yaml file, run:
+# doctl k8s cluster kubeconfig show project-shaungc-digitalocean-cluster > kubeconfig.yaml
 resource "local_file" "kubeconfig" {
     sensitive_content     = "${digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.raw_config}"
     filename = "kubeconfig.yaml"

@@ -21,7 +21,7 @@ data "http" "elasticsearch_helm_chart_values" {
 # do port forwarding by `. ./my-kubectl.sh port-forward svc/elasticsearch-master -n kube-system 9200`
 resource "helm_release" "elasticsearch" {
   name      = "my-elasticsearch-release"
-  namespace = "${kubernetes_service_account.tiller.metadata.0.namespace}"
+  namespace = kubernetes_service_account.tiller.metadata.0.namespace
 
   force_update = true
 
@@ -46,7 +46,7 @@ resource "helm_release" "elasticsearch" {
     esJavaOpts: "-Xmx512m -Xms512m" # TODO: set this if using too much resources
 
     # Kubernetes replica count for the statefulset (i.e. how many pods) ~= Data node replicas (statefulset)
-    replicas: "1"
+    replicas: "0" # zero to disable index replica, so that index status won't be yellow when only provisioning 1 node for es cluster
 
     # Allocate smaller chunks of memory per pod.
     resources:
