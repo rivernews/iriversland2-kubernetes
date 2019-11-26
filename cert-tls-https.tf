@@ -205,7 +205,12 @@ EOT
         # so we can avoid exceeding the letsencrypt api limit
         # to have an idea how many requests you sent to letsencrypt production,
         # see https://crt.sh/?q=*.shaungc.com
-        # "bash ./my-kubectl.sh delete secrets ${local.central_tls_ing_certificate_secret_name} -n ${kubernetes_namespace.cert_manager.metadata.0.name}",
+        "bash ./my-kubectl.sh delete secrets ${local.central_tls_ing_certificate_secret_name} -n ${kubernetes_namespace.cert_manager.metadata.0.name}",
+
+        # delete ing tls certificate secret when using a centralized namespace
+        # the content of certificate will be stored in this secret
+        # but be careful when deleting prod secret
+        "bash ./my-kubectl.sh delete secrets ${local.cert_cluster_issuer_secret_name_prod} ${local.cert_cluster_issuer_secret_name_staging} -n ${kubernetes_namespace.cert_manager.metadata.0.name}",
 
         # delete ing tls certificate secret in each microservice namespace, if microservices are deployed in their own namespace (hence having their own certificates in their namespaces)
         #

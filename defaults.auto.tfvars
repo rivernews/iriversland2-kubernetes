@@ -17,4 +17,4 @@ managed_k8_rx_domain = "shaungc.com"
 # app_container_image = "shaungc/iriversland2-django"
 
 
-letsencrypt_env = "prod"
+letsencrypt_env = "staging" # if changing to `prod`, also change the cert-manager so that it does not delete the secret and can be reused.
