@@ -78,7 +78,3 @@ module "kafka_connect" {
     helm_release.elasticsearch.id
   ]
 }
-
-output "test" {
-    value = helm_release.elasticsearch.values
-}

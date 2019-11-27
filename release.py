@@ -112,7 +112,8 @@ def terraform_deploy():
         terraform_command = terraform_base_command
 
     if args_data.target:
-        terraform_command += [' '.join([f'-target={target}' for target in args_data.target ])]
+        # terraform_command += [' '.join([f'-target={target}' for target in args_data.target ])]
+        terraform_command += [f'-target={target}' for target in args_data.target]
     
     s = input("\nTerraform command:\n{}\n\nPlease review the change above.\n".format(' '.join(terraform_command)))
 

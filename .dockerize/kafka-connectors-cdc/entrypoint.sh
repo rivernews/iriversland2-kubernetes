@@ -3,7 +3,7 @@
 DATABASE_APPLTRACKY_LOGICAL_NAME=${DATABASE_APPLTRACKY_LOGICAL_NAME:-appl_tracky}
 
 
-wait_till_connected() {
+wait_till_es_connected() {
     URL=${1:-localhost}
     MAX_ATTEMPTS=${2:-999}
     RETRY_INTERVAL=${3:-5}
@@ -16,7 +16,8 @@ wait_till_connected() {
         sleep ${RETRY_INTERVAL}
     done
 
-    echo "INFO: Connected to ${URL} sunccessfully."
+    echo "INFO: Connected to ${URL} sunccessfully, will cool down for 10 seconds..."
+    sleep 10
 }
 
 
@@ -26,7 +27,27 @@ echo ""
 echo "INFO: elasticsearch host is ${ELASTICSEARCH_HOST}"
 echo "INFO: elasticsearch port is ${ELASTICSEARCH_PORT}"
 echo "INFO: waiting for elasticsearch to be ready..."
-wait_till_connected ${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
+wait_till_es_connected ${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
+
+
+wait_till_postgres_connected() {
+    SQL_HOST=${1:-"postgres"}
+    SQL_USER=${2:-"admin"}
+    SQL_DATABASE=${3:-"default_database"}
+    MAX_ATTEMPTS=${4:-999}
+    RETRY_INTERVAL=${5:-5}
+
+    ATTEMPTS=0
+    # command based on https://stackoverflow.com/a/46862514/9814131
+    # see all psql args: https://www.postgresql.org/docs/9.2/app-psql.html
+    until psql --host=$SQL_HOST --username=$SQL_USER --dbname=$SQL_DATABASE --password &>/dev/null || [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
+        ATTEMPTS=$((ATTEMPTS + 1))
+        echo "WARNING: Cannot connect to ${SQL_HOST}, retrying in ${RETRY_INTERVAL} seconds...(${ATTEMPTS}/${MAX_ATTEMPTS})"
+        sleep ${RETRY_INTERVAL}
+    done
+
+    echo "INFO: Connected to ${URL} sunccessfully."
+}
 
 
 echo ""
@@ -35,7 +56,7 @@ echo ""
 echo "INFO: postgres host is ${SQL_HOST}"
 echo "INFO: postgres port is ${SQL_PORT}"
 echo "INFO: waiting for postgres to be ready..."
-wait_till_connected ${SQL_HOST}:${SQL_PORT}
+wait_till_postgres_connected ${SQL_HOST} ${SQL_USER} ${SQL_DATABASE}
 
 
 echo ""
