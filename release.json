@@ -1034,5 +1034,82 @@
         "postgres_cluster_image_tag": "11.5-r13",
         "redis_cluster_image_tag": "5.0.6",
         "kafka_connect_image_tag": "2.3.1-r46"
+    },
+    {
+        "app_container_image_tag": "dad6867e64b30a98b32b0dbb6c89c788e7153f24",
+        "appl_tracky_api_image_tag": "ced86a996808bdf820618d00d7f1e3516a49a8b2",
+        "postgres_cluster_image_tag": "11.5-r13",
+        "redis_cluster_image_tag": "5.0.6",
+        "kafka_connect_image_tag": "2.3.1-r46"
+    },
+    {
+        "app_container_image_tag": "dad6867e64b30a98b32b0dbb6c89c788e7153f24",
+        "appl_tracky_api_image_tag": "ced86a996808bdf820618d00d7f1e3516a49a8b2",
+        "postgres_cluster_image_tag": "11.5-r13",
+        "redis_cluster_image_tag": "5.0.6",
+        "kafka_connect_image_tag": "2.3.1-r46"
+    },
+    {
+        "app_container_image_tag": "dad6867e64b30a98b32b0dbb6c89c788e7153f24",
+        "appl_tracky_api_image_tag": "ced86a996808bdf820618d00d7f1e3516a49a8b2",
+        "postgres_cluster_image_tag": "11.5-r13",
+        "redis_cluster_image_tag": "5.0.6",
+        "kafka_connect_image_tag": "2.3.1-r46"
+    },
+    {
+        "app_container_image_tag": "dad6867e64b30a98b32b0dbb6c89c788e7153f24",
+        "appl_tracky_api_image_tag": "ced86a996808bdf820618d00d7f1e3516a49a8b2",
+        "postgres_cluster_image_tag": "11.5-r13",
+        "redis_cluster_image_tag": "5.0.6",
+        "kafka_connect_image_tag": "2.3.1-r46"
+    },
+    {
+        "app_container_image_tag": "dad6867e64b30a98b32b0dbb6c89c788e7153f24",
+        "appl_tracky_api_image_tag": "ced86a996808bdf820618d00d7f1e3516a49a8b2",
+        "postgres_cluster_image_tag": "11.5-r13",
+        "redis_cluster_image_tag": "5.0.6",
+        "kafka_connect_image_tag": "2.3.1-r46"
+    },
+    {
+        "app_container_image_tag": "dad6867e64b30a98b32b0dbb6c89c788e7153f24",
+        "appl_tracky_api_image_tag": "ced86a996808bdf820618d00d7f1e3516a49a8b2",
+        "postgres_cluster_image_tag": "11.5-r13",
+        "redis_cluster_image_tag": "5.0.6",
+        "kafka_connect_image_tag": "2.3.1-r46"
+    },
+    {
+        "app_container_image_tag": "dad6867e64b30a98b32b0dbb6c89c788e7153f24",
+        "appl_tracky_api_image_tag": "ced86a996808bdf820618d00d7f1e3516a49a8b2",
+        "postgres_cluster_image_tag": "11.5-r13",
+        "redis_cluster_image_tag": "5.0.6",
+        "kafka_connect_image_tag": "2.3.1-r46"
+    },
+    {
+        "app_container_image_tag": "dad6867e64b30a98b32b0dbb6c89c788e7153f24",
+        "appl_tracky_api_image_tag": "ced86a996808bdf820618d00d7f1e3516a49a8b2",
+        "postgres_cluster_image_tag": "11.5-r13",
+        "redis_cluster_image_tag": "5.0.6",
+        "kafka_connect_image_tag": "2.3.1-r46"
+    },
+    {
+        "app_container_image_tag": "dad6867e64b30a98b32b0dbb6c89c788e7153f24",
+        "appl_tracky_api_image_tag": "ced86a996808bdf820618d00d7f1e3516a49a8b2",
+        "postgres_cluster_image_tag": "11.5-r13",
+        "redis_cluster_image_tag": "5.0.6",
+        "kafka_connect_image_tag": "2.3.1-r47"
+    },
+    {
+        "app_container_image_tag": "dad6867e64b30a98b32b0dbb6c89c788e7153f24",
+        "appl_tracky_api_image_tag": "ced86a996808bdf820618d00d7f1e3516a49a8b2",
+        "postgres_cluster_image_tag": "11.5-r13",
+        "redis_cluster_image_tag": "5.0.6",
+        "kafka_connect_image_tag": "2.3.1-r47"
+    },
+    {
+        "app_container_image_tag": "dad6867e64b30a98b32b0dbb6c89c788e7153f24",
+        "appl_tracky_api_image_tag": "ced86a996808bdf820618d00d7f1e3516a49a8b2",
+        "postgres_cluster_image_tag": "11.5-r13",
+        "redis_cluster_image_tag": "5.0.6",
+        "kafka_connect_image_tag": "2.3.1-r47"
     }
 ]

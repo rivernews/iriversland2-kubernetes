@@ -65,6 +65,11 @@ variable "volume_mount_path" {
     type = string
 }
 
+variable "environment_variables" {
+    default = {}
+    type  = map
+}
+
 variable "depend_on" {
     default = []
     type = list

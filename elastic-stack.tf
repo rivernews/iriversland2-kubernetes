@@ -19,6 +19,9 @@ data "http" "elasticsearch_helm_chart_values" {
 # this release will create 3 pods running elasticsearch
 # you can verify by running `kubectl get pods --namespace=default -l app=elasticsearch-master -w`
 # do port forwarding by `. ./my-kubectl.sh port-forward svc/elasticsearch-master -n kube-system 9200`
+locals {
+    elasticsearch_port = 9200
+}
 resource "helm_release" "elasticsearch" {
   name      = "elasticsearch-release"
   namespace = kubernetes_service_account.tiller.metadata.0.namespace
@@ -40,6 +43,7 @@ resource "helm_release" "elasticsearch" {
     ---
     # Permit co-located instances for solitary minikube virtual machines.
     antiAffinity: "soft"
+    httpPort: ${local.elasticsearch_port}
 
     # Shrink default JVM heap.
     # mx and ms value must be the same, otherwise will give error
@@ -48,14 +52,12 @@ resource "helm_release" "elasticsearch" {
 
     # Kubernetes replica count for the statefulset (i.e. how many pods) && Data node replicas (statefulset)
     replicas: "1"
-    esConfig:
-        elasticsearch.yml: |
-            lifecycle:
-                postStart:
-                    exec:
-                        command: ["/bin/sh", "-c", "curl -v -XPUT -H 'Content-Type: application/json' */_settings -d '{ \"index\" : {\"number_of_replicas\" : 0}}' > /usr/share/message"]
-
-            # zero to disable index replica, so that index status won't be yellow when only provisioning 1 node for es cluster
+    
+    # zero to disable index replica, so that index status won't be yellow when only provisioning 1 node for es cluster
+    # lifecycle:
+    #     postStart:
+    #         exec:
+    #             command: ["sh", "-c", "sleep 30 && curl -v -XPUT -H 'Content-Type: application/json' http://elasticsearch-master:9200/_settings -d '{ \"index\" : {\"number_of_replicas\" : 0}}' > /usr/share/message"]
 
     # Allocate smaller chunks of memory per pod.
     resources:

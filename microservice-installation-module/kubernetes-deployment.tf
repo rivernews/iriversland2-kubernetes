@@ -55,6 +55,14 @@ resource "kubernetes_deployment" "app" {
           #     }
           #   }
 
+          dynamic "env" {
+              for_each = var.environment_variables
+              content {
+                  name  = env.key
+                  value = env.value
+              }
+          }
+
           # see `env_from` example at: https://www.michielsikkes.com/managing-and-deploying-app-secrets-at-firmhouse/
           env_from {
             secret_ref {

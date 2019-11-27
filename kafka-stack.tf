@@ -67,9 +67,18 @@ module "kafka_connect" {
     "/database/kubernetes_appl-tracky/SQL_PORT",
   ]
 
+  environment_variables = {
+      ELASTICSEARCH_HOST = "elasticsearch-master.${helm_release.elasticsearch.namespace}.svc.cluster.local"
+      ELASTICSEARCH_PORT = local.elasticsearch_port
+  }
+
   depend_on = [
     helm_release.kafka_stack.id,
     module.postgres_cluster.app_container_image,
     helm_release.elasticsearch.id
   ]
+}
+
+output "test" {
+    value = helm_release.elasticsearch.values
 }
