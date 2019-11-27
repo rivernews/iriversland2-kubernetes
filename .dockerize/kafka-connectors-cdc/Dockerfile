@@ -65,11 +65,8 @@ COPY kafka-connect.properties ${KAFKA_CONFIG}/
 COPY postgres-connector.properties ${KAFKA_CONFIG}/
 COPY elasticsearch-connector.properties ${KAFKA_CONFIG}/
 
-# install psql based on https://tecadmin.net/install-postgresql-server-on-ubuntu/
-RUN apt-get install wget ca-certificates \
-    wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add - \
-    sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" >> /etc/apt/sources.list.d/pgdg.list' \
-    apt-get update -y && apt-get install -y jq postgresql postgresql-contrib
+# install psql based on https://wiki.debian.org/PostgreSql#Installation
+RUN apt-get update -y && apt-get install -y jq postgresql postgresql-client
 
 # standalone mode args: https://docs.confluent.io/5.1.2/connect/userguide.html#standalone-mode
 # RUN mkdir -p /tmp

@@ -3,9 +3,9 @@
 resource "kubernetes_deployment" "app" {
   metadata {
     name      = "${var.app_label}-deployment"
-    namespace = "${kubernetes_service_account.app.metadata.0.namespace}"
+    namespace = kubernetes_service_account.app.metadata.0.namespace
     labels = {
-      app = "${var.app_label}"
+      app = var.app_label
     }
   }
 
@@ -14,14 +14,14 @@ resource "kubernetes_deployment" "app" {
 
     selector {
       match_labels = {
-        app = "${var.app_label}"
+        app = var.app_label
       }
     }
 
     template {
       metadata {
         labels = {
-          app = "${var.app_label}"
+          app = var.app_label
         }
       }
 

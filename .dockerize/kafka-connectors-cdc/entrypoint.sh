@@ -8,16 +8,51 @@ wait_till_es_connected() {
     MAX_ATTEMPTS=${2:-999}
     RETRY_INTERVAL=${3:-5}
 
-    ATTEMPTS=0
-    # use /dev/null to mute output: https://unix.stackexchange.com/a/119650
-    until $(curl $URL > /dev/null 2>&1) || [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
-        ATTEMPTS=$((ATTEMPTS + 1))
-        echo "WARNING: Cannot connect to ${URL}, retrying in ${RETRY_INTERVAL} seconds...(${ATTEMPTS}/${MAX_ATTEMPTS})"
+    # ATTEMPTS=0
+    # # use /dev/null to mute output: https://unix.stackexchange.com/a/119650
+    # until [ "$(curl $URL/_cluster/health?pretty > /dev/null 2>&1)" != "200" ] || [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
+    #     ATTEMPTS=$((ATTEMPTS + 1))
+    #     echo "WARNING: Cannot connect to ${URL}, retrying in ${RETRY_INTERVAL} seconds...(${ATTEMPTS}/${MAX_ATTEMPTS})"
+    #     sleep ${RETRY_INTERVAL}
+    # done
+
+    # if [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; then
+    #     echo "ERROR: Cannot connect to ${URL} and already tried too many times. "
+    #     exit 1
+    # fi
+
+    # echo "INFO: Connected to ${URL} successfully, will cool down for 10 seconds..."
+    # sleep 10
+
+
+    # health check es based on: https://github.com/elastic/elasticsearch-py/issues/778#issuecomment-384389668
+    until $(curl --output /dev/null --silent --head --fail "$URL"); do
+        printf '.'
         sleep ${RETRY_INTERVAL}
     done
 
-    echo "INFO: Connected to ${URL} sunccessfully, will cool down for 10 seconds..."
-    sleep 10
+    # First wait for ES to start...
+    response=$(curl $URL)
+
+    until [ "$response" = "200" ]; do
+        response=$(curl --write-out %{http_code} --silent --output /dev/null "$URL")
+        >&2 echo "Elastic Search is unavailable - sleeping"
+        sleep ${RETRY_INTERVAL}
+    done
+
+    # next wait for ES status to turn to Green
+    health="$(curl -fsSL "$URL/_cat/health?h=status")"
+    health="$(echo "$health" | sed -r 's/^[[:space:]]+|[[:space:]]+$//g')" # trim whitespace (otherwise we'll have "green ")
+
+    until [ "$health" = 'green' ]; do
+        health="$(curl -fsSL "$host/_cat/health?h=status")"
+        health="$(echo "$health" | sed -r 's/^[[:space:]]+|[[:space:]]+$//g')" # trim whitespace (otherwise we'll have "green ")
+        >&2 echo "Elastic Search is unavailable - sleeping"
+        sleep ${RETRY_INTERVAL}
+    done
+
+    >&2 echo "Elastic Search is up"
+    
 }
 
 
@@ -45,6 +80,11 @@ wait_till_postgres_connected() {
         echo "WARNING: Cannot connect to ${SQL_HOST}, retrying in ${RETRY_INTERVAL} seconds...(${ATTEMPTS}/${MAX_ATTEMPTS})"
         sleep ${RETRY_INTERVAL}
     done
+
+    if [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; then
+        echo "ERROR: Cannot connect to ${SQL_HOST} and already tried too many times. "
+        exit 1
+    fi
 
     echo "INFO: Connected to ${URL} sunccessfully."
 }
