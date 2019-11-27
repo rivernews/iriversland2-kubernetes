@@ -124,8 +124,8 @@ resource "helm_release" "elasticsearch" {
   #   }
 
   depends_on = [
-    "kubernetes_cluster_role_binding.tiller",
-    "kubernetes_service_account.tiller"
+    kubernetes_cluster_role_binding.tiller,
+    kubernetes_service_account.tiller
   ]
 }
 
@@ -135,7 +135,7 @@ resource "helm_release" "elasticsearch" {
 # you'll be able to access kibana via browser at http://localhost:5601
 resource "helm_release" "kibana" {
   name      = "kibana-release"
-  namespace = "${kubernetes_service_account.tiller.metadata.0.namespace}"
+  namespace = kubernetes_service_account.tiller.metadata.0.namespace
 
   force_update = true
 

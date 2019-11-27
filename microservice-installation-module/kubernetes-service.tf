@@ -16,8 +16,12 @@ resource "kubernetes_service" "app" {
     port {
       #    name = "http"
       #    protocol    = "TCP"
-      port        = "${var.app_exposed_port}" # make this service visible to other services by this port; https://stackoverflow.com/a/49982009/9814131
-      target_port = var.app_exposed_port # the port where your application is running on the container
+
+      # make this service visible to other services by this port; https://stackoverflow.com/a/49982009/9814131
+      port        = var.app_exposed_port 
+
+      # the port where your application is running on the container
+      target_port = var.app_exposed_port
     }
   }
 }

@@ -5,7 +5,7 @@ data "helm_repository" "kafka_stack" {
 
 resource "helm_release" "kafka_stack" {
   name      = "kafka-stack-release"
-  namespace = "${kubernetes_service_account.tiller.metadata.0.namespace}"
+  namespace = kubernetes_service_account.tiller.metadata.0.namespace
 
   force_update = true
 
@@ -46,10 +46,10 @@ module "kafka_connect" {
   source = "./microservice-installation-module"
 
   # cluster-wise config (shared resources across different microservices)
-  dockerhub_kubernetes_secret_name   = "${kubernetes_secret.dockerhub_secret.metadata.0.name}"
-  cert_cluster_issuer_name           = "${local.cert_cluster_issuer_name}"
+  dockerhub_kubernetes_secret_name   = kubernetes_secret.dockerhub_secret.metadata.0.name
+  cert_cluster_issuer_name           = local.cert_cluster_issuer_name
   tls_cert_covered_domain_list       = local.tls_cert_covered_domain_list
-  cert_cluster_issuer_k8_secret_name = "${local.cert_cluster_issuer_k8_secret_name}"
+  cert_cluster_issuer_k8_secret_name = local.cert_cluster_issuer_k8_secret_name
 
   # app-specific config (microservice)
   app_label           = "kafka-connect"

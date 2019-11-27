@@ -12,14 +12,14 @@
 resource "kubernetes_secret" "tls_route53_secret" {
   metadata {
     name      = "project-tls-cert-dns01-challenge-route53-credentials-secret"
-    namespace = "${kubernetes_namespace.cert_manager.metadata.0.name}"
+    namespace = kubernetes_namespace.cert_manager.metadata.0.name
   }
   # k8 doc: https://github.com/kubernetes/community/blob/c7151dd8dd7e487e96e5ce34c6a416bb3b037609/contributors/design-proposals/auth/secrets.md#secret-api-resource
   # default type is opaque, which represents arbitrary user-owned data.
   type = "Opaque"
 
   data = {
-    "secret-access-key" = "${var.aws_secret_key}"
+    "secret-access-key" = var.aws_secret_key
   }
 }
 
@@ -78,21 +78,21 @@ resource "null_resource" "crd_cert_resources_install" {
     # list all dependencies here
     #
     #
-    jetstack_cert_crd_version = "${local.jetstack_cert_crd_version}"
-    cert_cluster_issuer_name  = "${local.cert_cluster_issuer_name}"
+    jetstack_cert_crd_version = local.jetstack_cert_crd_version
+    cert_cluster_issuer_name  = local.cert_cluster_issuer_name
 
-    letsencrypt_env         = "${var.letsencrypt_env}"
-    acme_server_url_prod    = "${local.acme_server_url_prod}"
-    acme_server_url_staging = "${local.acme_server_url_staging}"
+    letsencrypt_env         = var.letsencrypt_env
+    acme_server_url_prod    = local.acme_server_url_prod
+    acme_server_url_staging = local.acme_server_url_staging
 
-    docker_email = "${var.docker_email}"
+    docker_email = var.docker_email
 
-    cert_cluster_issuer_k8_secret_name = "${local.cert_cluster_issuer_k8_secret_name}"
+    cert_cluster_issuer_k8_secret_name = local.cert_cluster_issuer_k8_secret_name
 
-    aws_region                   = "${var.aws_region}"
-    aws_access_key               = "${var.aws_access_key}"
-    tls_route53_secret_name      = "${kubernetes_secret.tls_route53_secret.metadata.0.name}"
-    tls_cert_covered_domain_list = "${join(";", local.tls_cert_covered_domain_list)}"
+    aws_region                   = var.aws_region
+    aws_access_key               = var.aws_access_key
+    tls_route53_secret_name      = kubernetes_secret.tls_route53_secret.metadata.0.name
+    tls_cert_covered_domain_list = join(";", local.tls_cert_covered_domain_list)
 
     # ingress controller
     # ingress_controller = "${helm_release.project-nginx-ingress.metadata.0.values}"
@@ -176,7 +176,7 @@ EOT
 
   # (CRD) Destroy-Time Provisioners
   provisioner "local-exec" {
-    when    = "destroy"
+    when    = destroy
     # command = "bash ./my-kubectl.sh delete customresourcedefinitions.apiextensions.k8s.io certificates.certmanager.k8s.io clusterissuers.certmanager.k8s.io issuers.certmanager.k8s.io orders.certmanager.k8s.io certificaterequests.certmanager.k8s.io challenges.certmanager.k8s.io \n echo \n echo \n echo \n echo INFO: delete certificate resources complete, will sleep for 10 sec... \n sleep 10"
 
     # based on jetstack/cert-manager doc: 
@@ -194,8 +194,8 @@ EOT
 
   # (Issuer Cert Secret)
   provisioner "local-exec" {
-    when    = "destroy"
-    command = "${join("\n", [
+    when    = destroy
+    command = join("\n", [
         # delete cluster issuer private key secret, for letsencrypt api call, can differ for prod or staging.
         # no need to delete if you didn't make any change to ClusterIssuer.spec.acme
         # "bash ./my-kubectl.sh delete secrets ${local.cert_cluster_issuer_secret_name_prod} ${local.cert_cluster_issuer_secret_name_staging} -n ${kubernetes_namespace.cert_manager.metadata.0.name}",
@@ -221,7 +221,7 @@ EOT
         "echo",
         "echo INFO: delete certificate secrets complete, will sleep for 5 sec...",
         "sleep 5"
-    ])}"
+    ])
   }
 }
 
@@ -246,7 +246,7 @@ resource "helm_release" "project_cert_manager" {
   name = "cert-manager"
 
   #   repository = "charts.jetstack.io"
-  repository = "${data.helm_repository.jetstack.metadata.0.name}"
+  repository = data.helm_repository.jetstack.metadata.0.name
 
   #   chart = "stable/cert-manager"
   chart = "jetstack/cert-manager"
@@ -262,7 +262,7 @@ resource "helm_release" "project_cert_manager" {
 
 
   #   namespace = "${kubernetes_service_account.tiller.metadata.0.namespace}"
-  namespace = "${kubernetes_namespace.cert_manager.metadata.0.name}"
+  namespace = kubernetes_namespace.cert_manager.metadata.0.name
   timeout   = "540"
   
   # ingressShim 
@@ -286,12 +286,12 @@ resource "helm_release" "project_cert_manager" {
 
 
   depends_on = [
-    "kubernetes_cluster_role_binding.tiller",
-    "kubernetes_service_account.tiller",
+    kubernetes_cluster_role_binding.tiller,
+    kubernetes_service_account.tiller,
 
-    "helm_release.project-nginx-ingress",
+    helm_release.project-nginx-ingress,
 
-    "null_resource.crd_cert_resources_install"
+    null_resource.crd_cert_resources_install
   ]
 }
 

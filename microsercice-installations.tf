@@ -2,10 +2,10 @@ module "iriversland2_api" {
   source = "./microservice-installation-module"
 
   # cluster-wise config (shared resources across different microservices)
-  dockerhub_kubernetes_secret_name   = "${kubernetes_secret.dockerhub_secret.metadata.0.name}"
-  cert_cluster_issuer_name           = "${local.cert_cluster_issuer_name}"
+  dockerhub_kubernetes_secret_name   = kubernetes_secret.dockerhub_secret.metadata.0.name
+  cert_cluster_issuer_name           = local.cert_cluster_issuer_name
   tls_cert_covered_domain_list       = local.tls_cert_covered_domain_list
-  cert_cluster_issuer_k8_secret_name = "${local.cert_cluster_issuer_k8_secret_name}"
+  cert_cluster_issuer_k8_secret_name = local.cert_cluster_issuer_k8_secret_name
 
   # app-specific config (microservice)
   app_label               = "iriversland2-api"
@@ -13,7 +13,7 @@ module "iriversland2_api" {
   app_deployed_domain     = "api.shaungc.com"
   cors_domain_whitelist   = ["shaungc.com"]
   app_container_image     = "shaungc/iriversland2-django"
-  app_container_image_tag = "${var.app_container_image_tag}"
+  app_container_image_tag = var.app_container_image_tag
   app_secret_name_list = [
     "/provider/aws/account/iriversland2-15pro/AWS_REGION",
     "/provider/aws/account/iriversland2-15pro/AWS_ACCESS_KEY_ID",
@@ -60,9 +60,9 @@ module "appl_tracky_api" {
 
   # cluster-wise config (shared resources across different microservices)
   dockerhub_kubernetes_secret_name   = "${kubernetes_secret.dockerhub_secret.metadata.0.name}"
-  cert_cluster_issuer_name           = "${local.cert_cluster_issuer_name}"
+  cert_cluster_issuer_name           = local.cert_cluster_issuer_name
   tls_cert_covered_domain_list       = local.tls_cert_covered_domain_list
-  cert_cluster_issuer_k8_secret_name = "${local.cert_cluster_issuer_k8_secret_name}"
+  cert_cluster_issuer_k8_secret_name = local.cert_cluster_issuer_k8_secret_name
 
   # app-specific config (microservice)
   app_label               = "appl-tracky-api"
@@ -70,7 +70,7 @@ module "appl_tracky_api" {
   app_deployed_domain     = "appl-tracky.api.shaungc.com"
   cors_domain_whitelist   = ["rivernews.github.io", "appl-tracky.shaungc.com"]
   app_container_image     = "shaungc/appl-tracky-api"
-  app_container_image_tag = "${var.appl_tracky_api_image_tag}"
+  app_container_image_tag = var.appl_tracky_api_image_tag
   app_secret_name_list = [
     "/provider/aws/account/iriversland2-15pro/AWS_REGION",
     "/provider/aws/account/iriversland2-15pro/AWS_ACCESS_KEY_ID",
@@ -118,11 +118,11 @@ module "postgres_cluster" {
   source = "./microservice-installation-module"
 
   # cluster-wise config (shared resources across different microservices)
-  kubeconfig_raw                     = "${digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.raw_config}"
-  dockerhub_kubernetes_secret_name   = "${kubernetes_secret.dockerhub_secret.metadata.0.name}"
-  cert_cluster_issuer_name           = "${local.cert_cluster_issuer_name}"
+  kubeconfig_raw                     = digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.raw_config
+  dockerhub_kubernetes_secret_name   = kubernetes_secret.dockerhub_secret.metadata.0.name
+  cert_cluster_issuer_name           = local.cert_cluster_issuer_name
   tls_cert_covered_domain_list       = local.tls_cert_covered_domain_list
-  cert_cluster_issuer_k8_secret_name = "${local.cert_cluster_issuer_k8_secret_name}"
+  cert_cluster_issuer_k8_secret_name = local.cert_cluster_issuer_k8_secret_name
 
   # app-specific config (microservice)
   app_label           = "postgres-cluster"
@@ -148,10 +148,10 @@ module "redis_cluster" {
   source = "./microservice-installation-module"
 
   # cluster-wise config (shared resources across different microservices)
-  dockerhub_kubernetes_secret_name   = "${kubernetes_secret.dockerhub_secret.metadata.0.name}"
-  cert_cluster_issuer_name           = "${local.cert_cluster_issuer_name}"
+  dockerhub_kubernetes_secret_name   = kubernetes_secret.dockerhub_secret.metadata.0.name
+  cert_cluster_issuer_name           = local.cert_cluster_issuer_name
   tls_cert_covered_domain_list       = local.tls_cert_covered_domain_list
-  cert_cluster_issuer_k8_secret_name = "${local.cert_cluster_issuer_k8_secret_name}"
+  cert_cluster_issuer_k8_secret_name = local.cert_cluster_issuer_k8_secret_name
 
   # app-specific config (microservice)
   app_label           = "redis-cluster"

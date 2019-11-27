@@ -3,6 +3,6 @@ provider "local" {
 }
 
 resource "local_file" "kubeconfig" {
-    sensitive_content     = "${var.kubeconfig_raw}"
+    sensitive_content     = var.kubeconfig_raw
     filename = "${path.module}/kubeconfig.yaml"
 }

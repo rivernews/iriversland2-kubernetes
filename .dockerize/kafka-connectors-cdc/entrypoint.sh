@@ -26,17 +26,18 @@ wait_till_es_connected() {
 
 
     # health check es based on: https://github.com/elastic/elasticsearch-py/issues/778#issuecomment-384389668
-    until $(curl --output /dev/null --silent --head --fail "$URL"); do
-        printf '.'
+    echo 'INFO: initial probe into elasticsearch cluster...'
+    until $(curl --silent --output /dev/null --head --fail "$URL"); do
+        echo 'INFO: still resolving elasticsearch host...'
         sleep ${RETRY_INTERVAL}
     done
 
     # First wait for ES to start...
-    response=$(curl $URL)
+    response=$(curl --silent $URL)
 
     until [ "$response" = "200" ]; do
         response=$(curl --write-out %{http_code} --silent --output /dev/null "$URL")
-        >&2 echo "Elastic Search is unavailable - sleeping"
+        >&2 echo "WARNING: Elastic Search is not 200 yet - sleeping"
         sleep ${RETRY_INTERVAL}
     done
 
@@ -47,7 +48,7 @@ wait_till_es_connected() {
     until [ "$health" = 'green' ]; do
         health="$(curl -fsSL "$host/_cat/health?h=status")"
         health="$(echo "$health" | sed -r 's/^[[:space:]]+|[[:space:]]+$//g')" # trim whitespace (otherwise we'll have "green ")
-        >&2 echo "Elastic Search is unavailable - sleeping"
+        >&2 echo "Elastic Search is not green yet - sleeping"
         sleep ${RETRY_INTERVAL}
     done
 
@@ -86,7 +87,7 @@ wait_till_postgres_connected() {
         exit 1
     fi
 
-    echo "INFO: Connected to ${URL} sunccessfully."
+    echo "INFO: Connected to ${SQL_HOST} sunccessfully."
 }
 
 

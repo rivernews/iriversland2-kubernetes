@@ -28,22 +28,22 @@ resource "kubernetes_deployment" "app" {
       spec {
         # automount_service_account_token = true
 
-        service_account_name = "${kubernetes_service_account.app.metadata.0.name}"
+        service_account_name = kubernetes_service_account.app.metadata.0.name
 
         image_pull_secrets {
-          name = "${var.dockerhub_kubernetes_secret_name}"
+          name = var.dockerhub_kubernetes_secret_name
         }
 
         container {
-          name  = "${var.app_label}"
-          image = "${lower(trimspace("${var.app_container_image}:${var.app_container_image_tag}"))}"
+          name  = var.app_label
+          image = lower(trimspace("${var.app_container_image}:${var.app_container_image_tag}"))
 
           # terraform official doc: https://www.terraform.io/docs/providers/kubernetes/r/deployment.html#image_pull_policy
           # private image registry: https://stackoverflow.com/questions/49639280/kubernetes-cannot-pull-image-from-private-docker-image-repository
           image_pull_policy = "Always"
 
           port {
-            container_port = "${var.app_exposed_port}"
+            container_port = var.app_exposed_port
             # name = "http"
           }
 
@@ -66,18 +66,18 @@ resource "kubernetes_deployment" "app" {
           # see `env_from` example at: https://www.michielsikkes.com/managing-and-deploying-app-secrets-at-firmhouse/
           env_from {
             secret_ref {
-              name = "${kubernetes_secret.app_credentials.metadata.0.name}"
+              name = kubernetes_secret.app_credentials.metadata.0.name
             }
           }
 
           env {
             name  = "DEPLOYED_DOMAIN"
-            value = "${var.app_deployed_domain}"
+            value = var.app_deployed_domain
           }
 
           env {
               name = "CORS_DOMAIN_WHITELIST"
-              value = "${join(",", var.cors_domain_whitelist)}"
+              value = join(",", var.cors_domain_whitelist)
           }
 
           #   resources {
@@ -158,7 +158,7 @@ data "aws_ssm_parameter" "app_credentials" {
 resource "kubernetes_secret" "app_credentials" {
   metadata {
     name      = "${var.app_label}-credentials"
-    namespace = "${kubernetes_service_account.app.metadata.0.namespace}"
+    namespace = kubernetes_service_account.app.metadata.0.namespace
   }
   # k8 doc: https://github.com/kubernetes/community/blob/c7151dd8dd7e487e96e5ce34c6a416bb3b037609/contributors/design-proposals/auth/secrets.md#secret-api-resource
   # default type is opaque, which represents arbitrary user-owned data.

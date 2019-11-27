@@ -11,7 +11,7 @@ resource "kubernetes_persistent_volume_claim" "app_digitalocean_pvc" {
   metadata {
     # for digitalocean - must be lowercase alphanumeric values and dashes (hyphen) only
     name      = "${var.app_label}-persistent-volume-claim"
-    namespace = "${kubernetes_service_account.app.metadata.0.namespace}"
+    namespace = kubernetes_service_account.app.metadata.0.namespace
   }
   spec {
     access_modes = ["ReadWriteOnce"]
@@ -32,6 +32,6 @@ resource "kubernetes_persistent_volume_claim" "app_digitalocean_pvc" {
 #   }
 
   depends_on = [
-    "local_file.kubeconfig"
+    local_file.kubeconfig
   ]
 }
