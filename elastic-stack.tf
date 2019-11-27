@@ -46,8 +46,16 @@ resource "helm_release" "elasticsearch" {
     # initial heap size [268435456] not equal to maximum heap size [536870912]; this can cause resize pauses and prevents mlockall from locking the entire heap
     esJavaOpts: "-Xmx512m -Xms512m" # TODO: set this if using too much resources
 
-    # Kubernetes replica count for the statefulset (i.e. how many pods) ~= Data node replicas (statefulset)
-    replicas: "0" # zero to disable index replica, so that index status won't be yellow when only provisioning 1 node for es cluster
+    # Kubernetes replica count for the statefulset (i.e. how many pods) && Data node replicas (statefulset)
+    replicas: "1"
+    esConfig:
+        elasticsearch.yml: |
+            lifecycle:
+                postStart:
+                    exec:
+                        command: ["/bin/sh", "-c", "curl -v -XPUT -H 'Content-Type: application/json' */_settings -d '{ \"index\" : {\"number_of_replicas\" : 0}}' > /usr/share/message"]
+
+            # zero to disable index replica, so that index status won't be yellow when only provisioning 1 node for es cluster
 
     # Allocate smaller chunks of memory per pod.
     resources:
