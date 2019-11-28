@@ -100,6 +100,19 @@ echo "INFO: waiting for postgres to be ready..."
 wait_till_postgres_connected ${SQL_HOST} ${SQL_USER} ${SQL_DATABASE}
 
 
+
+echo ""
+echo ""
+echo ""
+echo "INFO: installing  connectors..."
+mkdir -p ${KAFKA_CONNECT_POSTGRES_DIR} &&\
+    curl -sO  https://repo1.maven.org/maven2/io/debezium/debezium-connector-postgres/0.10.0.Final/debezium-connector-postgres-0.10.0.Final-plugin.tar.gz &&\
+    tar xf debezium-connector-postgres-0.10.0.Final-plugin.tar.gz --directory ${KAFKA_CONNECT_POSTGRES_DIR}
+
+mkdir -p ${KAFKA_CONNECT_ES_DIR} &&\
+    curl -sO  https://d1i4a15mxbxib1.cloudfront.net/api/plugins/confluentinc/kafka-connect-elasticsearch/versions/5.3.1/confluentinc-kafka-connect-elasticsearch-5.3.1.zip &&\
+    unzip confluentinc-kafka-connect-elasticsearch-5.3.1.zip -d ${KAFKA_CONNECT_ES_DIR}
+
 echo ""
 echo ""
 echo ""

@@ -23,6 +23,7 @@ ENV KAFKA_CFG_PLUGIN_PATH="${KAFKA_HOME}/connectors"
 # ENV KAFKA_CFG_PLUGIN_PATH="${KAFKA_CONNECT_PLUGINS_DIR}"
 
 ENV KAFKA_CONNECT_ES_DIR=$KAFKA_CFG_PLUGIN_PATH/kafka-connect-elasticsearch
+ENV KAFKA_CONNECT_POSTGRES_DIR=$KAFKA_CFG_PLUGIN_PATH/kafka-connect-postgres
 
 # default ENV values: https://vsupalov.com/docker-arg-env-variable-guide/#setting-env-values
 ENV KAFKA_HEAP_OPTS='-Xmx512m -Xms512m'
@@ -31,6 +32,9 @@ ENV ALLOW_PLAINTEXT_LISTENER=yes
 # ENV ADVERTISED_PORT 8083
 
 
+# install psql based on https://wiki.debian.org/PostgreSql#Installation
+RUN apt-get update -y && apt-get install -y jq postgresql postgresql-client unzip
+
 
 # Install connectors by copying over the jars as below
 # or, using confluent cli: https://docs.confluent.io/current/connect/managing/extending.html#create-a-docker-image-containing-c-hub-connectors
@@ -38,13 +42,20 @@ ENV ALLOW_PLAINTEXT_LISTENER=yes
 #     && confluent-hub install --no-prompt confluentinc/kafka-connect-elasticsearch:5.3.1
 
 # debezium postgres connector: https://www.confluent.io/hub/debezium/debezium-connector-postgresql
-RUN mkdir -p ${KAFKA_CFG_PLUGIN_PATH}
-COPY ./debezium-connector-postgres/. ${KAFKA_CFG_PLUGIN_PATH}/debezium-connector-postgres/
+# RUN mkdir -p ${KAFKA_CONNECT_POSTGRES_DIR} &&\
+#     curl -sO  https://repo1.maven.org/maven2/io/debezium/debezium-connector-postgres/0.10.0.Final/debezium-connector-postgres-0.10.0.Final-plugin.tar.gz &&\
+#     tar xf debezium-connector-postgres-0.10.0.Final-plugin.tar.gz --directory ${KAFKA_CONNECT_POSTGRES_DIR}
 
-# es connector jar hub page: https://www.confluent.io/hub/confluentinc/kafka-connect-elasticsearch
-# RUN mkdir -p ${KAFKA_CFG_PLUGIN_PATH}/confluentinc-kafka-connect-elasticsearch
-RUN mkdir -p ${KAFKA_CONNECT_ES_DIR}
-COPY ./confluentinc-kafka-connect-elasticsearch-5.3.1/. $KAFKA_CONNECT_ES_DIR/
+# # COPY ./debezium-connector-postgres/. ${KAFKA_CFG_PLUGIN_PATH}/debezium-connector-postgres/
+
+
+# # es connector jar hub page: https://www.confluent.io/hub/confluentinc/kafka-connect-elasticsearch
+# # RUN mkdir -p ${KAFKA_CFG_PLUGIN_PATH}/confluentinc-kafka-connect-elasticsearch
+# RUN mkdir -p ${KAFKA_CONNECT_ES_DIR} &&\
+#     curl -sO  https://d1i4a15mxbxib1.cloudfront.net/api/plugins/confluentinc/kafka-connect-elasticsearch/versions/5.3.1/confluentinc-kafka-connect-elasticsearch-5.3.1.zip &&\
+#     unzip confluentinc-kafka-connect-elasticsearch-5.3.1.zip -d ${KAFKA_CONNECT_ES_DIR}
+
+# COPY ./confluentinc-kafka-connect-elasticsearch-5.3.1/. $KAFKA_CONNECT_ES_DIR/
 
 
 # we replace the default connect-standalone.properties so we can properly resolve to our local Kafka docker development
@@ -54,8 +65,6 @@ COPY kafka-connect.properties ${KAFKA_CONFIG}/
 COPY postgres-connector.properties ${KAFKA_CONFIG}/
 COPY elasticsearch-connector.properties ${KAFKA_CONFIG}/
 
-# install psql based on https://wiki.debian.org/PostgreSql#Installation
-RUN apt-get update -y && apt-get install -y jq postgresql postgresql-client
 
 # standalone mode args: https://docs.confluent.io/5.1.2/connect/userguide.html#standalone-mode
 # RUN mkdir -p /tmp

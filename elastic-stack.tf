@@ -68,7 +68,9 @@ resource "helm_release" "elasticsearch" {
             cpu: "1000m"
             memory: "1024M"
 
-    # Request smaller persistent volumes.
+    # volume / data persistency settings
+    persistence:
+        enabled: true
     volumeClaimTemplate:
         accessModes: [ "ReadWriteOnce" ]
         storageClassName: "do-block-storage"
@@ -101,7 +103,7 @@ resource "helm_release" "elasticsearch" {
   # `. ./my-kubectl.sh get pods --namespace=kube-system -l app=elasticsearch-master --watch` to wait and expect a 1/1 READY
   # `. ./my-kubectl.sh logs --follow  elasticsearch-master-0 -n kube-system` for logs after pods created and elasticsearch start spinning up
   
-  wait = false
+  wait = true
 
   # all available configurations: https://github.com/elastic/helm-charts/tree/master/elasticsearch#configuration
   set_string {
@@ -140,7 +142,7 @@ resource "helm_release" "kibana" {
   force_update = true
 
   # don't rely on terraform helm provider to check on resource created successfully or not
-  wait = false
+  wait = true
 
   repository = data.helm_repository.elastic_stack.metadata[0].name
   chart      = "kibana"

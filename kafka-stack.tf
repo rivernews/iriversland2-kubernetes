@@ -10,7 +10,7 @@ resource "helm_release" "kafka_stack" {
   force_update = true
 
   # don't rely on terraform helm provider to check on resource created successfully or not
-  wait = false
+  wait = true
 
   repository = data.helm_repository.kafka_stack.metadata[0].name
   chart      = "bitnami/kafka"
