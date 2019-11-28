@@ -70,6 +70,7 @@ resource "helm_release" "elasticsearch" {
 
     # volume / data persistency settings
     persistence:
+        # must enable persistence or elasticsearch cannot launch
         enabled: true
     volumeClaimTemplate:
         accessModes: [ "ReadWriteOnce" ]

@@ -5,25 +5,7 @@ DATABASE_APPLTRACKY_LOGICAL_NAME=${DATABASE_APPLTRACKY_LOGICAL_NAME:-appl_tracky
 
 wait_till_es_connected() {
     URL=${1:-localhost}
-    MAX_ATTEMPTS=${2:-999}
-    RETRY_INTERVAL=${3:-5}
-
-    # ATTEMPTS=0
-    # # use /dev/null to mute output: https://unix.stackexchange.com/a/119650
-    # until [ "$(curl $URL/_cluster/health?pretty > /dev/null 2>&1)" != "200" ] || [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; do
-    #     ATTEMPTS=$((ATTEMPTS + 1))
-    #     echo "WARNING: Cannot connect to ${URL}, retrying in ${RETRY_INTERVAL} seconds...(${ATTEMPTS}/${MAX_ATTEMPTS})"
-    #     sleep ${RETRY_INTERVAL}
-    # done
-
-    # if [ $ATTEMPTS -eq $MAX_ATTEMPTS ]; then
-    #     echo "ERROR: Cannot connect to ${URL} and already tried too many times. "
-    #     exit 1
-    # fi
-
-    # echo "INFO: Connected to ${URL} successfully, will cool down for 10 seconds..."
-    # sleep 10
-
+    RETRY_INTERVAL=${2:-5}
 
     # health check es based on: https://github.com/elastic/elasticsearch-py/issues/778#issuecomment-384389668
     echo 'INFO: initial probe into elasticsearch cluster...'
@@ -64,6 +46,32 @@ echo "INFO: elasticsearch host is ${ELASTICSEARCH_HOST}"
 echo "INFO: elasticsearch port is ${ELASTICSEARCH_PORT}"
 echo "INFO: waiting for elasticsearch to be ready..."
 wait_till_es_connected ${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
+
+
+echo ""
+echo ""
+echo ""
+echo "INFO: configuring elasticsearch indices..."
+# elasticsearch put index API: https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates.html
+# use HERE document with curl, based on SO: https://stackoverflow.com/questions/34847981/curl-with-multiline-of-json
+curl -v -XPUT -H 'Content-Type: application/json' http://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}/_template/template_disable_replicas --data-binary @- << EOF 
+{
+    "index_patterns": ["appl_tracky*"], 
+    "settings": { 
+        "index" : {
+            "number_of_replicas" : 0
+        }
+    },
+    "mappings": {
+        "properties": {
+            "created_at": {
+                "type": "date",
+                "format": ["strict_date_time"]
+            }
+        }
+    }
+}
+EOF
 
 
 wait_till_postgres_connected() {
@@ -132,23 +140,6 @@ echo "POSTGRES_APPLTRACKY_SERVER_LOGICAL_NAME=${DATABASE_APPLTRACKY_LOGICAL_NAME
 echo "POSTGRES_APPLTRACKY_SLOT_NAME=${DATABASE_APPLTRACKY_LOGICAL_NAME}__slot" >> /tmp/credentials.properties
 echo "POSTGRES_APPLTRACKY_PUBLICATION_NAME=${DATABASE_APPLTRACKY_LOGICAL_NAME}__publication" >> /tmp/credentials.properties
 
-
-echo ""
-echo ""
-echo ""
-echo "INFO: configuring elasticsearch indices..."
-# elasticsearch put index API: https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates.html
-# use HERE document with curl, based on SO: https://stackoverflow.com/questions/34847981/curl-with-multiline-of-json
-curl -v -XPUT -H 'Content-Type: application/json' http://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}/_template/template_disable_replicas --data-binary @- << EOF 
-{
-    "index_patterns": ["*"], 
-    "settings": { 
-        "index" : {
-            "number_of_replicas" : 0
-        }
-    }
-}
-EOF
 
 echo ""
 echo ""
