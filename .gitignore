@@ -14,3 +14,6 @@ kubeconfig.yaml
 **local**.tfvars
 
 .DS_Store
+
+# pyenv
+.python-version

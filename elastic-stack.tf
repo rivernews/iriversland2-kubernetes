@@ -19,47 +19,65 @@ data "http" "elasticsearch_helm_chart_values" {
 # this release will create 3 pods running elasticsearch
 # you can verify by running `kubectl get pods --namespace=default -l app=elasticsearch-master -w`
 # do port forwarding by `. ./my-kubectl.sh port-forward svc/elasticsearch-master -n kube-system 9200`
+locals {
+    elasticsearch_port = 9200
+}
 resource "helm_release" "elasticsearch" {
   name      = "elasticsearch-release"
-  namespace = "${kubernetes_service_account.tiller.metadata.0.namespace}"
+  namespace = kubernetes_service_account.tiller.metadata.0.namespace
 
   force_update = true
 
   repository = data.helm_repository.elastic_stack.metadata[0].name
   chart      = "elasticsearch"
-  # version    = "6.0.1" # TODO: lock down version after this release works
+  version    = "7.4.1" # TODO: lock down version based on `Chart.yaml`, refer to https://github.com/elastic/helm-charts/blob/1f9e8a4f8a4edbf2773b4553953abb6074ee77ce/elasticsearch/Chart.yaml
+  # chart version 7.4.1 ==> es version 7.4.1
 
   #   values = [
   #     "${data.http.elasticsearch_helm_chart_values.body}"
   #   ]
 
   # https://github.com/elastic/helm-charts/blob/master/elasticsearch/examples/kubernetes-kind/values.yaml
+  # defaults: https://github.com/elastic/helm-charts/blob/master/elasticsearch/values.yaml
   values = [<<-EOF
     ---
     # Permit co-located instances for solitary minikube virtual machines.
     antiAffinity: "soft"
+    httpPort: ${local.elasticsearch_port}
 
     # Shrink default JVM heap.
     # mx and ms value must be the same, otherwise will give error
     # initial heap size [268435456] not equal to maximum heap size [536870912]; this can cause resize pauses and prevents mlockall from locking the entire heap
-    esJavaOpts: "-Xmx256m -Xms256m"
+    esJavaOpts: "-Xmx512m -Xms512m" # TODO: set this if using too much resources
+
+    # Kubernetes replica count for the statefulset (i.e. how many pods) && Data node replicas (statefulset)
+    replicas: "1"
+    
+    # zero to disable index replica, so that index status won't be yellow when only provisioning 1 node for es cluster
+    # lifecycle:
+    #     postStart:
+    #         exec:
+    #             command: ["sh", "-c", "sleep 30 && curl -v -XPUT -H 'Content-Type: application/json' http://elasticsearch-master:9200/_settings -d '{ \"index\" : {\"number_of_replicas\" : 0}}' > /usr/share/message"]
 
     # Allocate smaller chunks of memory per pod.
     resources:
         requests:
             cpu: "100m"
-            memory: "400M"
+            memory: "512M"
         limits:
             cpu: "1000m"
-            memory: "768M"
+            memory: "1024M"
 
-    # Request smaller persistent volumes.
+    # volume / data persistency settings
+    persistence:
+        # must enable persistence or elasticsearch cannot launch
+        enabled: true
     volumeClaimTemplate:
         accessModes: [ "ReadWriteOnce" ]
         storageClassName: "do-block-storage"
         resources:
             requests:
-                storage: "1Gi"
+                storage: "2Gi"
     extraInitContainers: |
         - name: create
           image: busybox:1.28
@@ -85,18 +103,19 @@ resource "helm_release" "elasticsearch" {
   # use below commands instead to inspect the pod readiness and logs
   # `. ./my-kubectl.sh get pods --namespace=kube-system -l app=elasticsearch-master --watch` to wait and expect a 1/1 READY
   # `. ./my-kubectl.sh logs --follow  elasticsearch-master-0 -n kube-system` for logs after pods created and elasticsearch start spinning up
-  wait = false
+  
+  wait = true
 
   # all available configurations: https://github.com/elastic/helm-charts/tree/master/elasticsearch#configuration
   set_string {
     name  = "imageTag"
-    value = "7.4.1" # lock down to version 7.4.1 of Elasticsearch
+    value = "7.4.1" # lock down to version 7.4.1 of Elasticsearch --> TODO: 6.X (e.g., latest 6.8.4 as of 11/20/2019) is recommended for better compatibility with other components
   }
 
-  set_string {
-    name  = "replicas"
-    value = "1"
-  }
+#   set_string {
+#     name  = "replicas"
+#     value = "1"
+#   }
 
   # this will be run before terraform delete resource
   # which will cause terraform error because when terraform 
@@ -108,8 +127,8 @@ resource "helm_release" "elasticsearch" {
   #   }
 
   depends_on = [
-    "kubernetes_cluster_role_binding.tiller",
-    "kubernetes_service_account.tiller"
+    kubernetes_cluster_role_binding.tiller,
+    kubernetes_service_account.tiller
   ]
 }
 
@@ -119,12 +138,12 @@ resource "helm_release" "elasticsearch" {
 # you'll be able to access kibana via browser at http://localhost:5601
 resource "helm_release" "kibana" {
   name      = "kibana-release"
-  namespace = "${kubernetes_service_account.tiller.metadata.0.namespace}"
+  namespace = kubernetes_service_account.tiller.metadata.0.namespace
 
   force_update = true
 
   # don't rely on terraform helm provider to check on resource created successfully or not
-  wait = false
+  wait = true
 
   repository = data.helm_repository.elastic_stack.metadata[0].name
   chart      = "kibana"
@@ -146,6 +165,10 @@ resource "helm_release" "kibana" {
   #     when    = "destroy"
   #     command = ". ./my-helm.sh delete kibana-release && . ./my-helm.sh del --purge kibana-release"
   #   }
+
+  depends_on = [
+    helm_release.elasticsearch
+  ]
 }
 
 # # this release will create 3 pod running metricbeat

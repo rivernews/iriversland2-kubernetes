@@ -20,14 +20,14 @@ locals {
 # `helm_release` is similar to `helm install ...`
 resource "helm_release" "project-nginx-ingress" {
   name      = "nginx-ingress-controller"
-  namespace = "${kubernetes_service_account.tiller.metadata.0.namespace}"
+  namespace = kubernetes_service_account.tiller.metadata.0.namespace
 
   force_update = true
 
   # or chart = "stable/nginx-ingress"
   # see https://github.com/digitalocean/digitalocean-cloud-controller-manager/issues/162
 
-  repository = "${data.helm_repository.stable.metadata.0.name}"
+  repository = data.helm_repository.stable.metadata.0.name
   chart      = "nginx-ingress"
   # version = ""
 
@@ -154,10 +154,10 @@ resource "helm_release" "project-nginx-ingress" {
   }
 
   depends_on = [
-    "kubernetes_cluster_role_binding.tiller",
-    "kubernetes_service_account.tiller",
+    kubernetes_cluster_role_binding.tiller,
+    kubernetes_service_account.tiller,
 
-    "null_resource.crd_cert_resources_install"
+    null_resource.crd_cert_resources_install
   ]
 }
 
@@ -200,7 +200,7 @@ resource "helm_release" "project-nginx-ingress" {
 resource "helm_release" "project-external-dns" {
   name      = "external-dns"
   chart     = "stable/external-dns"
-  namespace = "${kubernetes_service_account.tiller.metadata.0.namespace}"
+  namespace = kubernetes_service_account.tiller.metadata.0.namespace
 
   # see available version by `. ./my-helm.sh search -l stable/external-dns`
   # app version refer to: https://github.com/kubernetes-sigs/external-dns/blob/master/CHANGELOG.md
@@ -218,24 +218,24 @@ resource "helm_release" "project-external-dns" {
 
   set {
     name  = "aws.credentials.accessKey"
-    value = "${var.aws_access_key}"
+    value = var.aws_access_key
   }
 
   set {
     name  = "aws.credentials.secretKey"
-    value = "${var.aws_secret_key}"
+    value = var.aws_secret_key
   }
 
   set {
     name  = "aws.region"
-    value = "${var.aws_region}"
+    value = var.aws_region
   }
 
   # domains you want external-dns to be able to edit
   # see terraform official blog: https://www.hashicorp.com/blog/using-the-kubernetes-and-helm-providers-with-terraform-0-12
   set {
     name  = "domainFilters[0]"
-    value = "${var.managed_k8_rx_domain}"
+    value = var.managed_k8_rx_domain
   }
 
   #   set {
@@ -257,14 +257,9 @@ resource "helm_release" "project-external-dns" {
     value = true
   }
 
-  provisioner "local-exec" {
-    when    = "destroy"
-    command = ". ./my-helm.sh delete external-dns && . ./my-helm.sh del --purge external-dns"
-  }
-
   depends_on = [
-    "kubernetes_cluster_role_binding.tiller",
-    "kubernetes_service_account.tiller"
+    kubernetes_cluster_role_binding.tiller,
+    kubernetes_service_account.tiller
   ]
 }
 
@@ -275,7 +270,7 @@ resource "helm_release" "project-external-dns" {
 resource "kubernetes_ingress" "project-ingress-resource" {
   metadata {
     name      = "tls-wildcard-cert-ingress-resource"
-    namespace = "${module.iriversland2_api.microservice_namespace}"
+    namespace = module.iriversland2_api.microservice_namespace
 
     # annotation spec: https://github.com/kubernetes/ingress-nginx/blob/master/docs/user-guide/nginx-configuration/annotations.md#annotations
     annotations = {
@@ -294,7 +289,7 @@ resource "kubernetes_ingress" "project-ingress-resource" {
 
       # if want to share single TLS certificate, then only one ing should contain this annotation
       # https://github.com/jetstack/cert-manager/issues/841#issuecomment-414299467
-      "certmanager.k8s.io/cluster-issuer" = "${local.cert_cluster_issuer_name}"
+      "certmanager.k8s.io/cluster-issuer" = local.cert_cluster_issuer_name
     }
   }
 
@@ -312,7 +307,7 @@ resource "kubernetes_ingress" "project-ingress-resource" {
       #   hosts       = ["${var.managed_k8_rx_domain}", "${local.app_deployed_domain}", "*.${var.managed_k8_rx_domain}"]
 
       #   secret_name = "${local.cert_cluster_issuer_k8_secret_name}"
-      secret_name = "${local.central_tls_ing_certificate_secret_name}"
+      secret_name = local.central_tls_ing_certificate_secret_name
     }
     # for registering wildcard tls certificate
     # see https://github.com/kubernetes/ingress-nginx/issues/4206#issuecomment-503140848
@@ -325,8 +320,8 @@ resource "kubernetes_ingress" "project-ingress-resource" {
           path {
             backend {
               #   service_name = "${kubernetes_service.app.metadata.0.name}"
-              service_name = "${module.iriversland2_api.microservice_kubernetes_service_name}"
-              service_port = "${module.iriversland2_api.microservice_kubernetes_service_port}"
+              service_name = module.iriversland2_api.microservice_kubernetes_service_name
+              service_port = module.iriversland2_api.microservice_kubernetes_service_port
             }
 
             path = "/"
@@ -353,12 +348,12 @@ resource "kubernetes_ingress" "project-ingress-resource" {
     # }
 
     rule {
-      host = "${module.iriversland2_api.microservice_deployed_domain}"
+      host = module.iriversland2_api.microservice_deployed_domain
       http {
         path {
           backend {
-            service_name = "${module.iriversland2_api.microservice_kubernetes_service_name}"
-            service_port = "${module.iriversland2_api.microservice_kubernetes_service_port}"
+            service_name = module.iriversland2_api.microservice_kubernetes_service_name
+            service_port = module.iriversland2_api.microservice_kubernetes_service_port
           }
 
           path = "/"
@@ -367,12 +362,12 @@ resource "kubernetes_ingress" "project-ingress-resource" {
     }
 
     rule {
-      host = "${module.appl_tracky_api.microservice_deployed_domain}"
+      host = module.appl_tracky_api.microservice_deployed_domain
       http {
         path {
           backend {
-            service_name = "${module.appl_tracky_api.microservice_kubernetes_service_name}"
-            service_port = "${module.appl_tracky_api.microservice_kubernetes_service_port}"
+            service_name = module.appl_tracky_api.microservice_kubernetes_service_name
+            service_port = module.appl_tracky_api.microservice_kubernetes_service_port
           }
 
           path = "/"
@@ -393,7 +388,7 @@ resource "kubernetes_ingress" "project-ingress-resource" {
     # DON't -> 
 
     # above may not be true - see https://github.com/jetstack/cert-manager/blob/master/docs/tutorials/acme/quick-start/index.rst#step-7---deploy-a-tls-ingress-resource
-    "helm_release.project_cert_manager",
+    helm_release.project_cert_manager,
   ]
 }
 

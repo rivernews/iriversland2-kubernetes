@@ -21,14 +21,18 @@ MANIFEST_IMAGE_TAGS = [{
     'arg_name_full': 'redis_cluster_image_tag',
     'arg_name_short': 'rd',
     'project name': 'redis db'
+},{
+    'arg_name_full': 'kafka_connect_image_tag',
+    'arg_name_short': 'kc',
+    'project name': 'kafka connect cdc'
 }]
 
 def validate_tag(docker_build_hash):
     if docker_build_hash.lower().strip() == 'latest':
         return 'latest'
     
-    # check by version number
-    version_pattern = re.compile(r'[0-9]+\.[0-9]+\.[0-9]+')
+    # check by version number (X.X.X)-rX
+    version_pattern = re.compile(r'[0-9]+\.[0-9]+.*')
     if version_pattern.match(docker_build_hash):
         return docker_build_hash
 
@@ -97,7 +101,7 @@ def terraform_deploy():
     elif args_data.refresh:
         terraform_base_command = ['terraform', 'refresh']
     elif args_data.remove:
-        terraform_base_command = ['terraform', 'state', 'rm']
+        terraform_base_command = ['terraform', 'state', 'rm', '""']
         terraform_base_command += ['-dry-run'] if args_data.dryrun else []
     else:
         terraform_base_command = ['terraform', 'apply', '-auto-approve']
@@ -108,7 +112,8 @@ def terraform_deploy():
         terraform_command = terraform_base_command
 
     if args_data.target:
-        terraform_command += [' '.join([f'-target={target}' for target in args_data.target ])]
+        # terraform_command += [' '.join([f'-target={target}' for target in args_data.target ])]
+        terraform_command += [f'-target={target}' for target in args_data.target]
     
     s = input("\nTerraform command:\n{}\n\nPlease review the change above.\n".format(' '.join(terraform_command)))
 
@@ -122,7 +127,7 @@ def terraform_deploy():
 
             release_history.append(apply_release)
             with open('release.json', 'w') as f:
-                json.dump(release_history, f)
+                json.dump(release_history, f, indent=4)
         except subprocess.CalledProcessError as e:
             raise
     else:

@@ -1,4 +1,6 @@
-FROM hashicorp/terraform:0.12.6
+FROM hashicorp/terraform:0.12.16
+
+
 
 # install curl
 # https://stackoverflow.com/a/51209115/9814131

@@ -19,9 +19,11 @@ This repository provisions the entire Kubernetes cluster as below in the image. 
 
 ## Prerequisites
 
-- Install `brew install terraform` (version 0.12.6)
-- Install `brew install kubernetes-cli` for `kubectl` (version v1.15.2) for kubernetes CRD resources management support
-- Install `brew install kubernetes-helm` for `helm` (version v2.16.1) for helm release resources management support
+- Install `brew terraform kubernetes-cli helm`
+    - Terraform (version 0.12.6)
+    - Kubernetes CLI (version v1.15.2) for kubernetes CRD resources management support
+    - Helm CLI (version v2.16.1) for helm release resources management support
+- Optionally install `brew install doctl` for the digitalocean cli tool
 - Run `export KUBECONFIG=kubeconfig.yaml`
 
 Optional, nice to have (useful for debug):
@@ -112,7 +114,7 @@ Due to the lack of support for CRD (K8 custom resource) in Terraform, we are usi
 
 `null_resource` does not have much option when dealing with change - currently only creation and destroy, but not modify. To guarantee resources are in the right state, we put all dependencies in the trigger block of `null_resource`. How trigger works is quite rigid at this point (Terraform v0.12.6): whenever any of these values in trigger block change, it will always do re-create, i.e., destroy then create: run the provisioners commands w/ `when = destroy` (Destroy Provisioners), then run the provisioners w/o `when = destroy` (Creation Provisioners). This is far from ideal, but at least this makes sure our `local-exec`approach is reflecting any change correctly.
 
-However, Let's Encrypt, the certificate issuer, has a pretty strict rate limit on requesting production certificate. Changes like `ClusterIssuer`'s name are defintely not worth of requesting a new certificate, and should just run the creation provisioners (`kubectl apply`) w/o running the destroy provisioners (`kubectl delete`) beforehand. These changes should be avoid, or at least one has to be aware of Let's Encrypt rate limit. You can always [check how many certificate you have requested so far](https://crt.sh).
+However, Let's Encrypt, the certificate issuer, has a pretty strict rate limit on requesting production certificate. Changes like `ClusterIssuer`'s name are defintely not worth of requesting a new certificate, and should just run the creation provisioners (`kubectl apply`) w/o running the destroy provisioners (`kubectl delete`) beforehand. These changes should be avoid, or at least one has to be aware of Let's Encrypt rate limit. You can always [check how many certificate you have requested so far](https://crt.sh). Or, [use the tool `lectl`](https://community.letsencrypt.org/t/check-on-rate-limit-status-for-domain/37402/2) suggested in this post.
 
 Still, there are changes that indeed need a certificate renewal. e.g., changes in Let's Encrypt API endpoint (most likely due to version update), tls block in ingress resource, as well as aws credentials for the route53 dns challenge. Luckily, these changes are not likely to happen frequently. Using the current approach, you will change the variable values, then the `local-exec` will handle the rest for you.
 

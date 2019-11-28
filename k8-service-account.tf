@@ -24,9 +24,9 @@ resource "kubernetes_cluster_role_binding" "tiller" {
 
   subject {
     kind      = "ServiceAccount"
-    name      = "${kubernetes_service_account.tiller.metadata.0.name}"
+    name      = kubernetes_service_account.tiller.metadata.0.name
     api_group = ""
-    namespace = "${kubernetes_service_account.tiller.metadata.0.namespace}"
+    namespace = kubernetes_service_account.tiller.metadata.0.namespace
   }
 }
 
@@ -90,10 +90,10 @@ locals {
     dockercfg = {
         auths = {
             "${var.docker_registry_url}" = {
-                email    = "${var.docker_email}"
-                username = "${var.docker_username}"
-                password = "${var.docker_password}"
-                auth = "${base64encode(format("%s:%s", var.docker_username, var.docker_password))}"
+                email    = var.docker_email
+                username = var.docker_username
+                password = var.docker_password
+                auth = base64encode(format("%s:%s", var.docker_username, var.docker_password))
             }
         }
     }
@@ -105,11 +105,11 @@ locals {
 resource "kubernetes_secret" "dockerhub_secret" {
   metadata {
     name = "iriversland2-dockerhub-secret"
-    namespace = "${module.iriversland2_api.microservice_namespace}"
+    namespace = module.iriversland2_api.microservice_namespace
   }
 
   data = {
-    ".dockerconfigjson" = "${ jsonencode(local.dockercfg) }"
+    ".dockerconfigjson" = jsonencode(local.dockercfg)
   }
 
   type = "kubernetes.io/dockerconfigjson"
