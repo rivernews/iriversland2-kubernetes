@@ -32,7 +32,8 @@ ENV ALLOW_PLAINTEXT_LISTENER=yes
 
 
 
-# using confluent cli: https://docs.confluent.io/current/connect/managing/extending.html#create-a-docker-image-containing-c-hub-connectors
+# Install connectors by copying over the jars as below
+# or, using confluent cli: https://docs.confluent.io/current/connect/managing/extending.html#create-a-docker-image-containing-c-hub-connectors
 # RUN confluent-hub install --no-prompt debezium/debezium-connector-postgresql:0.10.0 \
 #     && confluent-hub install --no-prompt confluentinc/kafka-connect-elasticsearch:5.3.1
 
@@ -45,18 +46,6 @@ COPY ./debezium-connector-postgres/. ${KAFKA_CFG_PLUGIN_PATH}/debezium-connector
 RUN mkdir -p ${KAFKA_CONNECT_ES_DIR}
 COPY ./confluentinc-kafka-connect-elasticsearch-5.3.1/. $KAFKA_CONNECT_ES_DIR/
 
-# RUN cd ${KAFKA_CONNECT_ES_DIR} &&\
-#         curl -sO http://packages.confluent.io/maven/io/confluent/kafka-connect-elasticsearch/5.0.0/kafka-connect-elasticsearch-5.0.0.jar && \
-#         curl -sO http://central.maven.org/maven2/io/searchbox/jest/2.0.0/jest-2.0.0.jar && \
-#         curl -sO http://central.maven.org/maven2/org/apache/httpcomponents/httpcore-nio/4.4.4/httpcore-nio-4.4.4.jar && \
-#         curl -sO http://central.maven.org/maven2/org/apache/httpcomponents/httpclient/4.5.1/httpclient-4.5.1.jar && \
-#         curl -sO http://central.maven.org/maven2/org/apache/httpcomponents/httpasyncclient/4.1.1/httpasyncclient-4.1.1.jar && \
-#         curl -sO http://central.maven.org/maven2/org/apache/httpcomponents/httpcore/4.4.4/httpcore-4.4.4.jar && \
-#         curl -sO http://central.maven.org/maven2/commons-logging/commons-logging/1.2/commons-logging-1.2.jar && \
-#         curl -sO http://central.maven.org/maven2/commons-codec/commons-codec/1.9/commons-codec-1.9.jar && \
-#         curl -sO http://central.maven.org/maven2/org/apache/httpcomponents/httpcore/4.4.4/httpcore-4.4.4.jar && \
-#         curl -sO http://central.maven.org/maven2/io/searchbox/jest-common/2.0.0/jest-common-2.0.0.jar && \
-#         curl -sO http://central.maven.org/maven2/com/google/code/gson/gson/2.4/gson-2.4.jar
 
 # we replace the default connect-standalone.properties so we can properly resolve to our local Kafka docker development
 COPY kafka-connect.properties ${KAFKA_CONFIG}/
