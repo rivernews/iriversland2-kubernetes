@@ -160,6 +160,14 @@ resource "helm_release" "kibana" {
     value = "512Mi"
   }
 
+  values = [<<-EOF
+    lifecycle:
+        postStart:
+            exec:
+                command: ["sleep", "10"]
+  EOF
+  ]
+
   # do not use local-exec to do helm delete, see elasticsearch helm_release for reason
   #   provisioner "local-exec" {
   #     when    = "destroy"
@@ -167,7 +175,8 @@ resource "helm_release" "kibana" {
   #   }
 
   depends_on = [
-    helm_release.elasticsearch
+    # helm_release.elasticsearch
+    module.kafka_connect
   ]
 }
 

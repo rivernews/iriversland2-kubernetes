@@ -48,32 +48,6 @@ echo "INFO: waiting for elasticsearch to be ready..."
 wait_till_es_connected ${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
 
 
-echo ""
-echo ""
-echo ""
-echo "INFO: configuring elasticsearch indices..."
-# elasticsearch put index API: https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates.html
-# use HERE document with curl, based on SO: https://stackoverflow.com/questions/34847981/curl-with-multiline-of-json
-curl -v -XPUT -H 'Content-Type: application/json' http://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}/_template/template_disable_replicas --data-binary @- << EOF 
-{
-    "index_patterns": ["appl_tracky*"], 
-    "settings": { 
-        "index" : {
-            "number_of_replicas" : 0
-        }
-    },
-    "mappings": {
-        "properties": {
-            "created_at": {
-                "type": "date",
-                "format": ["strict_date_time"]
-            }
-        }
-    }
-}
-EOF
-
-
 wait_till_postgres_connected() {
     SQL_HOST=${1:-"postgres"}
     SQL_USER=${2:-"admin"}
@@ -144,6 +118,35 @@ echo "POSTGRES_APPLTRACKY_PUBLICATION_NAME=${DATABASE_APPLTRACKY_LOGICAL_NAME}__
 echo ""
 echo ""
 echo ""
-echo "INFO: launching kafka connect in standalone mode..."
+echo "INFO: configuring elasticsearch indices in 10 seconds..."
+# elasticsearch put index API: https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-templates.html
+# use HERE document with curl, based on SO: https://stackoverflow.com/questions/34847981/curl-with-multiline-of-json
+# es date format: https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html
+sleep 10
+curl -v -XPUT -H 'Content-Type: application/json' http://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}/_template/appl_tracky_template --data-binary @- << EOF 
+{
+    "index_patterns": ["*"],
+    "settings": { 
+        "index" : {
+            "number_of_replicas" : 0
+        }
+    },
+    "mappings": {
+        "properties": {
+            "created_at": {
+                "type": "date",
+                "format": "strict_date_time"
+            }
+        }
+    }
+}
+EOF
+# you should get response of `{"acknowledged":true}`
 
+
+echo ""
+echo ""
+echo ""
+echo "INFO: launching kafka connect in standalone mode in 10 seconds..."
+sleep 10
 ${KAFKA_HOME}/bin/connect-standalone.sh ${KAFKA_CONFIG}/kafka-connect.properties ${KAFKA_CONFIG}/postgres-connector.properties ${KAFKA_CONFIG}/elasticsearch-connector.properties
