@@ -36,7 +36,12 @@ def validate_tag(docker_build_hash):
     if version_pattern.match(docker_build_hash):
         return docker_build_hash
 
-    # check by hash
+    # check by short hash
+    pattern = re.compile(r'[a-z0-9]{7}')
+    if pattern.match(docker_build_hash):
+        return docker_build_hash
+
+    # check by long hash
     pattern = re.compile(r'[a-z0-9]{40}')
     if not pattern.match(docker_build_hash):
         raise argparse.ArgumentTypeError('Build hash string is invalid: {}'.format(docker_build_hash))

@@ -30,7 +30,7 @@ resource "helm_release" "elasticsearch" {
 
   repository = data.helm_repository.elastic_stack.metadata[0].name
   chart      = "elasticsearch"
-  version    = "7.4.1" # TODO: lock down version based on `Chart.yaml`, refer to https://github.com/elastic/helm-charts/blob/1f9e8a4f8a4edbf2773b4553953abb6074ee77ce/elasticsearch/Chart.yaml
+  version    = "7.4.1" # lock down version based on `Chart.yaml`, refer to https://github.com/elastic/helm-charts/blob/1f9e8a4f8a4edbf2773b4553953abb6074ee77ce/elasticsearch/Chart.yaml
   # chart version 7.4.1 ==> es version 7.4.1
 
   #   values = [
@@ -147,7 +147,7 @@ resource "helm_release" "kibana" {
 
   repository = data.helm_repository.elastic_stack.metadata[0].name
   chart      = "kibana"
-  # version    = "6.0.1" # TODO: lock down version after this release works
+  version    = "7.4.1"
 
   # all available configurations: https://github.com/elastic/helm-charts/tree/master/kibana
   set_string {
