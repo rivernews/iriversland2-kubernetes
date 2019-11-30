@@ -16,7 +16,7 @@ The CircleCI for this repo dockerizes this repo as image and is for use of other
 
 This repository provisions the entire Kubernetes cluster as below in the image. We use Terraform to do so, and this repository serves as the big "Terraform" base in the image. It creates the infrastructure for other projects, and forms an ecosystem on the cloud, enabling me to quickly deploy production-ready, highly available, scalable services.
 
-![platform](/docs/img/platform-rev04.jpg)
+![platform](/docs/img/platform-rev04.png)
 
 ## Prerequisites
 
