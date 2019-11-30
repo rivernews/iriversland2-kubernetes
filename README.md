@@ -8,6 +8,7 @@ This repository is part of my personal website project. Also see other repositor
 - **[Iriversland2 SPA](https://github.com/rivernews/iriversland2-spa)**: the frontend code base, using Angular.
 - **[Iriversland2 Backend API](https://github.com/rivernews/iriversland2-api)**: the backend RESTful API in Django.
 - **[Iriversland2 Kubernetes](https://github.com/rivernews/iriversland2-kubernetes)**: (this repository) infrastructure as code provisioning the Kubernetes cluster for the backend server.
+- **[Kafka Connect CDC](https://github.com/rivernews/kafka-connectors-cdc)**: the repository for Kafka Connect docker image used for real-time, change-data-capture (CDC) sync between postgres and elasticsearch.
 
 The CircleCI for this repo dockerizes this repo as image and is for use of other projects as a base image (mainly in their CircleCI jobs) to run terraform and k8 commands.
 
