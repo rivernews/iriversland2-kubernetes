@@ -14,7 +14,7 @@ resource "helm_release" "kafka_stack" {
 
   repository = data.helm_repository.kafka_stack.metadata[0].name
   chart      = "bitnami/kafka"
-#   version    = "0.1.0" # TODO: lock down version after this release works
+  version    = "2.3.1"
 
 
   # all available configurations: https://github.com/bitnami/charts/tree/master/bitnami/kafka
