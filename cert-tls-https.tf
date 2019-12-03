@@ -195,7 +195,7 @@ EOT
   # (Issuer Cert Secret)
   provisioner "local-exec" {
     when    = destroy
-    command = join("\n", [
+    command = var.letsencrypt_env == "prod" ? "echo && echo && echo INFO: will not delete secret for production letsencrypt due to quota concern. Please manually delete secret using kubectl if necessary." : join("\n", [
         # delete cluster issuer private key secret, for letsencrypt api call, can differ for prod or staging.
         # no need to delete if you didn't make any change to ClusterIssuer.spec.acme
         # "bash ./my-kubectl.sh delete secrets ${local.cert_cluster_issuer_secret_name_prod} ${local.cert_cluster_issuer_secret_name_staging} -n ${kubernetes_namespace.cert_manager.metadata.0.name}",
