@@ -1,1 +1,0 @@
-docker run --rm -d --name postgres-cdc shaungc/postgres-cdc
