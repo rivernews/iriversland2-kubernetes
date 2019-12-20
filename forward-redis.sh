@@ -1,0 +1,1 @@
+. ./my-kubectl.sh port-forward deploy/redis-cluster-deployment 6379:6379 -n cert-manager

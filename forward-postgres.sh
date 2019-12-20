@@ -1,0 +1,1 @@
+. ./my-kubectl.sh port-forward -n kube-system deploy/postgres-cluster-deployment 5432:5432 -n cert-manager
