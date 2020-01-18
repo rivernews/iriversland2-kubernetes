@@ -136,7 +136,7 @@ module "postgres_cluster" {
     "/database/postgres_cluster_kubernetes/POSTGRES_DB",
     "/database/postgres_cluster_kubernetes/POSTGRES_USER",
     "/database/postgres_cluster_kubernetes/POSTGRES_PASSWORD",
-    "/database/postgres_cluster_kubernetes/PGDATA",
+    "/database/postgres_cluster_kubernetes/DATA_VOLUME_MOUNT",
   ]
 
   is_persistent_volume_claim = true

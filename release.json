@@ -1503,5 +1503,19 @@
         "postgres_cluster_image_tag": "11.5-r13",
         "redis_cluster_image_tag": "5.0.6",
         "kafka_connect_image_tag": "cbfa384"
+    },
+    {
+        "app_container_image_tag": "dad6867e64b30a98b32b0dbb6c89c788e7153f24",
+        "appl_tracky_api_image_tag": "cca0e0bd226353d8c19cbcca25a1b0cc54e40fa7",
+        "postgres_cluster_image_tag": "11.5-r13",
+        "redis_cluster_image_tag": "5.0.6",
+        "kafka_connect_image_tag": "cbfa384"
+    },
+    {
+        "app_container_image_tag": "dad6867e64b30a98b32b0dbb6c89c788e7153f24",
+        "appl_tracky_api_image_tag": "dabd516c8f45a70b5e90e4223730617a5a767634",
+        "postgres_cluster_image_tag": "11.5-r13",
+        "redis_cluster_image_tag": "5.0.6",
+        "kafka_connect_image_tag": "cbfa384"
     }
 ]
