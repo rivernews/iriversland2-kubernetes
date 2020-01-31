@@ -116,6 +116,35 @@ module "appl_tracky_api" {
 }
 
 
+module "slack_middleware_service" {
+  source = "./microservice-installation-module"
+
+  # cluster-wise config (shared resources across different microservices)
+  dockerhub_kubernetes_secret_name   = "${kubernetes_secret.dockerhub_secret.metadata.0.name}"
+  cert_cluster_issuer_name           = local.cert_cluster_issuer_name
+  tls_cert_covered_domain_list       = local.tls_cert_covered_domain_list
+  cert_cluster_issuer_k8_secret_name = local.cert_cluster_issuer_k8_secret_name
+
+  # app-specific config (microservice)
+  app_label               = "slack-middleware-service"
+  app_exposed_port        = 8003
+  app_deployed_domain     = "slack.api.shaungc.com"
+  cors_domain_whitelist   = []
+  app_container_image     = "shaungc/slack-middleware-service"
+  app_container_image_tag = var.slack_middleware_service_image_tag
+  app_secret_name_list = [
+    "/service/slack-middleware-service/NODE_ENV",
+    "/service/slack-middleware-service/PUBLIC_URL",
+    "/service/slack-middleware-service/PORT",
+    "/service/slack-middleware-service/SLACK_TOKEN",
+    "/service/slack-middleware-service/TRAVIS_TOKEN"
+  ]
+  kubernetes_cron_jobs = []
+
+  depend_on = []
+}
+
+
 module "postgres_cluster" {
   source = "./microservice-installation-module"
 

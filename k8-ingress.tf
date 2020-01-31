@@ -375,6 +375,20 @@ resource "kubernetes_ingress" "project-ingress-resource" {
       }
     }
 
+    rule {
+      host = module.slack_middleware_service.microservice_deployed_domain
+      http {
+        path {
+          backend {
+            service_name = module.slack_middleware_service.microservice_kubernetes_service_name
+            service_port = module.slack_middleware_service.microservice_kubernetes_service_port
+          }
+
+          path = "/"
+        }
+      }
+    }
+
     # Add more ingest service here
     # ...
 

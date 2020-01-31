@@ -14,6 +14,10 @@ MANIFEST_IMAGE_TAGS = [{
     'arg_name_short': 'at',
     'project name': 'appl tracky'
 },{
+    'arg_name_full': 'slack_middleware_service_image_tag',
+    'arg_name_short': 'sl',
+    'project name': 'slack-middleware-service'
+},{
     'arg_name_full': 'postgres_cluster_image_tag',
     'arg_name_short': 'pg',
     'project name': 'postgres db'

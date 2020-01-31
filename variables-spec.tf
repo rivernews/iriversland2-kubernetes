@@ -1,11 +1,6 @@
 # https://www.terraform.io/docs/configuration/variables.html#variable-definitions-tfvars-files
 variable "project_name" {}
 
-# variable "app_container_image" {}
-variable "app_container_image_tag" {
-    description = "Lookup the image tags here: https://hub.docker.com/r/shaungc/iriversland2-django/tags"
-}
-
 # variable "cicd_namespace" {}
 
 # variable "app_label" {}
@@ -24,8 +19,18 @@ variable "letsencrypt_env" {
 }
 
 
+variable "app_container_image_tag" {
+    description = "Lookup the image tags here: https://hub.docker.com/r/shaungc/iriversland2-django/tags"
+}
+
+
 variable "appl_tracky_api_image_tag" {
     description = "Lookup the image tags here: https://hub.docker.com/r/shaungc/appl-tracky-api/tags"
+}
+
+
+variable "slack_middleware_service_image_tag" {
+    description = "Lookup the image tags here: https://hub.docker.com/r/shaungc/slack-middleware-service/tags"
 }
 
 
