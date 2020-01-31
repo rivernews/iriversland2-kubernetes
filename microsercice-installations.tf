@@ -85,8 +85,8 @@ module "appl_tracky_api" {
     "/database/kubernetes_appl-tracky/SQL_PASSWORD",
     "/database/kubernetes_appl-tracky/SQL_HOST",
     "/database/kubernetes_appl-tracky/SQL_PORT",
-    "database/elasticsearch_cluster_kubernetes/ELASTICSEARCH_HOST",
-    "database/elasticsearch_cluster_kubernetes/ELASTICSEARCH_PORT",
+    "/database/elasticsearch_cluster_kubernetes/ELASTICSEARCH_HOST",
+    "/database/elasticsearch_cluster_kubernetes/ELASTICSEARCH_PORT",
 
     "/database/redis_cluster_kubernetes/REDIS_HOST",
     "/database/redis_cluster_kubernetes/REDIS_PORT",
