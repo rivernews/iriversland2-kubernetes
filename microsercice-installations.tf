@@ -1,3 +1,12 @@
+locals {
+  microservices_ingress_resource_rules = [
+    module.iriversland2_api,
+    module.appl_tracky_api,
+    module.slack_middleware_service
+  ]
+}
+
+
 module "iriversland2_api" {
   source = "./microservice-installation-module"
 
@@ -127,17 +136,18 @@ module "slack_middleware_service" {
 
   # app-specific config (microservice)
   app_label               = "slack-middleware-service"
-  app_exposed_port        = 8003
+  app_exposed_port        = 8002
   app_deployed_domain     = "slack.api.shaungc.com"
   cors_domain_whitelist   = []
   app_container_image     = "shaungc/slack-middleware-service"
   app_container_image_tag = var.slack_middleware_service_image_tag
   app_secret_name_list = [
-    "/service/slack-middleware-service/NODE_ENV",
-    "/service/slack-middleware-service/PUBLIC_URL",
-    "/service/slack-middleware-service/PORT",
-    "/service/slack-middleware-service/SLACK_TOKEN",
-    "/service/slack-middleware-service/TRAVIS_TOKEN"
+    "/app/slack-middleware-service/NODE_ENV",
+    "/app/slack-middleware-service/HOST",
+    "/app/slack-middleware-service/PORT",
+    "/app/slack-middleware-service/SLACK_TOKEN",
+    "/app/slack-middleware-service/SLACK_TOKEN_INCOMING_URL",
+    "/app/slack-middleware-service/TRAVIS_TOKEN"
   ]
   kubernetes_cron_jobs = []
 

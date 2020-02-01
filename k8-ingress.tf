@@ -74,7 +74,7 @@ resource "helm_release" "project-nginx-ingress" {
   set {
     # nginx debugging: https://github.com/kubernetes/ingress-nginx/blob/master/docs/troubleshooting.md#debug-logging
     name  = "controller.extraArgs.v"
-    value = "3"
+    value = "4"
   }
 
   #   set {
@@ -347,44 +347,21 @@ resource "kubernetes_ingress" "project-ingress-resource" {
     #   }
     # }
 
-    rule {
-      host = module.iriversland2_api.microservice_deployed_domain
-      http {
-        path {
-          backend {
-            service_name = module.iriversland2_api.microservice_kubernetes_service_name
-            service_port = module.iriversland2_api.microservice_kubernetes_service_port
+    // microservice rules
+
+    dynamic "rule" {
+      for_each = local.microservices_ingress_resource_rules
+      content {
+        host = rule.value.microservice_deployed_domain
+        http {
+          path {
+            backend {
+              service_name = rule.value.microservice_kubernetes_service_name
+              service_port = rule.value.microservice_kubernetes_service_port
+            }
+
+            path = "/"
           }
-
-          path = "/"
-        }
-      }
-    }
-
-    rule {
-      host = module.appl_tracky_api.microservice_deployed_domain
-      http {
-        path {
-          backend {
-            service_name = module.appl_tracky_api.microservice_kubernetes_service_name
-            service_port = module.appl_tracky_api.microservice_kubernetes_service_port
-          }
-
-          path = "/"
-        }
-      }
-    }
-
-    rule {
-      host = module.slack_middleware_service.microservice_deployed_domain
-      http {
-        path {
-          backend {
-            service_name = module.slack_middleware_service.microservice_kubernetes_service_name
-            service_port = module.slack_middleware_service.microservice_kubernetes_service_port
-          }
-
-          path = "/"
         }
       }
     }
