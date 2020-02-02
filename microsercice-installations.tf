@@ -145,7 +145,8 @@ module "slack_middleware_service" {
     "/app/slack-middleware-service/NODE_ENV",
     "/app/slack-middleware-service/HOST",
     "/app/slack-middleware-service/PORT",
-    "/app/slack-middleware-service/SLACK_TOKEN",
+    "/app/slack-middleware-service/SLACK_TOKEN_OUTGOING_LAUNCH",
+    "/app/slack-middleware-service/SLACK_TOKEN_OUTGOING_LIST_ORG",
     "/app/slack-middleware-service/SLACK_TOKEN_INCOMING_URL",
     "/app/slack-middleware-service/TRAVIS_TOKEN"
   ]
