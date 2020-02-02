@@ -1649,5 +1649,13 @@
         "redis_cluster_image_tag": "5.0.6",
         "kafka_connect_image_tag": "cbfa384",
         "slack_middleware_service_image_tag": "fd09b3d"
+    },
+    {
+        "app_container_image_tag": "75b77b6b6b6055f483347783da5ed203cb202c08",
+        "appl_tracky_api_image_tag": "161331db186eb1c4f68b127daed657799a7281f7",
+        "postgres_cluster_image_tag": "11.5-r13",
+        "redis_cluster_image_tag": "5.0.6",
+        "kafka_connect_image_tag": "cbfa384",
+        "slack_middleware_service_image_tag": "0543410"
     }
 ]
