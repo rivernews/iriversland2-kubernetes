@@ -193,6 +193,9 @@ EOT
   # challenges.certmanager.k8s.io
 
   # (Issuer Cert Secret)
+  # TODO: deprecated for "destroy" provisioner referencing external resources / variables
+  # we can follow the post below to correct the logic
+  # https://discuss.hashicorp.com/t/how-to-rewrite-null-resource-with-local-exec-provisioner-when-destroy-to-prepare-for-deprecation-after-0-12-8/4580/2
   provisioner "local-exec" {
     when    = destroy
     command = var.letsencrypt_env == "prod" ? "echo && echo && echo INFO: will not delete secret for production letsencrypt due to quota concern. Please manually delete secret using kubectl if necessary." : join("\n", [

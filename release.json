@@ -1657,5 +1657,53 @@
         "redis_cluster_image_tag": "5.0.6",
         "kafka_connect_image_tag": "cbfa384",
         "slack_middleware_service_image_tag": "0543410"
+    },
+    {
+        "app_container_image_tag": "75b77b6b6b6055f483347783da5ed203cb202c08",
+        "appl_tracky_api_image_tag": "161331db186eb1c4f68b127daed657799a7281f7",
+        "postgres_cluster_image_tag": "11.5-r13",
+        "redis_cluster_image_tag": "5.0.6",
+        "kafka_connect_image_tag": "cbfa384",
+        "slack_middleware_service_image_tag": "06cd86a"
+    },
+    {
+        "app_container_image_tag": "75b77b6b6b6055f483347783da5ed203cb202c08",
+        "appl_tracky_api_image_tag": "161331db186eb1c4f68b127daed657799a7281f7",
+        "postgres_cluster_image_tag": "11.5-r13",
+        "redis_cluster_image_tag": "5.0.6",
+        "kafka_connect_image_tag": "cbfa384",
+        "slack_middleware_service_image_tag": "d13b5c5"
+    },
+    {
+        "app_container_image_tag": "75b77b6b6b6055f483347783da5ed203cb202c08",
+        "appl_tracky_api_image_tag": "161331db186eb1c4f68b127daed657799a7281f7",
+        "postgres_cluster_image_tag": "11.5-r13",
+        "redis_cluster_image_tag": "5.0.6",
+        "kafka_connect_image_tag": "cbfa384",
+        "slack_middleware_service_image_tag": "752fdec"
+    },
+    {
+        "app_container_image_tag": "75b77b6b6b6055f483347783da5ed203cb202c08",
+        "appl_tracky_api_image_tag": "161331db186eb1c4f68b127daed657799a7281f7",
+        "postgres_cluster_image_tag": "11.5-r13",
+        "redis_cluster_image_tag": "5.0.6",
+        "kafka_connect_image_tag": "cbfa384",
+        "slack_middleware_service_image_tag": "31232b8"
+    },
+    {
+        "app_container_image_tag": "75b77b6b6b6055f483347783da5ed203cb202c08",
+        "appl_tracky_api_image_tag": "161331db186eb1c4f68b127daed657799a7281f7",
+        "postgres_cluster_image_tag": "11.5-r13",
+        "redis_cluster_image_tag": "5.0.6",
+        "kafka_connect_image_tag": "cbfa384",
+        "slack_middleware_service_image_tag": "9bea3c9"
+    },
+    {
+        "app_container_image_tag": "75b77b6b6b6055f483347783da5ed203cb202c08",
+        "appl_tracky_api_image_tag": "161331db186eb1c4f68b127daed657799a7281f7",
+        "postgres_cluster_image_tag": "11.5-r13",
+        "redis_cluster_image_tag": "5.0.6",
+        "kafka_connect_image_tag": "cbfa384",
+        "slack_middleware_service_image_tag": "dfd8cfe"
     }
 ]
