@@ -43,12 +43,13 @@ resource "helm_release" "kafka_stack" {
 }
 
 module "kafka_connect" {
-  source = "./microservice-installation-module"
+  # source = "./microservice-installation-module"
+  source = "github.com/rivernews/microservice-on-kubernetes"
 
   # cluster-wise config (shared resources across different microservices)
-  cert_cluster_issuer_name           = local.cert_cluster_issuer_name
-  tls_cert_covered_domain_list       = local.tls_cert_covered_domain_list
-  cert_cluster_issuer_k8_secret_name = local.cert_cluster_issuer_k8_secret_name
+  # cert_cluster_issuer_name           = local.cert_cluster_issuer_name
+  # tls_cert_covered_domain_list       = local.tls_cert_covered_domain_list
+  # cert_cluster_issuer_k8_secret_name = local.cert_cluster_issuer_k8_secret_name
 
   # app-specific config (microservice)
   app_label           = "kafka-connect"

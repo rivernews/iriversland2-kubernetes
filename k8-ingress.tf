@@ -361,22 +361,22 @@ resource "kubernetes_ingress" "project-ingress-resource" {
 
     // microservice rules
 
-    dynamic "rule" {
-      for_each = local.microservices_ingress_resource_rules
-      content {
-        host = rule.value.microservice_deployed_domain
-        http {
-          path {
-            backend {
-              service_name = rule.value.microservice_kubernetes_service_name
-              service_port = rule.value.microservice_kubernetes_service_port
-            }
+    # dynamic "rule" {
+    #   for_each = local.microservices_ingress_resource_rules
+    #   content {
+    #     host = rule.value.microservice_deployed_domain
+    #     http {
+    #       path {
+    #         backend {
+    #           service_name = rule.value.microservice_kubernetes_service_name
+    #           service_port = rule.value.microservice_kubernetes_service_port
+    #         }
 
-            path = "/"
-          }
-        }
-      }
-    }
+    #         path = "/"
+    #       }
+    #     }
+    #   }
+    # }
 
     # Add more ingest service here
     # ...

@@ -8,12 +8,13 @@ locals {
 
 
 module "iriversland2_api" {
-  source = "./microservice-installation-module"
+  # source = "./microservice-installation-module"
+  source = "github.com/rivernews/microservice-on-kubernetes"
 
   # cluster-wise config (shared resources across different microservices)
-  cert_cluster_issuer_name           = local.cert_cluster_issuer_name
-  tls_cert_covered_domain_list       = local.tls_cert_covered_domain_list
-  cert_cluster_issuer_k8_secret_name = local.cert_cluster_issuer_k8_secret_name
+  # cert_cluster_issuer_name           = local.cert_cluster_issuer_name
+  # tls_cert_covered_domain_list       = local.tls_cert_covered_domain_list
+  # cert_cluster_issuer_k8_secret_name = local.cert_cluster_issuer_k8_secret_name
 
   # app-specific config (microservice)
   app_label               = "iriversland2-api"
@@ -64,12 +65,13 @@ module "iriversland2_api" {
 
 
 module "appl_tracky_api" {
-  source = "./microservice-installation-module"
+  # source = "./microservice-installation-module"
+  source = "github.com/rivernews/microservice-on-kubernetes"
 
   # cluster-wise config (shared resources across different microservices)
-  cert_cluster_issuer_name           = local.cert_cluster_issuer_name
-  tls_cert_covered_domain_list       = local.tls_cert_covered_domain_list
-  cert_cluster_issuer_k8_secret_name = local.cert_cluster_issuer_k8_secret_name
+  # cert_cluster_issuer_name           = local.cert_cluster_issuer_name
+  # tls_cert_covered_domain_list       = local.tls_cert_covered_domain_list
+  # cert_cluster_issuer_k8_secret_name = local.cert_cluster_issuer_k8_secret_name
 
   # app-specific config (microservice)
   app_label               = "appl-tracky-api"
@@ -125,12 +127,13 @@ module "appl_tracky_api" {
 
 
 module "slack_middleware_service" {
-  source = "./microservice-installation-module"
+  # source = "./microservice-installation-module"
+  source = "github.com/rivernews/microservice-on-kubernetes"
 
   # cluster-wise config (shared resources across different microservices)
-  cert_cluster_issuer_name           = local.cert_cluster_issuer_name
-  tls_cert_covered_domain_list       = local.tls_cert_covered_domain_list
-  cert_cluster_issuer_k8_secret_name = local.cert_cluster_issuer_k8_secret_name
+  # cert_cluster_issuer_name           = local.cert_cluster_issuer_name
+  # tls_cert_covered_domain_list       = local.tls_cert_covered_domain_list
+  # cert_cluster_issuer_k8_secret_name = local.cert_cluster_issuer_k8_secret_name
 
   # app-specific config (microservice)
   app_label               = "slack-middleware-service"
@@ -155,13 +158,14 @@ module "slack_middleware_service" {
 
 
 module "postgres_cluster" {
-  source = "./microservice-installation-module"
+  # source = "./microservice-installation-module"
+  source = "github.com/rivernews/microservice-on-kubernetes"
 
   # cluster-wise config (shared resources across different microservices)
   kubeconfig_raw                     = digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.raw_config
-  cert_cluster_issuer_name           = local.cert_cluster_issuer_name
-  tls_cert_covered_domain_list       = local.tls_cert_covered_domain_list
-  cert_cluster_issuer_k8_secret_name = local.cert_cluster_issuer_k8_secret_name
+  # cert_cluster_issuer_name           = local.cert_cluster_issuer_name
+  # tls_cert_covered_domain_list       = local.tls_cert_covered_domain_list
+  # cert_cluster_issuer_k8_secret_name = local.cert_cluster_issuer_k8_secret_name
 
   # app-specific config (microservice)
   app_label           = "postgres-cluster"
@@ -183,12 +187,13 @@ module "postgres_cluster" {
 
 
 module "redis_cluster" {
-  source = "./microservice-installation-module"
+  # source = "./microservice-installation-module"
+  source = "github.com/rivernews/microservice-on-kubernetes"
 
   # cluster-wise config (shared resources across different microservices)
-  cert_cluster_issuer_name           = local.cert_cluster_issuer_name
-  tls_cert_covered_domain_list       = local.tls_cert_covered_domain_list
-  cert_cluster_issuer_k8_secret_name = local.cert_cluster_issuer_k8_secret_name
+  # cert_cluster_issuer_name           = local.cert_cluster_issuer_name
+  # tls_cert_covered_domain_list       = local.tls_cert_covered_domain_list
+  # cert_cluster_issuer_k8_secret_name = local.cert_cluster_issuer_k8_secret_name
 
   # app-specific config (microservice)
   app_label           = "redis-cluster"
