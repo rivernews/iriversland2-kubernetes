@@ -85,32 +85,3 @@ resource "kubernetes_cluster_role_binding" "tiller" {
 #     namespace = "${kubernetes_service_account.cicd.metadata.0.namespace}"
 #   }
 # }
-
-locals {
-    dockercfg = {
-        auths = {
-            "${var.docker_registry_url}" = {
-                email    = var.docker_email
-                username = var.docker_username
-                password = var.docker_password
-                auth = base64encode(format("%s:%s", var.docker_username, var.docker_password))
-            }
-        }
-    }
-}
-
-# k8 official doc on dockerconfigjson: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#create-a-secret-by-providing-credentials-on-the-command-line
-# terraform doc: https://www.terraform.io/docs/providers/kubernetes/r/secret.html
-# only for iriversland2 (secret only available in same namespace)
-resource "kubernetes_secret" "dockerhub_secret" {
-  metadata {
-    name = "iriversland2-dockerhub-secret"
-    namespace = module.iriversland2_api.microservice_namespace
-  }
-
-  data = {
-    ".dockerconfigjson" = jsonencode(local.dockercfg)
-  }
-
-  type = "kubernetes.io/dockerconfigjson"
-}

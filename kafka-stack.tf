@@ -46,7 +46,6 @@ module "kafka_connect" {
   source = "./microservice-installation-module"
 
   # cluster-wise config (shared resources across different microservices)
-  dockerhub_kubernetes_secret_name   = kubernetes_secret.dockerhub_secret.metadata.0.name
   cert_cluster_issuer_name           = local.cert_cluster_issuer_name
   tls_cert_covered_domain_list       = local.tls_cert_covered_domain_list
   cert_cluster_issuer_k8_secret_name = local.cert_cluster_issuer_k8_secret_name
@@ -60,11 +59,11 @@ module "kafka_connect" {
   app_container_image_tag = var.kafka_connect_image_tag
 
   app_secret_name_list = [
-    "/database/kubernetes_appl-tracky/SQL_DATABASE",
-    "/database/kubernetes_appl-tracky/SQL_USER",
-    "/database/kubernetes_appl-tracky/SQL_PASSWORD",
-    "/database/kubernetes_appl-tracky/SQL_HOST",
-    "/database/kubernetes_appl-tracky/SQL_PORT",
+    "/database/postgres_cluster_kubernetes/SQL_DATABASE",
+    "/database/postgres_cluster_kubernetes/SQL_USER",
+    "/database/postgres_cluster_kubernetes/SQL_PASSWORD",
+    "/database/postgres_cluster_kubernetes/SQL_HOST",
+    "/database/postgres_cluster_kubernetes/SQL_PORT",
   ]
 
   environment_variables = {

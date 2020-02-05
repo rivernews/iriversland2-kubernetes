@@ -34,19 +34,19 @@ output "do_cluster_current_status" {
 #   value = "${var.app_container_image}:${var.app_container_image_tag}"
 # }
 
-output "appl_tracky_api_endpoint" {
-  value = "${module.appl_tracky_api.microservice_deployed_endpoint}"
-}
+# output "appl_tracky_api_endpoint" {
+#   value = "${module.appl_tracky_api.microservice_deployed_endpoint}"
+# }
 
-output "appl_tracky_api_hashed_endpoint" {
-  value = "${module.appl_tracky_api.microservice_hashed_deployed_endpoint}"
-}
+# output "appl_tracky_api_hashed_endpoint" {
+#   value = "${module.appl_tracky_api.microservice_hashed_deployed_endpoint}"
+# }
 
-output "iriversland2_api_endpoint" {
-  value = "${module.iriversland2_api.microservice_deployed_endpoint}"
-}
+# output "iriversland2_api_endpoint" {
+#   value = "${module.iriversland2_api.microservice_deployed_endpoint}"
+# }
 
-output "iriversland2_api_hashed_endpoint" {
-  value = "${module.iriversland2_api.microservice_hashed_deployed_endpoint}"
-}
+# output "iriversland2_api_hashed_endpoint" {
+#   value = "${module.iriversland2_api.microservice_hashed_deployed_endpoint}"
+# }
 

@@ -6,10 +6,6 @@ variable "app_exposed_port" {
   description = "Unique port within Kubernetes cluster for ingress to direct external traffix to the microservice"
 }
 
-variable "dockerhub_kubernetes_secret_name" {
-  description = "The name of the kubernetes secret for Dockerhub. The kubernetes secret is assumed already created or managed by the terraform script that calls this module."
-}
-
 variable "app_container_image" {
   description = "The container image name without tag"
 }
@@ -25,6 +21,7 @@ variable "app_secret_name_list" {
 
 variable "app_deployed_domain" {
   description = "The exact domain name to deploy the microservice on"
+  default = ""
 }
 
 variable "cors_domain_whitelist" {
@@ -55,12 +52,7 @@ variable "kubeconfig_raw" {
     type = string
 }
 
-variable "is_persistent_volume_claim" {
-    default = false
-    type = bool
-}
-
-variable "volume_mount_path" {
+variable "persistent_volume_mount_path_secret_name" {
     default = ""
     type = string
 }
@@ -73,4 +65,9 @@ variable "environment_variables" {
 variable "depend_on" {
     default = []
     type = list
+}
+
+variable "docker_registry_url" {
+  default = "https://index.docker.io/v1/"
+  type = string
 }

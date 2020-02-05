@@ -6,11 +6,11 @@
 #
 # tf doc: https://www.terraform.io/docs/providers/kubernetes/r/persistent_volume_claim.html
 resource "kubernetes_persistent_volume_claim" "app_digitalocean_pvc" {
-  count = var.is_persistent_volume_claim ? 1 : 0
+  count = var.persistent_volume_mount_path_secret_name != "" ? 1 : 0
 
   metadata {
     # for digitalocean - must be lowercase alphanumeric values and dashes (hyphen) only
-    name      = "${var.app_label}-persistent-volume-claim"
+    name      = count.index == 0 ? "${var.app_label}-persistent-volume-claim" : "${var.app_label}-persistent-volume-claim-${count.index}"
     namespace = kubernetes_service_account.app.metadata.0.namespace
   }
   spec {

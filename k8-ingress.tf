@@ -22,7 +22,12 @@ resource "helm_release" "project-nginx-ingress" {
   name      = "nginx-ingress-controller"
   namespace = kubernetes_service_account.tiller.metadata.0.namespace
 
-  force_update = true
+  # this will delete & re-create this controller when config changed
+  # note that this will let your service temporarily down as the controller pod IP will change
+  # and will take some time for external dns to propogate the IP update
+  # since we've already set updateStrategy.type to RollingUpdate, we're not likely needing this
+  # unless you don't see the changed config reflected and you want to debug
+  force_update = false
 
   # or chart = "stable/nginx-ingress"
   # see https://github.com/digitalocean/digitalocean-cloud-controller-manager/issues/162
@@ -77,13 +82,15 @@ resource "helm_release" "project-nginx-ingress" {
     value = "4"
   }
 
-  #   set {
-  #     name  = "controller.extraArgs.default-ssl-certificate"
-  #     # value = "${kubernetes_namespace.cert_manager.metadata.0.name}/${local.cert_cluster_issuer_k8_secret_name}"
-  #     # because we use iriversland2-api as fallback service, so the secret will be created there
-  #     # value = "${module.iriversland2_api.microservice_namespace}/${local.cert_cluster_issuer_k8_secret_name}"
-  #     value = "${kubernetes_namespace.cert_manager.metadata.0.name}/${local.cert_cluster_issuer_k8_secret_name}"
-  #   }
+  # helm config for default certificate 
+  # https://github.com/helm/charts/blob/master/stable/nginx-ingress/values.yaml#L108
+  set_string {
+    name  = "controller.extraArgs.default-ssl-certificate"
+    # value = "${kubernetes_namespace.cert_manager.metadata.0.name}/${local.cert_cluster_issuer_k8_secret_name}"
+    # because we use iriversland2-api as fallback service, so the secret will be created there
+    # value = "${module.iriversland2_api.microservice_namespace}/${local.cert_cluster_issuer_k8_secret_name}"
+    value = "${kubernetes_namespace.cert_manager.metadata.0.name}/${local.central_tls_ing_certificate_secret_name}"
+  }
 
 
   # equivalent to the data section in a `configmap` resource
@@ -116,7 +123,13 @@ resource "helm_release" "project-nginx-ingress" {
     controller:
         # global nginx settings for all ingress rules
         config:
+            # If a TLS block is present in ingress rule, the controller WILL redirect to TLS by default
+            # However, it may not work for some reason; recommended to config this up in each service app
             ssl-redirect: "false"
+
+            # never use this
+            # redirecting to https even if there is no TLS block in your ingress
+            # force-ssl-redirect: "false"
 
             # hsts config
             hsts: "true"
@@ -270,17 +283,16 @@ resource "helm_release" "project-external-dns" {
 resource "kubernetes_ingress" "project-ingress-resource" {
   metadata {
     name      = "tls-wildcard-cert-ingress-resource"
-    namespace = module.iriversland2_api.microservice_namespace
+    namespace = kubernetes_namespace.cert_manager.metadata.0.name
 
     # annotation spec: https://github.com/kubernetes/ingress-nginx/blob/master/docs/user-guide/nginx-configuration/annotations.md#annotations
     annotations = {
       "kubernetes.io/ingress.class" = "nginx"
-
-      #   "nginx.ingress.kubernetes.io/force-ssl-redirect" = "false"
-
-      #     "ingress.kubernetes.io/ssl-redirect" = "false"
-
-      #   "nginx.ingress.kubernetes.io/use-regex" = "true"
+      
+      # we are already setting most of these configs in nginx controller
+      
+      # let the host below be interpreted as regex
+      # "nginx.ingress.kubernetes.io/use-regex" = "true"
 
       # annotation `tls-acme` seems useless, the `cluster-issuer` does the auto cert creation
       # do we need this? because of dns01 challenge?

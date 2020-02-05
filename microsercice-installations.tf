@@ -1,8 +1,8 @@
 locals {
   microservices_ingress_resource_rules = [
     module.iriversland2_api,
-    module.appl_tracky_api,
-    module.slack_middleware_service
+    # module.appl_tracky_api,
+    # module.slack_middleware_service
   ]
 }
 
@@ -11,7 +11,6 @@ module "iriversland2_api" {
   source = "./microservice-installation-module"
 
   # cluster-wise config (shared resources across different microservices)
-  dockerhub_kubernetes_secret_name   = kubernetes_secret.dockerhub_secret.metadata.0.name
   cert_cluster_issuer_name           = local.cert_cluster_issuer_name
   tls_cert_covered_domain_list       = local.tls_cert_covered_domain_list
   cert_cluster_issuer_k8_secret_name = local.cert_cluster_issuer_k8_secret_name
@@ -33,11 +32,11 @@ module "iriversland2_api" {
     "/app/iriversland2/IPSTACK_API_TOKEN",
     "/app/iriversland2/RECAPTCHA_SECRET",
 
-    "/database/kubernetes_iriversland2/RDS_DB_NAME",
-    "/database/kubernetes_iriversland2/RDS_USERNAME",
-    "/database/kubernetes_iriversland2/RDS_PASSWORD",
-    "/database/kubernetes_iriversland2/RDS_HOSTNAME",
-    "/database/kubernetes_iriversland2/RDS_PORT",
+    "/app/iriversland2/SQL_DATABASE",
+    "/database/postgres_cluster_kubernetes/SQL_USER",
+    "/database/postgres_cluster_kubernetes/SQL_PASSWORD",
+    "/database/postgres_cluster_kubernetes/SQL_HOST",
+    "/database/postgres_cluster_kubernetes/SQL_PORT",
 
     "/database/redis_cluster_kubernetes/REDIS_HOST",
     "/database/redis_cluster_kubernetes/REDIS_PORT",
@@ -68,7 +67,6 @@ module "appl_tracky_api" {
   source = "./microservice-installation-module"
 
   # cluster-wise config (shared resources across different microservices)
-  dockerhub_kubernetes_secret_name   = "${kubernetes_secret.dockerhub_secret.metadata.0.name}"
   cert_cluster_issuer_name           = local.cert_cluster_issuer_name
   tls_cert_covered_domain_list       = local.tls_cert_covered_domain_list
   cert_cluster_issuer_k8_secret_name = local.cert_cluster_issuer_k8_secret_name
@@ -88,12 +86,13 @@ module "appl_tracky_api" {
     "/app/appl-tracky/DJANGO_SECRET_KEY",
     "/app/appl-tracky/ADMINS",
 
-    "/database/kubernetes_appl-tracky/SQL_ENGINE",
-    "/database/kubernetes_appl-tracky/SQL_DATABASE",
-    "/database/kubernetes_appl-tracky/SQL_USER",
-    "/database/kubernetes_appl-tracky/SQL_PASSWORD",
-    "/database/kubernetes_appl-tracky/SQL_HOST",
-    "/database/kubernetes_appl-tracky/SQL_PORT",
+    "/app/appl-tracky/SQL_ENGINE",
+    "/app/appl-tracky/SQL_DATABASE",
+    "/database/postgres_cluster_kubernetes/SQL_USER",
+    "/database/postgres_cluster_kubernetes/SQL_PASSWORD",
+    "/database/postgres_cluster_kubernetes/SQL_HOST",
+    "/database/postgres_cluster_kubernetes/SQL_PORT",
+
     "/database/elasticsearch_cluster_kubernetes/ELASTICSEARCH_HOST",
     "/database/elasticsearch_cluster_kubernetes/ELASTICSEARCH_PORT",
 
@@ -129,7 +128,6 @@ module "slack_middleware_service" {
   source = "./microservice-installation-module"
 
   # cluster-wise config (shared resources across different microservices)
-  dockerhub_kubernetes_secret_name   = "${kubernetes_secret.dockerhub_secret.metadata.0.name}"
   cert_cluster_issuer_name           = local.cert_cluster_issuer_name
   tls_cert_covered_domain_list       = local.tls_cert_covered_domain_list
   cert_cluster_issuer_k8_secret_name = local.cert_cluster_issuer_k8_secret_name
@@ -161,7 +159,6 @@ module "postgres_cluster" {
 
   # cluster-wise config (shared resources across different microservices)
   kubeconfig_raw                     = digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.raw_config
-  dockerhub_kubernetes_secret_name   = kubernetes_secret.dockerhub_secret.metadata.0.name
   cert_cluster_issuer_name           = local.cert_cluster_issuer_name
   tls_cert_covered_domain_list       = local.tls_cert_covered_domain_list
   cert_cluster_issuer_k8_secret_name = local.cert_cluster_issuer_k8_secret_name
@@ -175,14 +172,13 @@ module "postgres_cluster" {
   app_container_image_tag = var.postgres_cluster_image_tag # 12.0 is latest, but 11 or 10 is recommended
 
   app_secret_name_list = [
-    "/database/postgres_cluster_kubernetes/POSTGRES_DB",
-    "/database/postgres_cluster_kubernetes/POSTGRES_USER",
-    "/database/postgres_cluster_kubernetes/POSTGRES_PASSWORD",
-    "/database/postgres_cluster_kubernetes/DATA_VOLUME_MOUNT",
+    "/database/postgres_cluster_kubernetes/SQL_DATABASE",
+    "/database/postgres_cluster_kubernetes/SQL_USER",
+    "/database/postgres_cluster_kubernetes/SQL_PASSWORD",
+    "/database/postgres_cluster_kubernetes/SQL_DATA_VOLUME_MOUNT",
   ]
 
-  is_persistent_volume_claim = true
-  volume_mount_path          = "/data"
+  persistent_volume_mount_path_secret_name = "/database/postgres_cluster_kubernetes/SQL_DATA_VOLUME_MOUNT"
 }
 
 
@@ -190,7 +186,6 @@ module "redis_cluster" {
   source = "./microservice-installation-module"
 
   # cluster-wise config (shared resources across different microservices)
-  dockerhub_kubernetes_secret_name   = kubernetes_secret.dockerhub_secret.metadata.0.name
   cert_cluster_issuer_name           = local.cert_cluster_issuer_name
   tls_cert_covered_domain_list       = local.tls_cert_covered_domain_list
   cert_cluster_issuer_k8_secret_name = local.cert_cluster_issuer_k8_secret_name

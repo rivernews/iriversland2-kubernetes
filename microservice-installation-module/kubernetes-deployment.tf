@@ -31,7 +31,7 @@ resource "kubernetes_deployment" "app" {
         service_account_name = kubernetes_service_account.app.metadata.0.name
 
         image_pull_secrets {
-          name = var.dockerhub_kubernetes_secret_name
+          name = kubernetes_secret.dockerhub_secret.metadata.0.name
         }
 
         container {
@@ -110,24 +110,24 @@ resource "kubernetes_deployment" "app" {
         # persistent volume setup
         # based on https://www.digitalocean.com/docs/kubernetes/how-to/add-volumes/
         dynamic "init_container" {
-            for_each = var.is_persistent_volume_claim ? [true] : []
+            for_each = data.aws_ssm_parameter.persistent_volume_mount_path
             content {
                 name = "${var.app_label}-initial-container-${init_container.key}"
                 image = "busybox"
-                command = ["/bin/chmod","-R","777", var.volume_mount_path]
+                command = ["/bin/chmod","-R","777", init_container.value.value]
                 volume_mount {
-                    name = "${var.app_label}-volume-${init_container.key}"
-                    mount_path = var.volume_mount_path
+                    name = init_container.key == 0 ? "${var.app_label}-volume" : "${var.app_label}-volume-${init_container.key}"
+                    mount_path = init_container.value.value
                 }
             }
         }
 
         dynamic "volume" {
-            for_each = var.is_persistent_volume_claim ? [true] : []
+            for_each = data.aws_ssm_parameter.persistent_volume_mount_path
             content {
-                name = "${var.app_label}-volume-${volume.key}"
+                name = volume.key == 0 ? "${var.app_label}-volume" : "${var.app_label}-volume-${volume.key}"
                 persistent_volume_claim {
-                    claim_name = kubernetes_persistent_volume_claim.app_digitalocean_pvc.0.metadata.0.name
+                    claim_name = kubernetes_persistent_volume_claim.app_digitalocean_pvc[volume.key].metadata.0.name
                 }
             }
         }
@@ -147,6 +147,11 @@ locals {
   app_secret_key_value_pairs = {
     for index, secret_name in local.app_secret_name_list : split("/", secret_name)[length(split("/", secret_name)) - 1] => local.app_secret_value_list[index]
   }
+}
+
+data "aws_ssm_parameter" "persistent_volume_mount_path" {
+  count = var.persistent_volume_mount_path_secret_name != "" ? 1 : 0
+  name = var.persistent_volume_mount_path_secret_name
 }
 
 data "aws_ssm_parameter" "app_credentials" {

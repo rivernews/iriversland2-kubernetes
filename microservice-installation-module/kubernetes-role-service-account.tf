@@ -8,8 +8,8 @@ resource "kubernetes_service_account" "app" {
   metadata {
 
     name      = "${var.app_label}-service-account"
-    # namespace = "${kubernetes_namespace.app.metadata.0.name}"
-    namespace = "cert-manager" # TODO: after being able to let microservice use their own namespace, change this line to use module input values
+    namespace = (var.app_label == "slack-middleware-service" || var.app_label == "appl-tracky-api" || var.app_label == "iriversland2-api") ? kubernetes_namespace.app.metadata.0.name : "cert-manager"
+    # namespace =  "cert-manager" # TODO: after being able to let microservice use their own namespace, change this line to use module input values
   }
 
 }

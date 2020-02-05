@@ -4,6 +4,7 @@ import argparse
 import json
 import re
 import subprocess
+import sys
 
 MANIFEST_IMAGE_TAGS = [{
     'arg_name_full': 'app_container_image_tag',

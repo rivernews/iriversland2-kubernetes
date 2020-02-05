@@ -5,4 +5,4 @@ set -e
 
 echo "INFO: ready to copy our custom pg_hba.conf"
 echo "INFO: PGDATA check=$PGDATA"
-cp /data/pg_hba.conf "$PGDATA/pg_hba.conf"
+cp $SQL_DATA_VOLUME_MOUNT/pg_hba.conf "$PGDATA/pg_hba.conf"
