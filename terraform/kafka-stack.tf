@@ -43,15 +43,14 @@ resource "helm_release" "kafka_stack" {
 }
 
 module "kafka_connect" {
-  # source = "./microservice-installation-module"
-  source = "github.com/rivernews/microservice-on-kubernetes"
+  source  = "rivernews/kubernetes-microservice/digitalocean"
+  version = "v0.0.9"
 
-  # cluster-wise config (shared resources across different microservices)
-  # cert_cluster_issuer_name           = local.cert_cluster_issuer_name
-  # tls_cert_covered_domain_list       = local.tls_cert_covered_domain_list
-  # cert_cluster_issuer_k8_secret_name = local.cert_cluster_issuer_k8_secret_name
+  aws_region     = var.aws_region
+  aws_access_key = var.aws_access_key
+  aws_secret_key = var.aws_secret_key
+  cluster_name   = digitalocean_kubernetes_cluster.project_digitalocean_cluster.name
 
-  # app-specific config (microservice)
   app_label           = "kafka-connect"
   app_exposed_port    = 8083 # exposes kafka connect REST API on port 8083
   app_deployed_domain = ""

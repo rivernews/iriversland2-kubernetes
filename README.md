@@ -25,7 +25,8 @@ This repository provisions the entire Kubernetes cluster as below in the image. 
     - Kubernetes CLI (version v1.15.2) for kubernetes CRD resources management support
     - Helm CLI (version v2.16.1) for helm release resources management support
 - Optionally install `brew install doctl` for the digitalocean cli tool
-- Run `export KUBECONFIG=kubeconfig.yaml`
+    - To let `doctl` generate `kubeconfig.yaml`, run `doctl k8s cluster kubeconfig show project-shaungc-digitalocean-cluster > kubeconfig.yaml`
+- Run `export KUBECONFIG=kubeconfig.yaml`. The terraform provider `kubernetes` will need this file present.
 
 Optional, nice to have (useful for debug):
 

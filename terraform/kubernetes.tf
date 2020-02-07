@@ -28,8 +28,6 @@ resource "digitalocean_kubernetes_cluster" "project_digitalocean_cluster" {
     auto_scale = true
     tags       = ["${digitalocean_tag.project-cluster.id}"]
   }
-
-  # tags = ["${digitalocean_tag.project-cluster.id}"]
 }
 
 # tf doc: https://www.terraform.io/docs/providers/do/r/kubernetes_node_pool.html
@@ -45,19 +43,6 @@ resource "digitalocean_kubernetes_node_pool" "secondary_node_pool" {
   tags       = ["${digitalocean_tag.project-cluster.id}"]
 }
 
-# resource "null_resource" "pull_kubeconfig" {
-#     triggers = {
-#         project_digitalocean_cluster_id = "${digitalocean_kubernetes_cluster.project_digitalocean_cluster.id}"
-#     }
-#   provisioner "local-exec" {
-#     command = "./pull-do-kubeconfig.sh ${digitalocean_kubernetes_cluster.project_digitalocean_cluster.id}"
-#   }
-# }
-
-# issue: "local_file" may cause some error when digitalocean cluster tag is set. See https://github.com/terraform-providers/terraform-provider-digitalocean/issues/244
-# https://medium.com/@stepanvrany/terraforming-dok8s-helm-and-traefik-included-7ac42b5543dc
-#
-#
 
 provider "local" {
   version = "~> 1.3"
@@ -70,44 +55,42 @@ resource "local_file" "kubeconfig" {
     sensitive_content     = digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.raw_config
     filename = "kubeconfig.yaml"
 }
+
+
 # https://github.com/terraform-providers/terraform-provider-digitalocean/issues/234#issuecomment-493375811
 provider "null" {
   version = "~> 2.1"
 }
-# resource "null_resource" "kubeconfig" {
 
-# #   provisioner "local-exec" {
-# #     # command = ". ./pull-do-kubeconfig.sh ${digitalocean_kubernetes_cluster.project_digitalocean_cluster.id}"
-# #     command = "echo ${digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.raw_config} > kubeconfig.yaml"
-# #     # kubeconfig.yaml
-# #   }
-
-#   provisioner "file" {
-#     content = "${digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.raw_config}"
-#     destination = "kubeconfig.yaml"
-#   }
-
-#   triggers = {
-#     cluster_config = "${digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.raw_config}"
-#   }
-# }
 
 # initialize Kubernetes provider
 # https://www.terraform.io/docs/providers/do/r/kubernetes_cluster.html
 provider "kubernetes" {
+
+  # Resolve Error: Unauthorized issue
+  # suggested config: https://stackoverflow.com/a/58955100/9814131
+  # suggested cli: https://github.com/terraform-providers/terraform-provider-kubernetes/issues/679#issuecomment-552119320
+  # related merge request: https://github.com/terraform-providers/terraform-provider-kubernetes/pull/690
+
   # all k8 provider versions: https://github.com/terraform-providers/terraform-provider-kubernetes/blob/master/CHANGELOG.md
-  version = "~> 1.10"
+  version = "1.9"
+
+  # config_path = "./${local_file.kubeconfig.filename}"
+  # config_path = "./kubeconfig.yaml"
 
   host = digitalocean_kubernetes_cluster.project_digitalocean_cluster.endpoint
 
+  load_config_file = false
+
   token = digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config[0].token
+
   cluster_ca_certificate = base64decode(
     digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config[0].cluster_ca_certificate
   )
   
   # adding this block to resolve tf error: `<a k8 resource> is forbidden: User "system:anonymous cannot create resource "<a k8 resource>" in API group "" at the cluster scope`
-  client_certificate     = digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config[0].client_certificate
-  client_key             = digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config[0].client_key
+  # client_certificate     = digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config[0].client_certificate
+  # client_key             = digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config[0].client_key
   
 }
 
@@ -133,11 +116,13 @@ resource "digitalocean_firewall" "project-cluster-firewall" {
     # source_tags = ["${digitalocean_tag.project-cluster.id}"]
   }
 
-  inbound_rule {
-    protocol   = "tcp"
-    port_range = "22"
+  # TODO: remove this if not causing error
+  # removing this block to improve security, avoiding opening unnecessary port to external traffic
+  # inbound_rule {
+  #   protocol   = "tcp"
+  #   port_range = "22"
 
-    source_addresses = ["0.0.0.0/0", "::/0"]
-    # source_tags = ["${digitalocean_tag.project-cluster.id}"]
-  }
+  #   source_addresses = ["0.0.0.0/0", "::/0"]
+  #   # source_tags = ["${digitalocean_tag.project-cluster.id}"]
+  # }
 }

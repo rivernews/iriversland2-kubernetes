@@ -1905,5 +1905,49 @@
         "redis_cluster_image_tag": "5.0.6",
         "kafka_connect_image_tag": "cbfa384",
         "slack_middleware_service_image_tag": "dfd8cfe"
+    },
+    {
+        "app_container_image_tag": "b8ff8e054957503080302110ee0c50aa540993b3",
+        "appl_tracky_api_image_tag": "161331db186eb1c4f68b127daed657799a7281f7",
+        "postgres_cluster_image_tag": "11.5-r24",
+        "redis_cluster_image_tag": "5.0.6",
+        "kafka_connect_image_tag": "cbfa384",
+        "slack_middleware_service_image_tag": "dfd8cfe"
+    },
+    {
+        "app_container_image_tag": "b8ff8e054957503080302110ee0c50aa540993b3",
+        "appl_tracky_api_image_tag": "161331db186eb1c4f68b127daed657799a7281f7",
+        "postgres_cluster_image_tag": "11.5-r24",
+        "redis_cluster_image_tag": "5.0.6",
+        "kafka_connect_image_tag": "cbfa384",
+        "slack_middleware_service_image_tag": "dfd8cfe"
+    },
+    {
+        "app_container_image_tag": "b8ff8e054957503080302110ee0c50aa540993b3",
+        "appl_tracky_api_image_tag": "161331db186eb1c4f68b127daed657799a7281f7",
+        "postgres_cluster_image_tag": "11.5-r24",
+        "redis_cluster_image_tag": "5.0.6",
+        "kafka_connect_image_tag": "cbfa384",
+        "slack_middleware_service_image_tag": "dfd8cfe"
+    },
+    {
+        "postgres_cluster_image_tag": "11.5-r24",
+        "redis_cluster_image_tag": "5.0.6",
+        "kafka_connect_image_tag": "cbfa384"
+    },
+    {
+        "postgres_cluster_image_tag": "11.5-r24",
+        "redis_cluster_image_tag": "5.0.6",
+        "kafka_connect_image_tag": "cbfa384"
+    },
+    {
+        "postgres_cluster_image_tag": "11.5-r24",
+        "redis_cluster_image_tag": "5.0.6",
+        "kafka_connect_image_tag": "cbfa384"
+    },
+    {
+        "postgres_cluster_image_tag": "11.5-r24",
+        "redis_cluster_image_tag": "5.0.6",
+        "kafka_connect_image_tag": "cbfa384"
     }
 ]

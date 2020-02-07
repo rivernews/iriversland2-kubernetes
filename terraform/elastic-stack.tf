@@ -33,12 +33,10 @@ resource "helm_release" "elasticsearch" {
   version    = "7.4.1" # lock down version based on `Chart.yaml`, refer to https://github.com/elastic/helm-charts/blob/1f9e8a4f8a4edbf2773b4553953abb6074ee77ce/elasticsearch/Chart.yaml
   # chart version 7.4.1 ==> es version 7.4.1
 
-  #   values = [
-  #     "${data.http.elasticsearch_helm_chart_values.body}"
-  #   ]
-
   # https://github.com/elastic/helm-charts/blob/master/elasticsearch/examples/kubernetes-kind/values.yaml
   # defaults: https://github.com/elastic/helm-charts/blob/master/elasticsearch/values.yaml
+  # TODO: use `set_string` instead of values = [`<<-EOF`..., so that changes can be reflected on tf state correctly
+  # currently the <<-EOF will let even changes in comments trigger tf to update
   values = [<<-EOF
     ---
     # Permit co-located instances for solitary minikube virtual machines.
@@ -51,14 +49,9 @@ resource "helm_release" "elasticsearch" {
     esJavaOpts: "-Xmx512m -Xms512m" # TODO: set this if using too much resources
 
     # Kubernetes replica count for the statefulset (i.e. how many pods) && Data node replicas (statefulset)
+    # must specify at least 1 otherwise elasticsearch cannot launch
     replicas: "1"
     
-    # zero to disable index replica, so that index status won't be yellow when only provisioning 1 node for es cluster
-    # lifecycle:
-    #     postStart:
-    #         exec:
-    #             command: ["sh", "-c", "sleep 30 && curl -v -XPUT -H 'Content-Type: application/json' http://elasticsearch-master:9200/_settings -d '{ \"index\" : {\"number_of_replicas\" : 0}}' > /usr/share/message"]
-
     # Allocate smaller chunks of memory per pod.
     resources:
         requests:
@@ -103,28 +96,16 @@ resource "helm_release" "elasticsearch" {
   # use below commands instead to inspect the pod readiness and logs
   # `. ./my-kubectl.sh get pods --namespace=kube-system -l app=elasticsearch-master --watch` to wait and expect a 1/1 READY
   # `. ./my-kubectl.sh logs --follow  elasticsearch-master-0 -n kube-system` for logs after pods created and elasticsearch start spinning up
-  
   wait = true
 
+
   # all available configurations: https://github.com/elastic/helm-charts/tree/master/elasticsearch#configuration
+
+
   set_string {
     name  = "imageTag"
     value = "7.4.1" # lock down to version 7.4.1 of Elasticsearch --> but 6.X (e.g., latest 6.8.4 as of 11/20/2019) is recommended for better compatibility with other components
   }
-
-#   set_string {
-#     name  = "replicas"
-#     value = "1"
-#   }
-
-  # this will be run before terraform delete resource
-  # which will cause terraform error because when terraform 
-  # tries to destroy resource, the helm release is already
-  # delete, which will cause not found error
-  #   provisioner "local-exec" {
-  #     when    = "destroy"
-  #     command = ". ./my-helm.sh delete elasticsearch-release && . ./my-helm.sh del --purge elasticsearch-release"
-  #   }
 
   depends_on = [
     kubernetes_cluster_role_binding.tiller,
@@ -143,13 +124,17 @@ resource "helm_release" "kibana" {
   force_update = true
 
   # don't rely on terraform helm provider to check on resource created successfully or not
+  # you should always use kubectl or port-forwarding to verify
   wait = true
 
   repository = data.helm_repository.elastic_stack.metadata[0].name
   chart      = "kibana"
   version    = "7.4.1"
 
+
   # all available configurations: https://github.com/elastic/helm-charts/tree/master/kibana
+
+
   set_string {
     name  = "resources.requests.memory"
     value = "400Mi"
@@ -168,14 +153,8 @@ resource "helm_release" "kibana" {
   EOF
   ]
 
-  # do not use local-exec to do helm delete, see elasticsearch helm_release for reason
-  #   provisioner "local-exec" {
-  #     when    = "destroy"
-  #     command = ". ./my-helm.sh delete kibana-release && . ./my-helm.sh del --purge kibana-release"
-  #   }
-
   depends_on = [
-    # helm_release.elasticsearch
+    helm_release.elasticsearch,
     module.kafka_connect
   ]
 }

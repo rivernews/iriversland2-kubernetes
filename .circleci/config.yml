@@ -10,9 +10,10 @@ jobs:
       - image: circleci/buildpack-deps:stretch
     environment:
       IMAGE_NAME: shaungc/terraform-kubectl-image
-    working_directory: ~/terraform
+    working_directory: ~/repo/terraform
     steps:
-      - checkout # retrieves the code from GitHub
+      - checkout: # retrieves the code from GitHub
+        path: ~/repo
       
       # only run blocks below if you updated Dockerfile or terraform script in this repo
       #
@@ -34,7 +35,7 @@ jobs:
   exec_terraform:
     docker:
       - image: shaungc/terraform-kubectl-image
-    working_directory: /terraform
+    working_directory: /repo/terraform
     steps:
       - run:
           name: Initiate Terraform
