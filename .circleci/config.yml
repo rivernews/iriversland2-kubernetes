@@ -35,7 +35,7 @@ jobs:
   exec_terraform:
     docker:
       - image: shaungc/terraform-kubectl-image
-    working_directory: /repo/terraform
+    working_directory: ~/repo/terraform
     steps:
       - run:
           name: Initiate Terraform
@@ -54,6 +54,7 @@ jobs:
           name: Test Kubectl
           command: |
             bash my-kubectl.sh version --client
+            bash my-kubectl.sh get all --all-namespaces
 
 
       # only run this block if you want to provision infra here instead of the iriversland2-public circleci.
