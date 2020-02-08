@@ -10,7 +10,7 @@ jobs:
       - image: circleci/buildpack-deps:stretch
     environment:
       IMAGE_NAME: shaungc/terraform-kubectl-image
-    working_directory: ~/repo/terraform
+    working_directory: ~/repo/tf-kubectl-toolkit
     steps:
       - checkout: # retrieves the code from GitHub
           path: ~/repo
@@ -20,9 +20,9 @@ jobs:
       #
       - setup_remote_docker # sets up a remote, isolated environment for each build. This is required before you use any docker command inside a job step.
       - run:
-          name: Build Docker image
+          name: Build Terraform-Kubectl Toolkit image
           command: |
-            docker build -f .dockerize/terraform-provisioner/Dockerfile -t $IMAGE_NAME:latest .
+            docker build -f Dockerfile -t $IMAGE_NAME:latest .
       - run:
           name: Push Docker Image
           command: |
