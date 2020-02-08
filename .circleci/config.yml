@@ -13,7 +13,7 @@ jobs:
     working_directory: ~/repo/terraform
     steps:
       - checkout: # retrieves the code from GitHub
-        path: ~/repo
+          path: ~/repo
       
       # only run blocks below if you updated Dockerfile or terraform script in this repo
       #
