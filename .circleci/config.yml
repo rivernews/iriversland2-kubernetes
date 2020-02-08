@@ -52,6 +52,7 @@ jobs:
           name: Plan Terraform
           command: |
             terraform apply -auto-approve \
+              -target=local_file.kubeconfig \
               -var="letsencrypt_env=prod" \
               -var="docker_registry_url=https://index.docker.io/v1/" \
               -var="managed_route53_zone_name=shaungc.com." \
@@ -60,7 +61,6 @@ jobs:
               -var="postgres_cluster_image_tag=latest" \
               -var="redis_cluster_image_tag=latest" \
               -var="kafka_connect_image_tag=latest" \
-              -t local_file.kubeconfig
       - run:
           name: Test Kubectl
           command: |
