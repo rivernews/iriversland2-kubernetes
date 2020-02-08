@@ -1,1 +1,0 @@
-kubectl --kubeconfig ../../kubeconfig.yaml get pods -n kube-system

@@ -9,6 +9,8 @@ kubeconfig.yaml
 *.tfstate
 *.tfstate.*
 
+**.tf.log
+
 # .tfvars files
 # *.tfvars
 **local**.tfvars
