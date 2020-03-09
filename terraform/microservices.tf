@@ -1,6 +1,6 @@
 module "postgres_cluster" {
   source  = "rivernews/kubernetes-microservice/digitalocean"
-  version = "v0.0.9"
+  version = "v0.1.6"
 
   aws_region     = var.aws_region
   aws_access_key = var.aws_access_key
@@ -21,7 +21,7 @@ module "postgres_cluster" {
     "/database/postgres_cluster_kubernetes/SQL_DATA_VOLUME_MOUNT",
   ]
 
-  persistent_volume_mount_path_secret_name = "/database/postgres_cluster_kubernetes/SQL_DATA_VOLUME_MOUNT"
+  persistent_volume_mount_path_secret_name_list = ["/database/postgres_cluster_kubernetes/SQL_DATA_VOLUME_MOUNT"]
 }
 
 
