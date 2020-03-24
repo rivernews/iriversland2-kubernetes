@@ -4,6 +4,9 @@ data "helm_repository" "kafka_stack" {
 }
 
 resource "helm_release" "kafka_stack" {
+  # TODO: temp disable
+  count = 0
+
   name      = "kafka-stack-release"
   namespace = kubernetes_service_account.tiller.metadata.0.namespace
 
@@ -42,38 +45,38 @@ resource "helm_release" "kafka_stack" {
   ]
 }
 
-module "kafka_connect" {
-  source  = "rivernews/kubernetes-microservice/digitalocean"
-  version = "v0.1.6"
+# module "kafka_connect" {
+#   source  = "rivernews/kubernetes-microservice/digitalocean"
+#   version = "v0.1.6"
 
-  aws_region     = var.aws_region
-  aws_access_key = var.aws_access_key
-  aws_secret_key = var.aws_secret_key
-  cluster_name   = digitalocean_kubernetes_cluster.project_digitalocean_cluster.name
+#   aws_region     = var.aws_region
+#   aws_access_key = var.aws_access_key
+#   aws_secret_key = var.aws_secret_key
+#   cluster_name   = digitalocean_kubernetes_cluster.project_digitalocean_cluster.name
 
-  app_label           = "kafka-connect"
-  app_exposed_port    = 8083 # exposes kafka connect REST API on port 8083
-  app_deployed_domain = ""
+#   app_label           = "kafka-connect"
+#   app_exposed_port    = 8083 # exposes kafka connect REST API on port 8083
+#   app_deployed_domain = ""
 
-  app_container_image     = "shaungc/kafka-connectors-cdc"
-  app_container_image_tag = var.kafka_connect_image_tag
+#   app_container_image     = "shaungc/kafka-connectors-cdc"
+#   app_container_image_tag = var.kafka_connect_image_tag
 
-  app_secret_name_list = [
-    "/database/postgres_cluster_kubernetes/SQL_DATABASE",
-    "/database/postgres_cluster_kubernetes/SQL_USER",
-    "/database/postgres_cluster_kubernetes/SQL_PASSWORD",
-    "/database/postgres_cluster_kubernetes/SQL_HOST",
-    "/database/postgres_cluster_kubernetes/SQL_PORT",
-  ]
+#   app_secret_name_list = [
+#     "/database/postgres_cluster_kubernetes/SQL_DATABASE",
+#     "/database/postgres_cluster_kubernetes/SQL_USER",
+#     "/database/postgres_cluster_kubernetes/SQL_PASSWORD",
+#     "/database/postgres_cluster_kubernetes/SQL_HOST",
+#     "/database/postgres_cluster_kubernetes/SQL_PORT",
+#   ]
 
-  environment_variables = {
-      ELASTICSEARCH_HOST = "elasticsearch-master.${helm_release.elasticsearch.namespace}.svc.cluster.local"
-      ELASTICSEARCH_PORT = local.elasticsearch_port
-  }
+#   environment_variables = {
+#       ELASTICSEARCH_HOST = "elasticsearch-master.${helm_release.elasticsearch.namespace}.svc.cluster.local"
+#       ELASTICSEARCH_PORT = local.elasticsearch_port
+#   }
 
-  depend_on = [
-    helm_release.kafka_stack.id,
-    module.postgres_cluster.app_container_image,
-    helm_release.elasticsearch.id
-  ]
-}
+#   depend_on = [
+#     helm_release.kafka_stack.id,
+#     module.postgres_cluster.app_container_image,
+#     helm_release.elasticsearch.id
+#   ]
+# }

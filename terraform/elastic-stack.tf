@@ -7,15 +7,6 @@ data "helm_repository" "elastic_stack" {
   url  = "https://helm.elastic.co"
 }
 
-provider "http" {
-  version = "~> 1.1"
-}
-
-data "http" "elasticsearch_helm_chart_values" {
-  # other choices of values.yaml available at: https://github.com/elastic/helm-charts/tree/master/elasticsearch
-  url = "https://raw.githubusercontent.com/elastic/helm-charts/master/elasticsearch/examples/kubernetes-kind/values.yaml"
-}
-
 # this release will create 3 pods running elasticsearch
 # you can verify by running `kubectl get pods --namespace=default -l app=elasticsearch-master -w`
 # do port forwarding by `. ./my-kubectl.sh port-forward svc/elasticsearch-master -n kube-system 9200`
@@ -23,6 +14,9 @@ locals {
     elasticsearch_port = 9200
 }
 resource "helm_release" "elasticsearch" {
+  # TODO: temp disable
+  count = 0
+
   name      = "elasticsearch-release"
   namespace = kubernetes_service_account.tiller.metadata.0.namespace
 
@@ -118,6 +112,9 @@ resource "helm_release" "elasticsearch" {
 # do port forwarding by `. ./my-kubectl.sh port-forward deployment/kibana-release-kibana 5601 -n kube-system`
 # you'll be able to access kibana via browser at http://localhost:5601
 resource "helm_release" "kibana" {
+  # TODO: temp disable
+  count = 0
+  
   name      = "kibana-release"
   namespace = kubernetes_service_account.tiller.metadata.0.namespace
 
@@ -155,7 +152,7 @@ resource "helm_release" "kibana" {
 
   depends_on = [
     helm_release.elasticsearch,
-    module.kafka_connect
+    # module.kafka_connect
   ]
 }
 

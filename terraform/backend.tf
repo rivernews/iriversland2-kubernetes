@@ -7,6 +7,6 @@
 terraform {
   backend "s3" {
     bucket = "iriversland-cloud"
-    key    = "terraform/kubernetes.remote-terraform.tfstate"
+    key    = "terraform/kubernetes/kubernetes-cluster.remote-terraform.tfstate"
   }
 }

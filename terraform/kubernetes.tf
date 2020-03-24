@@ -5,7 +5,8 @@ provider "digitalocean" {
   token   = var.do_token
 
   # version changelog: https://github.com/terraform-providers/terraform-provider-digitalocean/blob/master/CHANGELOG.md
-  version = "~> 1.11"
+  # version = "~> 1.11"
+  version = "1.15.1"
 }
 
 # Terraform officials: https://www.terraform.io/docs/providers/do/r/tag.html
@@ -18,13 +19,14 @@ resource "digitalocean_kubernetes_cluster" "project_digitalocean_cluster" {
   name    = "${var.project_name}-cluster"
   region  = "sfo2"
   # Grab the latest version slug from `doctl kubernetes options versions`
-  version = "1.15.5-do.1"
+  # version = "1.15.5-do.1"
+  version = "1.16.6-do.2"
 
   node_pool {
     name       = "${var.project_name}-node-pool"
-    size       = "s-2vcpu-4gb" # do not easily change this, as this will cause the entire k8 cluster to vanish
+    size       = "s-4vcpu-8gb" # do not easily change this, as this will cause the entire k8 cluster to vanish
     min_nodes  = 1
-    max_nodes  = 2
+    max_nodes  = 1
     auto_scale = true
     tags       = ["${digitalocean_tag.project-cluster.id}"]
   }
@@ -32,16 +34,16 @@ resource "digitalocean_kubernetes_cluster" "project_digitalocean_cluster" {
 
 # tf doc: https://www.terraform.io/docs/providers/do/r/kubernetes_node_pool.html
 # k8 will spread pods across nodes based on available free resources: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
-resource "digitalocean_kubernetes_node_pool" "secondary_node_pool" {
-  cluster_id = digitalocean_kubernetes_cluster.project_digitalocean_cluster.id
+# resource "digitalocean_kubernetes_node_pool" "secondary_node_pool" {
+#   cluster_id = digitalocean_kubernetes_cluster.project_digitalocean_cluster.id
 
-  name       = "secondary-node-pool"
-  size       = "s-2vcpu-4gb"
-  min_nodes  = 1
-  max_nodes  = 2
-  auto_scale = true
-  tags       = ["${digitalocean_tag.project-cluster.id}"]
-}
+#   name       = "secondary-node-pool"
+#   size       = "s-2vcpu-4gb"
+#   min_nodes  = 1
+#   max_nodes  = 2
+#   auto_scale = true
+#   tags       = ["${digitalocean_tag.project-cluster.id}"]
+# }
 
 
 provider "local" {
@@ -73,7 +75,8 @@ provider "kubernetes" {
   # related merge request: https://github.com/terraform-providers/terraform-provider-kubernetes/pull/690
 
   # all k8 provider versions: https://github.com/terraform-providers/terraform-provider-kubernetes/blob/master/CHANGELOG.md
-  version = "1.9"
+  # version = "1.9"
+  version = "1.11.1"
 
   # config_path = "./${local_file.kubeconfig.filename}"
   # config_path = "./kubeconfig.yaml"
