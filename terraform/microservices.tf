@@ -34,9 +34,24 @@ module "redis_cluster" {
   aws_secret_key = var.aws_secret_key
   cluster_name   = digitalocean_kubernetes_cluster.project_digitalocean_cluster.name
 
-  app_label        = "redis-cluster"
-  app_exposed_port = 6379
+  app_label           = "redis-cluster"
+  
+  # This has to be 6379, since the redis image we're using spins up Redis on 6379 by default,
+  # thus if you want to change port number, setting k8s service & deployment port is not enough
+  # you also need to change Redis configuration so that it listens on the changed port
+  app_exposed_port    = 6379
 
-  app_container_image     = "redis"
+  # https://github.com/bitnami/bitnami-docker-redis
+  app_container_image     = "bitnami/redis"
   app_container_image_tag = var.redis_cluster_image_tag
+
+  app_secret_name_list = [
+    "/database/redis_cluster_kubernetes/REDIS_PASSWORD"
+  ]
+
+  depend_on = [
+    # Redis exposes tcp services, which relies on ingress controller
+    # The ingress resources are L7 networking, which only allows http/https services
+    helm_release.project-nginx-ingress
+  ]
 }

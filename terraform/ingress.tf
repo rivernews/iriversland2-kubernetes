@@ -1,7 +1,7 @@
 locals {
   tls_cert_covered_domain_list = [
     "*.${var.managed_k8_rx_domain}",
-    
+
     # no need to create for `api.` since the `*.api.` one already covers that; otherwisw cert-manager will throw error
     # "api.${var.managed_k8_rx_domain}",
 
@@ -66,10 +66,12 @@ resource "helm_release" "project-nginx-ingress" {
     value = true
   }
 
-  # nginx debugging: https://github.com/kubernetes/ingress-nginx/blob/master/docs/troubleshooting.md#debug-logging
-  set {
-    name  = "controller.extraArgs.v"
-    value = "4"
+  # exposing tcp services (non-http services, non-web server)
+  # helm's way: https://github.com/helm/charts/issues/5408#issuecomment-388843681
+  # nginx-ingress doc supporting tcp load balancing: https://kubernetes.github.io/ingress-nginx/user-guide/exposing-tcp-udp-services/
+  set_string {
+    name = "tcp.6378"
+    value = "redis-cluster/redis-cluster-service:6379"
   }
 
   # helm config for default certificate 
@@ -104,7 +106,7 @@ resource "helm_release" "project-nginx-ingress" {
             proxy-body-size: "1m" # default is 1m
 
             location-snippet: |
-                # add custom nginx config here
+                # add custom nginx config here for location block
   EOF
   ]
 
@@ -113,6 +115,12 @@ resource "helm_release" "project-nginx-ingress" {
   set {
     name  = "updateStrategy.type"
     value = "RollingUpdate"
+  }
+
+  # nginx debugging: https://github.com/kubernetes/ingress-nginx/blob/master/docs/troubleshooting.md#debug-logging
+  set {
+    name  = "controller.extraArgs.v"
+    value = "4"
   }
 
   depends_on = [
@@ -203,9 +211,9 @@ resource "kubernetes_ingress" "project-ingress-resource" {
     # annotation spec: https://github.com/kubernetes/ingress-nginx/blob/master/docs/user-guide/nginx-configuration/annotations.md#annotations
     annotations = {
       "kubernetes.io/ingress.class" = "nginx"
-      
+
       # we are already setting most of these configs in nginx controller
-      
+
       # let the host below be interpreted as regex
       # "nginx.ingress.kubernetes.io/use-regex" = "true"
 
@@ -228,7 +236,7 @@ resource "kubernetes_ingress" "project-ingress-resource" {
     # see https://github.com/jetstack/cert-manager/blob/master/docs/tasks/issuing-certificates/ingress-shim.rst#how-it-works
     tls {
       hosts = local.tls_cert_covered_domain_list
-      
+
       # this will be used for default-ssl-certificate
       # this is the secret containing letsencrypt secrets,
       # not the one created by cert-manager

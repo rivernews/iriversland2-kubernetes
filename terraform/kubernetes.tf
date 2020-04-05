@@ -5,7 +5,6 @@ provider "digitalocean" {
   token   = var.do_token
 
   # version changelog: https://github.com/terraform-providers/terraform-provider-digitalocean/blob/master/CHANGELOG.md
-  # version = "~> 1.11"
   version = "1.15.1"
 }
 
@@ -19,7 +18,6 @@ resource "digitalocean_kubernetes_cluster" "project_digitalocean_cluster" {
   name    = "${var.project_name}-cluster"
   region  = "sfo2"
   # Grab the latest version slug from `doctl kubernetes options versions`
-  # version = "1.15.5-do.1"
   version = "1.16.6-do.2"
 
   node_pool {
@@ -75,7 +73,6 @@ provider "kubernetes" {
   # related merge request: https://github.com/terraform-providers/terraform-provider-kubernetes/pull/690
 
   # all k8 provider versions: https://github.com/terraform-providers/terraform-provider-kubernetes/blob/master/CHANGELOG.md
-  # version = "1.9"
   version = "1.11.1"
 
   # config_path = "./${local_file.kubeconfig.filename}"
@@ -128,4 +125,12 @@ resource "digitalocean_firewall" "project-cluster-firewall" {
   #   source_addresses = ["0.0.0.0/0", "::/0"]
   #   # source_tags = ["${digitalocean_tag.project-cluster.id}"]
   # }
+
+  # Allow load balancer traffic / tcp
+  inbound_rule {
+    protocol   = "tcp"
+    port_range = "6378"
+
+    source_addresses = ["0.0.0.0/0", "::/0"]
+  }
 }

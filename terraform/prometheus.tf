@@ -21,6 +21,19 @@ resource "helm_release" "prometheus_stack" {
             kubernetesResources:
                 limits:
                     memory: "200Mi"
+    grafana:
+      ingress:
+        enabled: true
+        annotations:
+          kubernetes.io/ingress.class: "nginx"
+          nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+        hosts:
+          - "grafana.shaungc.com"
+        tls:
+          - hosts:
+            - "grafana.shaungc.com"
+      adminPassword: "${data.aws_ssm_parameter.grafana_credentials.value}"
+
   EOF
   ]
 
@@ -36,4 +49,8 @@ resource "helm_release" "prometheus_stack" {
       "bash ./my-kubectl.sh delete crd thanosrulers.monitoring.coreos.com",
     ])
   }
+}
+
+data "aws_ssm_parameter" "grafana_credentials" {
+  name  = "/service/grafana/ADMIN_PASSWORD"
 }
