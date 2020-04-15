@@ -49,6 +49,14 @@ resource "helm_release" "prometheus_stack" {
       "bash ./my-kubectl.sh delete crd thanosrulers.monitoring.coreos.com",
     ])
   }
+
+  depends_on = [
+    # add the binding as dependency to avoid error below (due to binding deleted prior to refreshing / altering this resource)
+    # Error: rpc error: code = Unknown desc = configmaps is forbidden: User "system:serviceaccount:kube-system:tiller-service-account" cannot list resource "configmaps" in API group "" in the namespace "kube-system"
+    #
+    # Way to debug such error: https://github.com/helm/helm/issues/5100#issuecomment-533787541
+    kubernetes_cluster_role_binding.tiller
+  ]
 }
 
 data "aws_ssm_parameter" "grafana_credentials" {
