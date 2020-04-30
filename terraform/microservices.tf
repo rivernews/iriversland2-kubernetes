@@ -27,12 +27,13 @@
 
 module "redis_cluster" {
   source  = "rivernews/kubernetes-microservice/digitalocean"
-  version = ">= v0.1.13"
+  version = ">= v0.1.16"
 
   aws_region     = var.aws_region
   aws_access_key = var.aws_access_key
   aws_secret_key = var.aws_secret_key
   cluster_name   = digitalocean_kubernetes_cluster.project_digitalocean_cluster.name
+  node_pool_name = digitalocean_kubernetes_cluster.project_digitalocean_cluster.node_pool.0.name
 
   app_label           = "redis-cluster"
   

@@ -13,14 +13,31 @@ resource "helm_release" "prometheus_stack" {
   chart      = "stable/prometheus-operator"
   version    = "8.12.3"
 
-
-  # all available configurations: https://github.com/bitnami/charts/tree/master/bitnami/kafka
   values = [<<-EOF
     defaultRules:
         rules:
             kubernetesResources:
                 limits:
                     memory: "200Mi"
+    
+    prometheusOperator:
+      admissionWebhooks:
+        patch:
+          nodeSelector:
+            "doks.digitalocean.com/node-pool": ${digitalocean_kubernetes_cluster.project_digitalocean_cluster.node_pool.0.name}
+      nodeSelector:
+        "doks.digitalocean.com/node-pool": ${digitalocean_kubernetes_cluster.project_digitalocean_cluster.node_pool.0.name}
+    
+    prometheus:
+      prometheusSpec:
+        nodeSelector:
+          "doks.digitalocean.com/node-pool": ${digitalocean_kubernetes_cluster.project_digitalocean_cluster.node_pool.0.name}
+
+    alertmanager:
+      alertmanagerSpec:
+        nodeSelector:
+          "doks.digitalocean.com/node-pool": ${digitalocean_kubernetes_cluster.project_digitalocean_cluster.node_pool.0.name}
+
     grafana:
       ingress:
         enabled: true
@@ -33,7 +50,6 @@ resource "helm_release" "prometheus_stack" {
           - hosts:
             - "grafana.shaungc.com"
       adminPassword: "${data.aws_ssm_parameter.grafana_credentials.value}"
-
   EOF
   ]
 
@@ -55,7 +71,10 @@ resource "helm_release" "prometheus_stack" {
     # Error: rpc error: code = Unknown desc = configmaps is forbidden: User "system:serviceaccount:kube-system:tiller-service-account" cannot list resource "configmaps" in API group "" in the namespace "kube-system"
     #
     # Way to debug such error: https://github.com/helm/helm/issues/5100#issuecomment-533787541
-    kubernetes_cluster_role_binding.tiller
+    kubernetes_cluster_role_binding.tiller,
+
+    # script `my-kubectl.sh` requires kubeconfig.yaml
+    local_file.kubeconfig
   ]
 }
 
