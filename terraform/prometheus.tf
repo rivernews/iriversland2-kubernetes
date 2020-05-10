@@ -57,12 +57,13 @@ resource "helm_release" "prometheus_stack" {
     # destroy provisioner will not run upon tainted (which is, update, or a re-create / replace is needed)
     when    = destroy
     command = join("\n", [
-      "bash ./my-kubectl.sh delete crd prometheuses.monitoring.coreos.com",
-      "bash ./my-kubectl.sh delete crd prometheusrules.monitoring.coreos.com",
-      "bash ./my-kubectl.sh delete crd servicemonitors.monitoring.coreos.com",
-      "bash ./my-kubectl.sh delete crd podmonitors.monitoring.coreos.com",
-      "bash ./my-kubectl.sh delete crd alertmanagers.monitoring.coreos.com",
-      "bash ./my-kubectl.sh delete crd thanosrulers.monitoring.coreos.com",
+      "bash prometheus/del-crd.sh"
+      # "bash ./my-kubectl.sh delete crd prometheuses.monitoring.coreos.com",
+      # "bash ./my-kubectl.sh delete crd prometheusrules.monitoring.coreos.com",
+      # "bash ./my-kubectl.sh delete crd servicemonitors.monitoring.coreos.com",
+      # "bash ./my-kubectl.sh delete crd podmonitors.monitoring.coreos.com",
+      # "bash ./my-kubectl.sh delete crd alertmanagers.monitoring.coreos.com",
+      # "bash ./my-kubectl.sh delete crd thanosrulers.monitoring.coreos.com",
     ])
   }
 
