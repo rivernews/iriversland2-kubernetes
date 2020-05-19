@@ -1,3 +1,8 @@
+# # https://www.terraform.io/docs/providers/random/r/id.html
+resource "random_id" "random_domain" { 
+  byte_length = 5
+}
+
 locals {
   tls_cert_covered_domain_list = [
     "*.${var.managed_k8_rx_domain}",
@@ -5,7 +10,9 @@ locals {
     # no need to create for `api.` since the `*.api.` one already covers that; otherwisw cert-manager will throw error
     # "api.${var.managed_k8_rx_domain}",
 
-    "*.api.${var.managed_k8_rx_domain}"
+    "*.api.${var.managed_k8_rx_domain}",
+
+    "*.${random_id.random_domain.b64_url}.${var.managed_k8_rx_domain}"
   ]
 }
 
