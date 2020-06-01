@@ -51,6 +51,8 @@ jobs:
       - run:
           name: Plan Terraform
           command: |
+            python release.py -p
+            return
             terraform apply -auto-approve \
               -target=local_file.kubeconfig \
               -var="letsencrypt_env=prod" \
@@ -60,12 +62,12 @@ jobs:
               -var="letsencrypt_env=prod" \
               -var="postgres_cluster_image_tag=latest" \
               -var="redis_cluster_image_tag=latest" \
-              -var="kafka_connect_image_tag=latest" \
+              -var="kafka_connect_image_tag=latest"
       - run:
           name: Test Kubectl
           command: |
-            bash my-kubectl.sh version --client
-            bash my-kubectl.sh get all --all-namespaces
+            kubectl version --client
+            kubectl get all --all-namespaces
       - slack/status:
           mentions: 'here,'
           success_message: "*Build & Test Terraform Complete*\nThe Terraform base image \"shaungc/terraform-kubectl-image\" is ready to be used!"
@@ -76,8 +78,11 @@ workflows:
     jobs:
       - build:
         filters:
-            branches:
-              only: master
+          branches:
+            only: master
       - exec_terraform:
-          requires:
-            - build
+        filters:
+          branches:
+            only: master
+        requires:
+          - build
