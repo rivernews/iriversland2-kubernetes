@@ -70,6 +70,7 @@ jobs:
           success_message: "*Build & Test Terraform Complete*\nThe Terraform base image \"shaungc/terraform-kubectl-image\" is ready to be used!"
 
 # To validate this config file, run `circleci config validate`
+# https://circleci.com/docs/2.0/local-cli/#validate-a-circleci-config
 # You can install circle cli by `brew install circleci`
 workflows:
   build-master:
@@ -77,10 +78,14 @@ workflows:
       - build:
           filters:
               branches:
-                only: master
+                only: 
+                  - master
+                  - release
       - plan_terraform:
           filters:
               branches:
-                only: master
+                only: 
+                  - master
+                  - release
           requires:
             - build
