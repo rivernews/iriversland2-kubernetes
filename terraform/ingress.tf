@@ -1,7 +1,5 @@
 # # https://www.terraform.io/docs/providers/random/r/id.html
-resource "random_id" "random_domain" { 
-  byte_length = 5
-}
+resource "random_uuid" "random_domain" { }
 
 locals {
   tls_cert_covered_domain_list = [
@@ -12,7 +10,7 @@ locals {
 
     "*.api.${var.managed_k8_rx_domain}",
 
-    "*.${random_id.random_domain.b64_url}.${var.managed_k8_rx_domain}"
+    "*.${random_uuid.random_domain.result}.${var.managed_k8_rx_domain}"
   ]
 }
 
