@@ -31,8 +31,7 @@ jobs:
             docker push $IMAGE_NAME:latest
             docker push $IMAGE_NAME:$CIRCLE_SHA1
 
-
-  exec_terraform:
+  plan_terraform:
     docker:
       - image: shaungc/terraform-kubectl-image
     working_directory: ~/repo/terraform
@@ -52,24 +51,22 @@ jobs:
           name: Plan Terraform
           command: |
             python release.py -p -y
-            return
-            terraform apply -auto-approve \
-              -target=local_file.kubeconfig \
-              -var="letsencrypt_env=prod" \
-              -var="docker_registry_url=https://index.docker.io/v1/" \
-              -var="managed_route53_zone_name=shaungc.com." \
-              -var="managed_k8_rx_domain=shaungc.com" \
-              -var="letsencrypt_env=prod" \
-              -var="postgres_cluster_image_tag=latest" \
-              -var="redis_cluster_image_tag=latest" \
-              -var="kafka_connect_image_tag=latest"
+      - run:
+        name: Apply Terraform
+        command: |
+          if [ "${CIRCLE_BRANCH}" == "release" ];
+          then
+            python release.py -p -y
+          else
+            echo 'Skipped apply terraform'
+          fi
       - run:
           name: Test Kubectl
           command: |
             kubectl version --client
             kubectl get all --all-namespaces
       - slack/status:
-          mentions: 'here,'
+          # mentions: 'here,'
           success_message: "*Build & Test Terraform Complete*\nThe Terraform base image \"shaungc/terraform-kubectl-image\" is ready to be used!"
 
 
@@ -80,6 +77,6 @@ workflows:
         filters:
             branches:
               only: master
-      - exec_terraform:
+      - plan_terraform:
           requires:
             - build
