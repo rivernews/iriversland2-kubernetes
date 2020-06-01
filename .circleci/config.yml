@@ -73,13 +73,13 @@ jobs:
 workflows:
   build-master:
     jobs:
-      # - build:
+      - build:
         filters:
             branches:
               only: master
       - plan_terraform:
-          filters:
+        filters:
             branches:
               only: master
-          # requires:
-          #   - build
+        requires:
+          - build
