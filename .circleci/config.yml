@@ -64,7 +64,7 @@ jobs:
           name: Test Kubectl
           command: |
             kubectl version --client
-            kubectl get all --all-namespaces
+            # kubectl get all --all-namespaces
       - slack/status:
           # mentions: 'here,'
           success_message: "*Build & Test Terraform Complete*\nThe Terraform base image \"shaungc/terraform-kubectl-image\" is ready to be used!"
