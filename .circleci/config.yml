@@ -81,8 +81,5 @@ workflows:
           branches:
             only: master
       - exec_terraform:
-        filters:
-          branches:
-            only: master
         requires:
           - build
