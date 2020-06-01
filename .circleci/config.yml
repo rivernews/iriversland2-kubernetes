@@ -22,7 +22,7 @@ jobs:
       - run:
           name: Build Terraform-Kubectl Toolkit image
           command: |
-            docker build -f Dockerfile -t $IMAGE_NAME:latest .
+            docker build -f Dockerfile -t $IMAGE_NAME:latest ..
       - run:
           name: Push Docker Image
           command: |
