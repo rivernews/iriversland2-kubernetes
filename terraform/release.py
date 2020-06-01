@@ -6,6 +6,20 @@ import re
 import subprocess
 import sys
 
+python_version = str(sys.version)
+if python_version.startswith('2'):
+    python_version = 2
+else:
+    python_version = 3
+
+# make script compatible by python 2 & 3
+# https://stackoverflow.com/a/21731110/9814131
+try:
+    input = raw_input
+except NameError:
+    pass
+
+
 MANIFEST_IMAGE_TAGS = [
 # {
 #     'arg_name_full': 'app_container_image_tag',
@@ -125,17 +139,17 @@ def terraform_deploy():
 
     if args_data.target:
         # terraform_command += [' '.join([f'-target={target}' for target in args_data.target ])]
-        terraform_command += [f'-target={target}' for target in args_data.target]
+        terraform_command += ['-target={}'.format(target) for target in args_data.target]
     
     s = input("\nTerraform command:\n{}\n\nPlease review the change above.\n".format(' '.join(terraform_command)))
 
     # run terraform here
     if args_data.delete or args_data.plan or args_data.refresh or args_data.remove:  
-        subprocess.run(terraform_command, check=True)
+        subprocess.run(terraform_command, check=True) if python_version == 3 else subprocess.check_call(terraform_command)
     elif changed_release or args_data.force:
         print('INFO: running terraform...')
         try:
-            subprocess.run(terraform_command, check=True)
+            subprocess.run(terraform_command, check=True) if python_version == 3 else subprocess.check_call(terraform_command)
 
             release_history.append(apply_release)
             with open('release.json', 'w') as f:
