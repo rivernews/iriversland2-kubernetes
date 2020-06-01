@@ -131,7 +131,7 @@
           "format": "bytes",
           "label": "",
           "logBase": 1,
-          "max": "5589934592",
+          "max": "9589934592",
           "min": "0",
           "show": true
         },
@@ -1565,5 +1565,5 @@
   "timezone": "",
   "title": "Kubernetes Cluster (Single)",
   "uid": "os6Bh8Omk",
-  "version": 4
+  "version": 2
 }
