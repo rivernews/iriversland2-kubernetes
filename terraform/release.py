@@ -72,6 +72,7 @@ def terraform_deploy():
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-f', '--force', action='store_true', help="force run terraform command even if no change in release. Useful when terraform script changed except microservice installation does not.")
+    parser.add_argument('-y', '--yes', action='store_true', help="skip confirmation before running terraform")
 
     parser.add_argument('-p', '--plan', action='store_true', help="run a plan terraform command to do a dry run.")
 
@@ -141,7 +142,12 @@ def terraform_deploy():
         # terraform_command += [' '.join([f'-target={target}' for target in args_data.target ])]
         terraform_command += ['-target={}'.format(target) for target in args_data.target]
     
-    s = input("\nTerraform command:\n{}\n\nPlease review the change above.\n".format(' '.join(terraform_command)))
+    prompt_message = "\nTerraform command:\n{}\n\nPlease review the change above.\n".format(' '.join(terraform_command))
+    if args_data.yes:
+        prompt_message += '\nSkipped confirmation...'
+        print(prompt_message)
+    else:
+        input(prompt_message)
 
     # run terraform here
     if args_data.delete or args_data.plan or args_data.refresh or args_data.remove:  
