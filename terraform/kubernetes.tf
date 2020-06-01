@@ -22,7 +22,9 @@ resource "digitalocean_kubernetes_cluster" "project_digitalocean_cluster" {
 
   node_pool {
     name       = "${var.project_name}-node-pool"
-    size       = "s-2vcpu-4gb" # do not easily change this, as this will cause the entire k8 cluster to vanish
+    size       = "s-4vcpu-8gb" # do not easily change this, as this will cause the entire k8 cluster to vanish
+    # size       = "m-1vcpu-8gb" # $40
+    # size       = "s-2vcpu-4gb" # $20
     node_count = 1
     min_nodes  = 1
     max_nodes  = 1
@@ -33,16 +35,16 @@ resource "digitalocean_kubernetes_cluster" "project_digitalocean_cluster" {
 
 # tf doc: https://www.terraform.io/docs/providers/do/r/kubernetes_node_pool.html
 # k8 will spread pods across nodes based on available free resources: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
-# resource "digitalocean_kubernetes_node_pool" "scraper_worker_node_pool" {
+# resource "digitalocean_kubernetes_node_pool" "slack_node_pool" {
 #   cluster_id = digitalocean_kubernetes_cluster.project_digitalocean_cluster.id
 
-#   name       = "scraper-worker-node-pool"
-#   size       = "s-2vcpu-4gb"
+#   name       = "slack-node-pool"
+#   size       = "s-1vcpu-3gb" # $15
 #   node_count = 1
 #   min_nodes  = 1
 #   max_nodes  = 2
-#   auto_scale = false
-#   tags       = ["${digitalocean_tag.project-cluster.id}", "scraper-worker-node"]
+#   auto_scale = true
+#   tags       = ["${digitalocean_tag.project-cluster.id}", "slack-node"]
 # }
 
 
