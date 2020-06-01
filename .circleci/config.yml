@@ -51,7 +51,7 @@ jobs:
       - run:
           name: Plan Terraform
           command: |
-            python release.py -p
+            python release.py -p -y
             return
             terraform apply -auto-approve \
               -target=local_file.kubeconfig \
