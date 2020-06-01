@@ -56,7 +56,7 @@ jobs:
           command: |
             if [ "${CIRCLE_BRANCH}" == "release" ];
             then
-              python release.py -p -y
+              python release.py -f -y
             else
               echo 'Skipped apply terraform'
             fi
