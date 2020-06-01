@@ -52,14 +52,14 @@ jobs:
           command: |
             python release.py -p -y
       - run:
-        name: Apply Terraform
-        command: |
-          if [ "${CIRCLE_BRANCH}" == "release" ];
-          then
-            python release.py -p -y
-          else
-            echo 'Skipped apply terraform'
-          fi
+          name: Apply Terraform
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "release" ];
+            then
+              python release.py -p -y
+            else
+              echo 'Skipped apply terraform'
+            fi
       - run:
           name: Test Kubectl
           command: |
