@@ -31,7 +31,7 @@ jobs:
             docker push $IMAGE_NAME:latest
             docker push $IMAGE_NAME:$CIRCLE_SHA1
 
-  plan_terraform:
+  exec_terraform:
     docker:
       - image: shaungc/terraform-kubectl-image
     working_directory: ~/repo/terraform
@@ -85,7 +85,7 @@ workflows:
                   - master
                   - release
                   - destroy-release
-      - plan_terraform:
+      - exec_terraform:
           filters:
               branches:
                 only: 
