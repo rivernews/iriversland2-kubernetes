@@ -22,24 +22,14 @@ jobs:
       - run:
           name: Build Terraform-Kubectl Toolkit image
           command: |
-            if [ "${CIRCLE_BRANCH}" == "master" ];
-            then
-              docker build -f Dockerfile -t $IMAGE_NAME:latest ..
-            else
-              echo 'Skipped'
-            fi
+            docker build -f Dockerfile -t $IMAGE_NAME:latest ..
       - run:
           name: Push Docker Image
           command: |
-            if [ "${CIRCLE_BRANCH}" == "master" ];
-            then
-              echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-              docker tag $IMAGE_NAME:latest $IMAGE_NAME:$CIRCLE_SHA1
-              docker push $IMAGE_NAME:latest
-              docker push $IMAGE_NAME:$CIRCLE_SHA1
-            else
-              echo 'Skipped'
-            fi
+            echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+            docker tag $IMAGE_NAME:latest $IMAGE_NAME:$CIRCLE_SHA1
+            docker push $IMAGE_NAME:latest
+            docker push $IMAGE_NAME:$CIRCLE_SHA1
 
   exec_terraform:
     docker:
