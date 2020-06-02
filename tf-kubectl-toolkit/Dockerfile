@@ -20,6 +20,7 @@ RUN apk update && \
     sudo mv ./kubectl /bin/kubectl && \
     sudo chmod +x /bin/kubectl && \
     # install doctl
+    # https://github.com/digitalocean/doctl#downloading-a-release-from-github
     curl -OL https://github.com/digitalocean/doctl/releases/download/v${DOCTL_VERSION}/doctl-${DOCTL_VERSION}-linux-amd64.tar.gz && \
     tar xf doctl-${DOCTL_VERSION}-linux-amd64.tar.gz --directory /usr/bin && \
     # clean up
