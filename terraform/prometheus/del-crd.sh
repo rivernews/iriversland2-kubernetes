@@ -4,7 +4,7 @@ unset KUBECONFIG
 
 set -e
 
-if [ -z "$DIGITALOCEAN_ACCESS_TOKEN" ]
+if [ -z "$TF_VAR_do_token" ]
 then
     echo "Skip doctl login"
 else
