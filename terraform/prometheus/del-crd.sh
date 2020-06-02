@@ -11,6 +11,7 @@ else
     DIGITALOCEAN_ACCESS_TOKEN=${TF_VAR_do_token} doctl auth init
 fi
 
+mkdir -p ~/.kube
 doctl k8s cluster kubeconfig show project-shaungc-digitalocean-cluster > ~/.kube/config
 
 kubectl delete crd prometheuses.monitoring.coreos.com
