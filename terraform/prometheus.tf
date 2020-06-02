@@ -53,7 +53,7 @@ resource "helm_release" "prometheus_stack" {
   EOF
   ]
 
-  triggers = {
+  self = {
     do_token = var.do_token
   }
 
@@ -61,7 +61,7 @@ resource "helm_release" "prometheus_stack" {
     # destroy provisioner will not run upon tainted (which is, update, or a re-create / replace is needed)
     when    = destroy
     command = join("\n", [
-      "export DIGITALOCEAN_ACCESS_TOKEN=${self.triggers.do_token}",
+      "export DIGITALOCEAN_ACCESS_TOKEN=${self.do_token}",
       "bash prometheus/del-crd.sh"
       # "bash ./my-kubectl.sh delete crd prometheuses.monitoring.coreos.com",
       # "bash ./my-kubectl.sh delete crd prometheusrules.monitoring.coreos.com",
