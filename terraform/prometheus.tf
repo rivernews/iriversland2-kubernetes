@@ -57,6 +57,7 @@ resource "helm_release" "prometheus_stack" {
     # destroy provisioner will not run upon tainted (which is, update, or a re-create / replace is needed)
     when    = destroy
     command = join("\n", [
+      "cp kubeconfig.yaml ~/.kube/config",
       "bash prometheus/del-crd.sh"
       # "bash ./my-kubectl.sh delete crd prometheuses.monitoring.coreos.com",
       # "bash ./my-kubectl.sh delete crd prometheusrules.monitoring.coreos.com",
