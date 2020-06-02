@@ -7,13 +7,16 @@ set -e
 if [ -z "$DIGITALOCEAN_ACCESS_TOKEN" ]
 then
     echo "Skip doctl login"
-else 
+else
+    echo "Login doctl"
     DIGITALOCEAN_ACCESS_TOKEN=${TF_VAR_do_token} doctl auth init
 fi
 
 # make sure .kube dir exist to avoid error 'No such file or directory'
 mkdir -p ~/.kube
 doctl k8s cluster kubeconfig show project-shaungc-digitalocean-cluster > ~/.kube/config
+
+ls -l ~/.kube/
 
 kubectl delete crd prometheuses.monitoring.coreos.com
 kubectl delete crd prometheusrules.monitoring.coreos.com
