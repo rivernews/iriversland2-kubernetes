@@ -4,6 +4,13 @@ unset KUBECONFIG
 
 set -e
 
+if [ -z "$DIGITALOCEAN_ACCESS_TOKEN" ]
+then
+    echo "Skip doctl login"
+else 
+    DIGITALOCEAN_ACCESS_TOKEN=${TF_VAR_do_token} doctl auth init
+fi
+
 doctl k8s cluster kubeconfig show project-shaungc-digitalocean-cluster > ~/.kube/config
 
 kubectl delete crd prometheuses.monitoring.coreos.com
