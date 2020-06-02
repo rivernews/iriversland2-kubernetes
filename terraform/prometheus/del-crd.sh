@@ -4,7 +4,7 @@ unset KUBECONFIG
 
 set -e
 
-# doctl k8s cluster kubeconfig show project-shaungc-digitalocean-cluster > ~/.kube/config
+doctl k8s cluster kubeconfig show project-shaungc-digitalocean-cluster > ~/.kube/config
 
 kubectl delete crd prometheuses.monitoring.coreos.com
 kubectl delete crd prometheusrules.monitoring.coreos.com

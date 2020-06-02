@@ -3,6 +3,7 @@
 FROM alpine:3.10
 
 ENV TERRAFORM_VERSION=0.12.18
+ENV DOCTL_VERSION=1.36.0
 
 # install curl
 # https://stackoverflow.com/a/51209115/9814131
@@ -18,6 +19,9 @@ RUN apk update && \
     curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.15.2/bin/linux/amd64/kubectl && \
     sudo mv ./kubectl /bin/kubectl && \
     sudo chmod +x /bin/kubectl && \
+    # install doctl
+    curl -OL https://github.com/digitalocean/doctl/releases/download/v${DOCTL_VERSION}/doctl-${DOCTL_VERSION}-linux-amd64.tar.gz && \
+    tar xf doctl-${DOCTL_VERSION}-linux-amd64.tar.gz --directory /usr/bin && \
     # clean up
     rm -rf /tmp/* && \
     rm -rf /var/cache/apk/* && \
