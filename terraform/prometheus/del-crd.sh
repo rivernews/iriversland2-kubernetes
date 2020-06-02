@@ -11,6 +11,7 @@ else
     DIGITALOCEAN_ACCESS_TOKEN=${TF_VAR_do_token} doctl auth init
 fi
 
+# make sure .kube dir exist to avoid error 'No such file or directory'
 mkdir -p ~/.kube
 doctl k8s cluster kubeconfig show project-shaungc-digitalocean-cluster > ~/.kube/config
 
