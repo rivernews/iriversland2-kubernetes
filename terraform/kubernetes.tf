@@ -58,6 +58,10 @@ provider "local" {
 resource "local_file" "kubeconfig" {
     sensitive_content     = digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.raw_config
     filename = "kubeconfig.yaml"
+
+    provisioner "local-exec" {
+    command = "cp kubeconfig.yaml ~/.kube/config"
+  }
 }
 
 
