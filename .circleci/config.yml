@@ -57,6 +57,9 @@ jobs:
             if [ "${CIRCLE_BRANCH}" == "release" ];
             then
               python release.py -f -y
+            elif [ "${CIRCLE_BRANCH}" == "destroy-release" ];
+            then
+              python release.py -d -y
             else
               echo 'Skipped apply terraform'
             fi
@@ -81,11 +84,13 @@ workflows:
                 only: 
                   - master
                   - release
+                  - destroy-release
       - plan_terraform:
           filters:
               branches:
                 only: 
                   - master
                   - release
+                  - destroy-release
           requires:
             - build
