@@ -40,13 +40,13 @@ jobs:
           path: ~/repo
       - setup_remote_docker # sets up a remote, isolated environment for each build. This is required before you use any docker command inside a job step.
       - run:
-          name: Test Tools
+          name: Check Deploy Tools Availability
           command: |
             kubectl version --client
-            # DIGITALOCEAN_ACCESS_TOKEN=$TF_VAR_do_token doctl auth init
-            # mkdir -p ~/.kube
-            # doctl k8s cluster kubeconfig show project-shaungc-digitalocean-cluster > ~/.kube/config
-            # kubectl get all --all-namespaces
+            DIGITALOCEAN_ACCESS_TOKEN=$TF_VAR_do_token doctl auth init
+            mkdir -p ~/.kube
+            doctl k8s cluster kubeconfig show project-shaungc-digitalocean-cluster > ~/.kube/config || true
+            kubectl get all --all-namespaces || true
             docker -v
       - run:
           name: Initiate Terraform Against Cluster
