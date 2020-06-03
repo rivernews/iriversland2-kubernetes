@@ -57,7 +57,12 @@ jobs:
       - run:
           name: Plan Terraform
           command: |
-            python release.py -p -y
+            if [ "${CIRCLE_BRANCH}" == "master" ];
+            then  
+              python release.py -p -y
+            else
+              echo 'Skipped'
+            fi
       - run:
           name: Apply Terraform
           command: |

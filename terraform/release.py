@@ -153,7 +153,7 @@ def terraform_deploy():
     if args_data.delete or args_data.plan or args_data.refresh or args_data.remove:  
         subprocess.run(terraform_command, check=True) if python_version == 3 else subprocess.check_call(terraform_command)
         # also delete tfstate in s3 in case of destroy all
-        if not args_data.target:
+        if args_data.delete and (not args_data.target):
             script_command = [
                 'sh', 'clean-s3-tf-state.sh'
             ]
