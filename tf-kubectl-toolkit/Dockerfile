@@ -10,7 +10,7 @@ ENV DOCTL_VERSION=1.36.0
 # new curl release issue: https://stackoverflow.com/a/57982728/9814131
 # RUN apk --upgrade --no-cache add curl && apk --no-cache add bash ca-certificates sudo
 RUN apk update && \
-    apk add curl jq python bash ca-certificates sudo git openssl unzip wget && \
+    apk add curl jq python bash ca-certificates sudo git openssl unzip wget docker && \
     cd /tmp && \
     wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
     unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip -d /usr/bin && \
