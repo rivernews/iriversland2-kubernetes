@@ -4,11 +4,11 @@ This guide is [based on cert manager quickstart guide](https://github.com/jetsta
 
 ## Look at nginx logging, in realtime
 
-`bash ./my-kubectl.sh logs --follow ds/nginx-ingress-controller -n kube-system`
+`kubectl logs --follow ds/nginx-ingress-controller -n kube-system`
 
 ## Look at cert manager logging, in realtime
 
-`bash ./my-kubectl.sh logs --follow  $(bash ./my-kubectl.sh get pods -n cert-manager | grep cert-manager --max-count=1 | awk '{print $1}') -n cert-manager`
+`kubectl logs --follow  $(kubectl get pods -n cert-manager | grep cert-manager --max-count=1 | awk '{print $1}') -n cert-manager`
 
 Does cert manager started working on certificate? It should generate a lot of log more than 15 lines.
 
@@ -19,7 +19,7 @@ Does cert manager started working on certificate? It should generate a lot of lo
 
 Does it show the `READY` column as `True`?
 
-`bash ./my-kubectl.sh describe certificate letsencrypt-staging-secret -n cicd-django`
+`kubectl describe certificate letsencrypt-staging-secret -n cicd-django`
 
 Check the event log on certificate, does it show something like below?
 
@@ -77,7 +77,7 @@ In case you don't find anything useful after inspecting at resources above, you 
 
 ### Check out issuer
 
-`bash ./my-kubectl.sh describe clusterissuer letsencrypt-staging`
+`kubectl describe clusterissuer letsencrypt-staging`
 
 ### Check out the order
 
@@ -93,11 +93,11 @@ Particularly, look at if any failure or error present; if so, look at the reason
 
 - Get all the ingresses resources
 
-`bash ./my-kubectl.sh get ingress -n cicd-django`
+`kubectl get ingress -n cicd-django`
 
 - Get the ingress resources description for django
 
-`bash ./my-kubectl.sh get ingress project-shaungc-digitalocean-ingress-resource -n cicd-django -o yaml`
+`kubectl get ingress project-shaungc-digitalocean-ingress-resource -n cicd-django -o yaml`
 
 Does the annotation look right?
 
@@ -117,8 +117,8 @@ Before doing this, try to read from logs above to find out what cause the error.
 
     1. ⚡️ This may be the most useful after you made changes to tf: **`terraform destroy -target=helm_release.project_cert_manager -target=helm_release.project-nginx-ingress`**
 
-        - The above should already delete the custom resources together, but just to make sure you can run these command to verify that they are deleted: `bash ./my-kubectl.sh delete certificate letsencrypt-staging-secret && bash ./my-kubectl.sh delete clusterissuer letsencrypt-staging-issuer`
-    1. You may also need to delete secrets created by cert-manager. List `bash ./my-kubectl.sh get secrets -n cert-manager`, then delete like ⚡️ `bash ./my-kubectl.sh delete secrets letsencrypt-staging-secret  -n cert-manager`.
+        - The above should already delete the custom resources together, but just to make sure you can run these command to verify that they are deleted: `kubectl delete certificate letsencrypt-staging-secret && kubectl delete clusterissuer letsencrypt-staging-issuer`
+    1. You may also need to delete secrets created by cert-manager. List `kubectl get secrets -n cert-manager`, then delete like ⚡️ `kubectl delete secrets letsencrypt-staging-secret  -n cert-manager`.
     1. `terraform apply`.
 
 

@@ -58,12 +58,12 @@ resource "helm_release" "prometheus_stack" {
     when    = destroy
     command = join("\n", [
       "bash prometheus/del-crd.sh"
-      # "bash ./my-kubectl.sh delete crd prometheuses.monitoring.coreos.com",
-      # "bash ./my-kubectl.sh delete crd prometheusrules.monitoring.coreos.com",
-      # "bash ./my-kubectl.sh delete crd servicemonitors.monitoring.coreos.com",
-      # "bash ./my-kubectl.sh delete crd podmonitors.monitoring.coreos.com",
-      # "bash ./my-kubectl.sh delete crd alertmanagers.monitoring.coreos.com",
-      # "bash ./my-kubectl.sh delete crd thanosrulers.monitoring.coreos.com",
+      # "kubectl delete crd prometheuses.monitoring.coreos.com",
+      # "kubectl delete crd prometheusrules.monitoring.coreos.com",
+      # "kubectl delete crd servicemonitors.monitoring.coreos.com",
+      # "kubectl delete crd podmonitors.monitoring.coreos.com",
+      # "kubectl delete crd alertmanagers.monitoring.coreos.com",
+      # "kubectl delete crd thanosrulers.monitoring.coreos.com",
     ])
   }
 
