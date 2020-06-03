@@ -42,8 +42,11 @@ jobs:
       - run:
           name: Test Tools
           command: |
+            DIGITALOCEAN_ACCESS_TOKEN=$TF_VAR_do_token doctl auth init
+            mkdir -p ~/.kube
+            doctl k8s cluster kubeconfig show project-shaungc-digitalocean-cluster > ~/.kube/config
             kubectl version --client
-            # kubectl get all --all-namespaces
+            kubectl get all --all-namespaces
             docker -v
       - run:
           name: Initiate Terraform Against Cluster
