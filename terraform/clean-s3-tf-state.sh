@@ -1,5 +1,5 @@
-# docker awscli
-# 
+# docker awscli s3
+# https://docs.aws.amazon.com/cli/latest/reference/s3/index.html#use-of-exclude-and-include-filters
 
 set -e
 
