@@ -39,11 +39,11 @@ jobs:
       - checkout: # retrieves the code from GitHub
           path: ~/repo
       - run:
-        name: Test Tools
-        command: |
-          kubectl version --client
-          # kubectl get all --all-namespaces
-          docker -v
+          name: Test Tools
+          command: |
+            kubectl version --client
+            # kubectl get all --all-namespaces
+            docker -v
       - run:
           name: Initiate Terraform Against Cluster
           command: |
