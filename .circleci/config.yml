@@ -38,6 +38,7 @@ jobs:
     steps:
       - checkout: # retrieves the code from GitHub
           path: ~/repo
+      - setup_remote_docker # sets up a remote, isolated environment for each build. This is required before you use any docker command inside a job step.
       - run:
           name: Test Tools
           command: |
