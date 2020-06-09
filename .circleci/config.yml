@@ -42,7 +42,7 @@ jobs:
     docker:
       - image: shaungc/terraform-kubectl-image
     environment:
-      TF_VAR_droplet_size: << pipeline.parameters.kubernetes-cluster-droplet-size
+      TF_VAR_droplet_size: << pipeline.parameters.kubernetes-cluster-droplet-size >>
     working_directory: ~/repo/terraform
     steps:
       - checkout: # retrieves the code from GitHub
