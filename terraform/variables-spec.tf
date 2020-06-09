@@ -1,6 +1,15 @@
 # https://www.terraform.io/docs/configuration/variables.html#variable-definitions-tfvars-files
 variable "project_name" {}
 
+variable "droplet_size" {
+    # size       = "s-4vcpu-8gb" # do not easily change this, as this will cause the entire k8 cluster to vanish
+    # size       = "m-1vcpu-8gb" # $40
+    # size       = "s-2vcpu-4gb" # $20
+    # size       = "s-1vcpu-3gb" # $15
+    default = "s-4vcpu-8gb"
+    type = string
+}
+
 variable "managed_route53_zone_name" {}
 variable "managed_k8_rx_domain" {}
 

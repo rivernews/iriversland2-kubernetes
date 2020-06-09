@@ -22,9 +22,7 @@ resource "digitalocean_kubernetes_cluster" "project_digitalocean_cluster" {
 
   node_pool {
     name       = "${var.project_name}-node-pool"
-    size       = "s-4vcpu-8gb" # do not easily change this, as this will cause the entire k8 cluster to vanish
-    # size       = "m-1vcpu-8gb" # $40
-    # size       = "s-2vcpu-4gb" # $20
+    size       = var.droplet_size
     node_count = 1
     min_nodes  = 1
     max_nodes  = 1
