@@ -1,5 +1,12 @@
 version: 2.1
 
+# sending env var by pipeline parameters
+# https://github.com/CircleCI-Public/api-preview-docs/blob/master/docs/pipeline-parameters.md
+parameters:
+  kubernetes-cluster-droplet-size:
+    type: string
+    default: "s-4vcpu-8gb"
+
 orbs:
   slack: circleci/slack@3.3.0
 
@@ -34,6 +41,8 @@ jobs:
   exec_terraform:
     docker:
       - image: shaungc/terraform-kubectl-image
+    environment:
+      TF_VAR_droplet_size: << pipeline.parameters.kubernetes-cluster-droplet-size
     working_directory: ~/repo/terraform
     steps:
       - checkout: # retrieves the code from GitHub
