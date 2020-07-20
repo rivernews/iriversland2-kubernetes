@@ -102,14 +102,11 @@ workflows:
               branches:
                 only: 
                   - master
-                  - release
-                  - destroy-release
       - exec_terraform:
           filters:
               branches:
                 only: 
-                  - master
                   - release
                   - destroy-release
-          requires:
-            - build
+          # requires:
+          #   - build
