@@ -86,6 +86,15 @@ For example, to update a new build for appl tracky, run `python release.py -at <
 
 To add a new microservice to be supported by the release script, add a new entry in `MANIFEST_IMAGE_TAGS` in `release.py`.
 
+### When terraform failed
+
+When error occurs in `terraform apply` or `terraform destroy` and it's hard to fix the issue, the last resort could be nuking the entire kubernetes cluster and start over. The process is simple:
+
+1. Delete tfstate file in s3. Currently we have script `clean-s3-tf-state.sh` to do this.
+2. Delete k8s cluster in digitalocean
+3. Delete firewall in digitalocean
+4. Delete volumes in digitalocean
+
 ## Purpose
 
 Check out the issue page for ongoing progress. Below talks about the achieved goals.
