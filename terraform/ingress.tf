@@ -74,9 +74,17 @@ resource "helm_release" "project-nginx-ingress" {
   # exposing tcp services (non-http services, non-web server)
   # helm's way: https://github.com/helm/charts/issues/5408#issuecomment-388843681
   # nginx-ingress doc supporting tcp load balancing: https://kubernetes.github.io/ingress-nginx/user-guide/exposing-tcp-udp-services/
+  
+  # use api.shaungc.com:6378 on local to initiate connection
   set_string {
     name = "tcp.6378"
     value = "redis-cluster/redis-cluster-service:6379"
+  }
+
+  # use api.shaungc.com:5433 on local to initiate connection
+  set_string {
+    name = "tcp.5433"
+    value = "postgres-cluster/postgres-cluster-service:5432"
   }
 
   # helm config for default certificate 
