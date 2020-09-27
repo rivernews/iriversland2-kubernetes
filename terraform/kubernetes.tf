@@ -4,8 +4,8 @@
 provider "digitalocean" {
   token   = var.do_token
 
-  # version changelog: https://github.com/terraform-providers/terraform-provider-digitalocean/blob/master/CHANGELOG.md
-  version = "1.15.1"
+  # version changelog: https://github.com/digitalocean/terraform-provider-digitalocean/blob/master/CHANGELOG.md
+  version = "1.22.2"
 }
 
 # Terraform officials: https://www.terraform.io/docs/providers/do/r/tag.html
@@ -13,12 +13,15 @@ resource "digitalocean_tag" "project-cluster" {
   name = "${var.project_name}-digitalocean-kubernetes-cluster-tag"
 }
 
+# https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/data-sources/kubernetes_versions
+data "digitalocean_kubernetes_versions" "shared" {}
+
 # Terraform official: https://www.terraform.io/docs/providers/do/d/kubernetes_cluster.html
 resource "digitalocean_kubernetes_cluster" "project_digitalocean_cluster" {
   name    = "${var.project_name}-cluster"
   region  = "sfo2"
   # Grab the latest version slug from `doctl kubernetes options versions`
-  version = "1.17.9-do.0"
+  version = data.digitalocean_kubernetes_versions.shared.latest_version
 
   node_pool {
     name       = "${var.project_name}-node-pool"
