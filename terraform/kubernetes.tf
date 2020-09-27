@@ -102,6 +102,7 @@ provider "kubernetes" {
   
 }
 
+# https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/firewall
 resource "digitalocean_firewall" "project-cluster-firewall" {
   name = "${var.project_name}-cluster-firewall"
   tags = ["${digitalocean_tag.project-cluster.id}"]
@@ -138,6 +139,13 @@ resource "digitalocean_firewall" "project-cluster-firewall" {
   inbound_rule {
     protocol   = "tcp"
     port_range = "6378"
+
+    source_addresses = ["0.0.0.0/0", "::/0"]
+  }
+
+  inbound_rule {
+    protocol   = "tcp"
+    port_range = "5433"
 
     source_addresses = ["0.0.0.0/0", "::/0"]
   }

@@ -74,6 +74,10 @@ resource "helm_release" "project-nginx-ingress" {
   # exposing tcp services (non-http services, non-web server)
   # helm's way: https://github.com/helm/charts/issues/5408#issuecomment-388843681
   # nginx-ingress doc supporting tcp load balancing: https://kubernetes.github.io/ingress-nginx/user-guide/exposing-tcp-udp-services/
+  #
+  # steps required to expost a tcp port:
+  # 1. specify the tcp port here and service it should point to
+  # 2. allow the port in `digitalocean_firewall`
   
   # use api.shaungc.com:6378 on local to initiate connection
   set_string {
