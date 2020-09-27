@@ -72,7 +72,10 @@ app_container_image_tag = "the-tag-when-you-docker-build"
 
 3. Make some changes if needed
 4. If changes involve TLS / Cert Manager, please refer to the section `Terraform: Lifecycle of TLS / Cert Manager / Let's Encrypt Resources` under `Pitfalls and Known Issues` below.
-5. Run `terraform plan` to check. If everything seems good, run `terraform apply`. It will double check with you again. Remember the state would be stored on remote postgres, which means that it is persistent regardless of where you run this terraform script.
+5. Run `python release.py [options]` to auto populate required image tags variables.
+    - Run `python release.py -p` to get the plan.
+    - If you make changes to tf files instead of image tag (e.g. for kafka, redis, postgres, etc), `python release.py` might not run since it will only run when detected change in image tag. To apply changes for tf files, force the change by `python release.py -f`.
+    - For other options, please see `release.py`.
 
 ### Update / Deploy microservice
 
