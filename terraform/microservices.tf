@@ -6,10 +6,10 @@ module "postgres_cluster" {
   aws_access_key = var.aws_access_key
   aws_secret_key = var.aws_secret_key
   cluster_name   = digitalocean_kubernetes_cluster.project_digitalocean_cluster.name
+  node_pool_name = digitalocean_kubernetes_cluster.project_digitalocean_cluster.node_pool.0.name
 
   app_label           = "postgres-cluster"
   app_exposed_port    = 5432
-  app_deployed_domain = ""
 
   app_container_image     = "shaungc/postgres-cdc"
   app_container_image_tag = var.postgres_cluster_image_tag
@@ -22,6 +22,10 @@ module "postgres_cluster" {
   ]
 
   persistent_volume_mount_path_secret_name_list = ["/database/postgres_cluster_kubernetes/SQL_DATA_VOLUME_MOUNT"]
+
+  depend_on = [
+    helm_release.project-nginx-ingress
+  ]
 }
 
 
