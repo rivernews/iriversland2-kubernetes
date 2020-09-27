@@ -76,6 +76,7 @@ app_container_image_tag = "the-tag-when-you-docker-build"
     - Run `python release.py -p` to get the plan.
     - If you make changes to tf files instead of image tag (e.g. for kafka, redis, postgres, etc), `python release.py` might not run since it will only run when detected change in image tag. To apply changes for tf files, force the change by `python release.py -f`.
     - For other options, please see `release.py`.
+6. After commit, pushed changes to `master` branch, if confident with the change, then it's time for sync for release and destroy branch. Run `gco release && git merge master && gp && gco destroy-release && git merge master && gp && gco master`.
 
 ### Update / Deploy microservice
 
