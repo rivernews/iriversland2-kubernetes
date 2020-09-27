@@ -6,7 +6,10 @@ variable "droplet_size" {
     # size       = "m-1vcpu-8gb" # $40
     # size       = "s-2vcpu-4gb" # $20
     # size       = "s-1vcpu-3gb" # $15
-    default = "s-4vcpu-8gb"
+    
+    # do not set default to avoid cluster being re-created (destroyed then created) when terraform detect change in k8s cluster node size
+    # default = "s-4vcpu-8gb"
+
     type = string
 }
 
