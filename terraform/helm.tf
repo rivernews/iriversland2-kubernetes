@@ -33,5 +33,5 @@ provider "helm" {
 # Terraform official: https://www.terraform.io/docs/providers/helm/repository.html
 data "helm_repository" "stable" {
   name = "stable"
-  url  = "https://kubernetes-charts.storage.googleapis.com"
+  url  = "https://charts.helm.sh/stable"
 }
