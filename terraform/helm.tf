@@ -30,8 +30,9 @@ provider "helm" {
 }
 
 
-# Terraform official: https://www.terraform.io/docs/providers/helm/repository.html
 data "helm_repository" "stable" {
   name = "stable"
-  url  = "https://kubernetes-charts.storage.googleapis.com"
+  # updated to newest url
+  # https://stackoverflow.com/questions/61954440/how-to-resolve-https-kubernetes-charts-storage-googleapis-com-is-not-a-valid
+  url  = "https://charts.helm.sh/stable"
 }
