@@ -14,18 +14,19 @@ resource "digitalocean_tag" "project-cluster" {
 }
 
 # https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/data-sources/kubernetes_versions
-data "digitalocean_kubernetes_versions" "shared" {}
+data "digitalocean_kubernetes_versions" "shared" {
+  version_prefix = "1.20."
+}
 
 # Terraform official: https://www.terraform.io/docs/providers/do/d/kubernetes_cluster.html
 resource "digitalocean_kubernetes_cluster" "project_digitalocean_cluster" {
   name    = "${var.project_name}-cluster"
   region  = "sfo2"
 
-  # do not set this to dynamic value like `data.digitalocean_kubernetes_versions.shared.latest_version`
-  # since tf WILL re-create (destroy then create) the cluster if k8s version changed
-  # (even if upgrading)
-  # Grab the latest version slug from `doctl kubernetes options versions`
-  version = "1.20.2-do.0"
+  # according to tf do doc page
+  # will not diff/change cluster when upgrade (will alter/re-create cluster if downgrade)
+  # https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/kubernetes_cluster#version
+  version = data.digitalocean_kubernetes_versions.shared.latest_version
 
   node_pool {
     name       = "${var.project_name}-node-pool"
