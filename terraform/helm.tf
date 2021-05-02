@@ -32,7 +32,7 @@ provider "helm" {
 
 data "helm_repository" "stable" {
   name = "stable"
-  # updated to newest url
+  # updated to newest url...
   # https://stackoverflow.com/questions/61954440/how-to-resolve-https-kubernetes-charts-storage-googleapis-com-is-not-a-valid
   url  = "https://charts.helm.sh/stable"
 }
