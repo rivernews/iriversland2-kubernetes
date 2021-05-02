@@ -22,9 +22,10 @@ resource "digitalocean_kubernetes_cluster" "project_digitalocean_cluster" {
   region  = "sfo2"
 
   # do not set this to dynamic value like `data.digitalocean_kubernetes_versions.shared.latest_version`
-  # since tf may re-create (destroy then create) the cluster if k8s version changed
+  # since tf WILL re-create (destroy then create) the cluster if k8s version changed
+  # (even if upgrading)
   # Grab the latest version slug from `doctl kubernetes options versions`
-  version = "1.18.14-do.0"
+  version = "1.20.2-do.0"
 
   node_pool {
     name       = "${var.project_name}-node-pool"
