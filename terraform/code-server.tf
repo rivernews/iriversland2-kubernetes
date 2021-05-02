@@ -23,6 +23,11 @@ module "code_server" {
     "/service/code-server/CODE_SERVER_VOLUME_MOUNT"
   ]
 
+  environment_variables = {
+    VIRTUAL_HOST = "0.0.0.0"
+    VIRTUAL_PORT = "8003"
+  }
+
   depend_on = [
     helm_release.project-nginx-ingress
   ]
