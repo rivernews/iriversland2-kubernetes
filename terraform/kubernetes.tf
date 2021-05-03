@@ -15,7 +15,7 @@ resource "digitalocean_tag" "project-cluster" {
 
 # https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/data-sources/kubernetes_versions
 data "digitalocean_kubernetes_versions" "shared" {
-  version_prefix = "1.20."
+  version_prefix = "1.18."
 }
 
 # Terraform official: https://www.terraform.io/docs/providers/do/d/kubernetes_cluster.html
