@@ -24,10 +24,7 @@ module "code_server" {
   ]
 
   environment_variables = {
-    VIRTUAL_HOST = "0.0.0.0"
-    VIRTUAL_PORT = "8003"
     PORT = "8003"
-    PROXY_DOMAIN = "*.shaungc.com"
   }
 
   depend_on = [
