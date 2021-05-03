@@ -50,15 +50,15 @@ jobs:
       - image: shaungc/terraform-kubectl-image
     working_directory: ~/repo/terraform
     steps:
+      - checkout: # retrieves the code from GitHub
+          path: ~/repo
+      - setup_remote_docker # sets up a remote, isolated environment for each build. This is required before you use any docker command inside a job step.
       - run:
           name: Setup Computed Environment Variable
           command: |
             set -ex
             TF_VAR_droplet_size=$(if [ "<< pipeline.parameters.kubernetes-cluster-droplet-size >>" = "" ]; then echo "${DIGITALOCEAN_KUBERNETES_CLUSTER_DROPLET_SIZE:-s-4vcpu-8gb}"; else echo "<< pipeline.parameters.kubernetes-cluster-droplet-size >>"; fi)
             echo "export TF_VAR_droplet_size=$TF_VAR_droplet_size" >> $BASH_ENV
-      - checkout: # retrieves the code from GitHub
-          path: ~/repo
-      - setup_remote_docker # sets up a remote, isolated environment for each build. This is required before you use any docker command inside a job step.
       - run:
           name: Check Deploy Tools Availability
           command: |
