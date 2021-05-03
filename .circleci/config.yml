@@ -1,5 +1,8 @@
 version: 2.1
 
+# setting env var
+# various ways: https://circleci.com/docs/2.0/env-vars/#setting-an-environment-variable-in-a-job
+
 # sending env var by pipeline parameters
 # this is mainly used for API
 # https://github.com/CircleCI-Public/api-preview-docs/blob/master/docs/pipeline-parameters.md
@@ -45,10 +48,14 @@ jobs:
   exec_terraform:
     docker:
       - image: shaungc/terraform-kubectl-image
-    environment:
-      TF_VAR_droplet_size: $(if [ "<< pipeline.parameters.kubernetes-cluster-droplet-size >>" = "" ]; then echo "${DIGITALOCEAN_KUBERNETES_CLUSTER_DROPLET_SIZE:-s-4vcpu-8gb}"; else echo "<< pipeline.parameters.kubernetes-cluster-droplet-size >>"; fi)
     working_directory: ~/repo/terraform
     steps:
+      - run:
+          name: Setup Computed Environment Variable
+          command: |
+            set -ex
+            TF_VAR_droplet_size=$(if [ "<< pipeline.parameters.kubernetes-cluster-droplet-size >>" = "" ]; then echo "${DIGITALOCEAN_KUBERNETES_CLUSTER_DROPLET_SIZE:-s-4vcpu-8gb}"; else echo "<< pipeline.parameters.kubernetes-cluster-droplet-size >>"; fi)
+            echo "export TF_VAR_droplet_size=$TF_VAR_droplet_size" >> $BASH_ENV
       - checkout: # retrieves the code from GitHub
           path: ~/repo
       - setup_remote_docker # sets up a remote, isolated environment for each build. This is required before you use any docker command inside a job step.
@@ -73,11 +80,13 @@ jobs:
       - run:
           name: Plan Terraform
           command: |
+            source $BASH_ENV
             echo "Using droplet size ${TF_VAR_droplet_size}..."
             python release.py -p -y
       - run:
           name: Apply Terraform
           command: |
+            source $BASH_ENV
             if [ "${CIRCLE_BRANCH}" == "release" ];
             then
               python release.py -f -y
