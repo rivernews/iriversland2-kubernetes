@@ -1,11 +1,14 @@
 version: 2.1
 
 # sending env var by pipeline parameters
+# this is mainly used for API
 # https://github.com/CircleCI-Public/api-preview-docs/blob/master/docs/pipeline-parameters.md
 parameters:
   kubernetes-cluster-droplet-size:
     type: string
-    default: "s-4vcpu-8gb"
+    # see all droplet size options
+    # https://developers.digitalocean.com/documentation/changelog/api-v2/new-size-slugs-for-droplet-plan-changes/
+    default: ${DIGITALOCEAN_KUBERNETES_CLUSTER_DROPLET_SIZE:-s-4vcpu-8gb}
 
 orbs:
   slack: circleci/slack@3.3.0
@@ -21,7 +24,7 @@ jobs:
     steps:
       - checkout: # retrieves the code from GitHub
           path: ~/repo
-      
+
       # only run blocks below if you updated Dockerfile or terraform script in this repo
       #
       #
@@ -70,7 +73,7 @@ jobs:
           name: Plan Terraform
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ];
-            then  
+            then
               python release.py -p -y
             else
               echo 'Skipped'
@@ -100,12 +103,12 @@ workflows:
       - build:
           filters:
               branches:
-                only: 
-                  - master
+                only:
+                  - master--disabled
       - exec_terraform:
           filters:
               branches:
-                only: 
+                only:
                   - release
                   - destroy-release
           # requires:
