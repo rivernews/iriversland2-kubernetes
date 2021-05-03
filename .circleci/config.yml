@@ -9,7 +9,7 @@ parameters:
     # see all droplet size options
     # `doctl compute size list`
     # https://developers.digitalocean.com/documentation/changelog/api-v2/new-size-slugs-for-droplet-plan-changes/
-    default: ${DIGITALOCEAN_KUBERNETES_CLUSTER_DROPLET_SIZE:-s-4vcpu-8gb}
+    default: ''
 
 orbs:
   slack: circleci/slack@3.3.0
@@ -46,7 +46,7 @@ jobs:
     docker:
       - image: shaungc/terraform-kubectl-image
     environment:
-      TF_VAR_droplet_size: << pipeline.parameters.kubernetes-cluster-droplet-size >>
+      TF_VAR_droplet_size: $(if [ "<< pipeline.parameters.kubernetes-cluster-droplet-size >>" = "" ]; then echo "${DIGITALOCEAN_KUBERNETES_CLUSTER_DROPLET_SIZE:-s-4vcpu-8gb}"; else echo "<< pipeline.parameters.kubernetes-cluster-droplet-size >>"; fi)
     working_directory: ~/repo/terraform
     steps:
       - checkout: # retrieves the code from GitHub
