@@ -45,6 +45,27 @@ jobs:
             docker push $IMAGE_NAME:latest
             docker push $IMAGE_NAME:$CIRCLE_SHA1
 
+  build-postgres:
+    docker:
+      - image: circleci/buildpack-deps:stretch
+    environment:
+      IMAGE_NAME: shaungc/postgres-cdc
+      # change this and release.json to pick up changes and use it in deployment
+      IMAGE_TAG: 11.5-r25
+    working_directory: ~/repo/postgres-cdc
+    steps:
+      - checkout: # retrieves the code from GitHub
+          path: ~/repo
+      - setup_remote_docker
+      - run:
+          name: Build and push Postgres Image
+          command: |
+            docker build -f Dockerfile -t $IMAGE_NAME:latest .
+            echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+            docker tag $IMAGE_NAME:latest $IMAGE_NAME:$IMAGE_TAG
+            docker push $IMAGE_NAME:latest
+            docker push $IMAGE_NAME:$IMAGE_TAG
+
   exec_terraform:
     docker:
       - image: shaungc/terraform-kubectl-image

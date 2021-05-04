@@ -2146,7 +2146,7 @@
         "kafka_connect_image_tag": "cbfa384"
     },
     {
-        "postgres_cluster_image_tag": "11.5-r24",
+        "postgres_cluster_image_tag": "11.5-r25",
         "redis_cluster_image_tag": "5.0.6",
         "kafka_connect_image_tag": "cbfa384"
     }
