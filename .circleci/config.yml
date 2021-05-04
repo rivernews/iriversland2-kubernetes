@@ -45,7 +45,7 @@ jobs:
             docker push $IMAGE_NAME:latest
             docker push $IMAGE_NAME:$CIRCLE_SHA1
 
-  build-postgres:
+  build_postgres:
     docker:
       - image: circleci/buildpack-deps:stretch
     environment:
@@ -132,6 +132,11 @@ workflows:
               branches:
                 only:
                   - master--disabled
+      - build_postgres:
+          filters:
+              branches:
+                only:
+                  - release
       - exec_terraform:
           filters:
               branches:
