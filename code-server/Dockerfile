@@ -37,10 +37,10 @@ RUN cd /tmp && curl -LO https://storage.googleapis.com/kubernetes-release/releas
     sudo chmod +x /bin/kubectl
 
 RUN cd /tmp && curl -LO https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
-    unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip -d /usr/bin
+    sudo unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip -d /usr/bin
 
 RUN cd /tmp && curl -OL https://github.com/digitalocean/doctl/releases/download/v${DOCTL_VERSION}/doctl-${DOCTL_VERSION}-linux-amd64.tar.gz && \
-    tar xf doctl-${DOCTL_VERSION}-linux-amd64.tar.gz --directory /usr/bin
+    sudo tar xf doctl-${DOCTL_VERSION}-linux-amd64.tar.gz --directory /usr/bin
 
 RUN rm -rf /tmp/* && \
     rm -rf /var/cache/apk/* && \
