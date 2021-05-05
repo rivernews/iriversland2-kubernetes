@@ -10,20 +10,20 @@ ENV TERRAFORM_VERSION=0.12.18
 ENV DOCTL_VERSION=1.36.0
 
 # setup git
-RUN git config --global user.name ${USER_FULL_NAME} && \
-    git config --global user.email ${USER_EMAIL}
+# RUN git config --global user.name ${USER_FULL_NAME} && \
+    # git config --global user.email ${USER_EMAIL}
 
 # install zsh & autocomplete
-echo -e "INFO: Installing Oh my Zsh framework..." && \
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+RUN echo -e "INFO: Installing Oh my Zsh framework..." && \
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
 # zsh syntax-highlighting - let shell commands keywords be recognized and displayed in green, etc
 # https://github.com/zsh-users/zsh-syntax-highlighting/blob/master/INSTALL.md
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+RUN git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 
 # zsh autosuggestions (grayed-out words hinting you)
 # https://github.com/zsh-users/zsh-autosuggestions
-git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+RUN git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 
 # TODO: add zsh plugin
 

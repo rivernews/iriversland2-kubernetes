@@ -12,7 +12,7 @@ module "code_server" {
   app_exposed_port    = 8003
   app_deployed_domain = "code-server.shaungc.com"
 
-  app_container_image     = "codercom/code-server"
+  app_container_image     = "shaungc/code-server"
   app_container_image_tag = "3.9.3"
 
   app_secret_name_list = [
