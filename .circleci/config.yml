@@ -58,7 +58,28 @@ jobs:
           path: ~/repo
       - setup_remote_docker
       - run:
-          name: Build and push Postgres Image
+          name: Build and push postgres image
+          command: |
+            docker build -f Dockerfile -t $IMAGE_NAME:latest .
+            echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+            docker tag $IMAGE_NAME:latest $IMAGE_NAME:$IMAGE_TAG
+            docker push $IMAGE_NAME:latest
+            docker push $IMAGE_NAME:$IMAGE_TAG
+  
+  build_code_server:
+    docker:
+      - image: circleci/buildpack-deps:stretch
+    environment:
+      IMAGE_NAME: shaungc/code-server
+      # change this and tf microservice module `app_container_image_tag` to pick up changes and use it in deployment
+      IMAGE_TAG: 3.9.3
+    working_directory: ~/repo/code-server
+    steps:
+      - checkout:
+          path: ~/repo
+      - setup_remote_docker
+      - run:
+          name: Build and push code-server image
           command: |
             docker build -f Dockerfile -t $IMAGE_NAME:latest .
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
@@ -137,11 +158,17 @@ workflows:
               branches:
                 only:
                   - release
+      - build_code_server:
+          filters:
+              branches:
+                only:
+                  - release
       - exec_terraform:
           filters:
               branches:
                 only:
                   - release
                   - destroy-release
-          # requires:
-          #   - build
+          requires:
+            - build_postgres
+            - build_code_server
