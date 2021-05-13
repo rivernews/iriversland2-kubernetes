@@ -72,7 +72,7 @@ jobs:
     environment:
       IMAGE_NAME: shaungc/code-server
       # change this and tf microservice module `app_container_image_tag` to pick up changes and use it in deployment
-      IMAGE_TAG: 3.9.3
+      IMAGE_TAG: 3.9.3-01-docker
     working_directory: ~/repo/code-server
     steps:
       - checkout:

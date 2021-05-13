@@ -1,6 +1,6 @@
 module "code_server" {
   source  = "rivernews/kubernetes-microservice/digitalocean"
-  version = ">= v0.1.18"
+  version = ">= v0.1.19" # >.1.19 for docker support
 
   aws_region     = var.aws_region
   aws_access_key = var.aws_access_key
@@ -13,7 +13,7 @@ module "code_server" {
   app_deployed_domain = "code-server.shaungc.com"
 
   app_container_image     = "shaungc/code-server"
-  app_container_image_tag = "3.9.3"
+  app_container_image_tag = "3.9.3-01-docker"
 
   app_secret_name_list = [
     "/service/code-server/PASSWORD"
@@ -26,6 +26,8 @@ module "code_server" {
   environment_variables = {
     PORT = "8003"
   }
+
+  enable_docker_socket = true
 
   depend_on = [
     helm_release.project-nginx-ingress
