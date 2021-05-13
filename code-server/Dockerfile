@@ -30,7 +30,9 @@ RUN git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-$HO
 # TODO: set vscode default shell to zsh
 
 # install dev tools (doctl, terraform, kubectl)
-RUN sudo apt-get update -y && sudo apt-get install unzip
+RUN sudo apt-get update -y && \
+    sudo apt-get install unzip docker.io && \
+    docker --version
 
 RUN cd /tmp && curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.15.2/bin/linux/amd64/kubectl && \
     sudo mv ./kubectl /bin/kubectl && \
