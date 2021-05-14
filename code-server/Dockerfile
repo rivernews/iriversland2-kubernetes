@@ -44,7 +44,7 @@ RUN cd /tmp && curl -LO https://releases.hashicorp.com/terraform/${TERRAFORM_VER
 RUN cd /tmp && curl -OL https://github.com/digitalocean/doctl/releases/download/v${DOCTL_VERSION}/doctl-${DOCTL_VERSION}-linux-amd64.tar.gz && \
     sudo tar xf doctl-${DOCTL_VERSION}-linux-amd64.tar.gz --directory /usr/bin
 
-RUN cd /tmp && curl https://rclone.org/install.sh | sudo bash
+RUN cd /tmp && curl https://rclone.org/install.sh | bash
 
 RUN rm -rf /tmp/* && \
     rm -rf /var/cache/apk/* && \
