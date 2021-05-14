@@ -83,7 +83,7 @@ provider "kubernetes" {
   # related merge request: https://github.com/terraform-providers/terraform-provider-kubernetes/pull/690
 
   # all k8 provider versions: https://github.com/terraform-providers/terraform-provider-kubernetes/blob/master/CHANGELOG.md
-  version = "1.11.1"
+  version = "1.13.3"
 
   # config_path = "./${local_file.kubeconfig.filename}"
   # config_path = "./kubeconfig.yaml"
