@@ -1,4 +1,4 @@
-FROM codercom/code-server:3.9.3
+FROM codercom/code-server:3.10.0
 
 # TODO: run docker in pod / or build on circleCI|GithubAction
 
@@ -44,6 +44,12 @@ RUN cd /tmp && curl -LO https://releases.hashicorp.com/terraform/${TERRAFORM_VER
 RUN cd /tmp && curl -OL https://github.com/digitalocean/doctl/releases/download/v${DOCTL_VERSION}/doctl-${DOCTL_VERSION}-linux-amd64.tar.gz && \
     sudo tar xf doctl-${DOCTL_VERSION}-linux-amd64.tar.gz --directory /usr/bin
 
+RUN cd /tmp && curl https://rclone.org/install.sh | sudo bash
+
 RUN rm -rf /tmp/* && \
     rm -rf /var/cache/apk/* && \
     rm -rf /var/tmp/*
+
+COPY override-docker-entrypoint.sh /tmp/
+RUN /bin/chmod -R 777 /tmp/override-docker-entrypoint.sh
+ENTRYPOINT [ "/tmp/override-docker-entrypoint.sh" ]
