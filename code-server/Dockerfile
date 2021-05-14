@@ -51,5 +51,5 @@ RUN sudo rm -rf /tmp/* && \
     sudo rm -rf /var/tmp/*
 
 COPY override-docker-entrypoint.sh /tmp/
-RUN /bin/chmod -R 777 /tmp/override-docker-entrypoint.sh
+RUN sudo /bin/chmod -R 777 /tmp/override-docker-entrypoint.sh
 ENTRYPOINT [ "/tmp/override-docker-entrypoint.sh" ]
