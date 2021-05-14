@@ -13,19 +13,16 @@ module "code_server" {
   app_deployed_domain = "code-server.shaungc.com"
 
   app_container_image     = "shaungc/code-server"
-  app_container_image_tag = "3.9.3-01-docker"
+  app_container_image_tag = "3.10.0-01-docker"
 
   app_secret_name_list = [
     "/service/code-server/PASSWORD"
   ]
 
   persistent_volume_mount_path_secret_name_list = [
-    "/service/code-server/CODE_SERVER_VOLUME_MOUNT"
+    "/service/code-server/CODE_SERVER_VOLUME_MOUNT",
+    "/service/code-server/CODE_SERVER_PORT"
   ]
-
-  environment_variables = {
-    PORT = "8003"
-  }
 
   enable_docker_socket = true
 
