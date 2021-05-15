@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # see official image entrypoint:
 # https://github.com/cdr/code-server/blob/main/ci/release-image/Dockerfile
 
