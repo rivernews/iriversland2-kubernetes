@@ -49,7 +49,7 @@ locals {
   # this secret, and the certificate created will be in the same namespace as the ingress.
   # since we are using wildcard and cluster issuer, we will only need one central TLS ing to generate certificate to cover all domains used in all microservices.
   central_tls_ing_certificate_secret_name = "wilcard-tls-ing-certificate-secret"
-  
+
   # constant values
   cert_cluster_issuer_secret_name_prod = "letsencrypt-prod-secret"
   cert_cluster_issuer_secret_name_staging = "letsencrypt-staging-secret"
@@ -60,7 +60,7 @@ locals {
 
 resource "null_resource" "crd_cert_resources_install" {
   triggers = {
-    
+
     # list all dependencies here
 
     cert_manager_namespace = kubernetes_namespace.cert_manager.metadata.0.name
@@ -87,7 +87,7 @@ resource "null_resource" "crd_cert_resources_install" {
   # Terraform provisioners: https://www.terraform.io/docs/provisioners/index.html
   # (CRD) Creation-Time Provisioners
   provisioner "local-exec" {
-    command = "echo INFO: installing CRD... && doctl k8s cluster kubeconfig show project-shaungc-digitalocean-cluster > ~/.kube/config && sleep 5 && kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/${local.jetstack_cert_crd_version}/deploy/manifests/00-crds.yaml && echo INFO: complete CRD installation, sleeping 10 sec... && sleep 10"
+    command = "echo INFO: installing CRD... && doctl k8s cluster kubeconfig show ${digitalocean_kubernetes_cluster.project_digitalocean_cluster} > ~/.kube/config && sleep 5 && kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/${local.jetstack_cert_crd_version}/deploy/manifests/00-crds.yaml && echo INFO: complete CRD installation, sleeping 10 sec... && sleep 10"
   }
 
 
@@ -139,9 +139,9 @@ EOT
   # (CRD) Destroy-Time Provisioners
   provisioner "local-exec" {
     when    = destroy
-    
+
     # recommended resource to delete when removing cert-manager
-    # based on jetstack/cert-manager doc: 
+    # based on jetstack/cert-manager doc:
     # http://docs.cert-manager.io/en/latest/tasks/upgrading/upgrading-0.5-0.6.html#upgrading-from-older-versions-using-helm
     command = "kubectl delete crd certificates.certmanager.k8s.io clusterissuers.certmanager.k8s.io issuers.certmanager.k8s.io \n echo \n echo \n echo \n echo INFO: delete certificate resources complete, will sleep for 10 sec... \n sleep 10"
 
@@ -190,11 +190,11 @@ resource "helm_release" "project_cert_manager" {
 
   namespace = kubernetes_namespace.cert_manager.metadata.0.name
   timeout   = "540"
-  
+
   # ingressShim is used together with the ingress rule annotation `kubernetes.io/tls-acme: "true"`
   # it is for automated TLS certificate renewal
   # the doc also mentioned it is installed by default
-  # but since we are doing dns01 challenge additionally, 
+  # but since we are doing dns01 challenge additionally,
   # we explictly specified `defaultIssuerName` and `defaultIssuerKind` as well, but
   # note that this might not be necessary.
   # https://docs.cert-manager.io/en/release-0.10/tasks/issuing-certificates/ingress-shim.html#configuration

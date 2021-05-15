@@ -1,6 +1,3 @@
-# # https://www.terraform.io/docs/providers/random/r/id.html
-resource "random_uuid" "random_domain" { }
-
 locals {
   tls_cert_covered_domain_list = [
     "*.${var.managed_k8_rx_domain}",
@@ -78,7 +75,7 @@ resource "helm_release" "project-nginx-ingress" {
   # steps required to expost a tcp port:
   # 1. specify the tcp port here and service it should point to
   # 2. allow the port in `digitalocean_firewall`
-  
+
   # use api.shaungc.com:6378 on local to initiate connection
   set_string {
     name = "tcp.6378"
@@ -91,7 +88,7 @@ resource "helm_release" "project-nginx-ingress" {
     value = "postgres-cluster/postgres-cluster-service:5432"
   }
 
-  # helm config for default certificate 
+  # helm config for default certificate
   # https://github.com/helm/charts/blob/master/stable/nginx-ingress/values.yaml#L108
   #
   # also use `set_string` to avoid bool parsing error in configmap
@@ -288,7 +285,7 @@ resource "kubernetes_ingress" "project-ingress-resource" {
     # ingress resource must be created first
     # see "4. Create ingress with tls-acme annotation and tls spec":
     # https://medium.com/asl19-developers/use-lets-encrypt-cert-manager-and-external-dns-to-publish-your-kubernetes-apps-to-your-website-ff31e4e3badf
-    # DON't -> 
+    # DON't ->
 
     # above may not be true - see https://github.com/jetstack/cert-manager/blob/master/docs/tutorials/acme/quick-start/index.rst#step-7---deploy-a-tls-ingress-resource
     helm_release.project_cert_manager,

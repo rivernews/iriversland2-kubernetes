@@ -20,7 +20,7 @@ data "digitalocean_kubernetes_versions" "shared" {
 
 # Terraform official: https://www.terraform.io/docs/providers/do/d/kubernetes_cluster.html
 resource "digitalocean_kubernetes_cluster" "project_digitalocean_cluster" {
-  name    = "${var.project_name}-cluster-${substr(random_uuid.random_domain.result, length(random_uuid.random_domain.result)-5, 5)}"
+  name    = "${var.project_name}-cluster-${local.random_short}"
   region  = "sfo2"
 
   # according to tf do doc page
@@ -60,7 +60,7 @@ provider "local" {
 
 # tf doc: https://www.terraform.io/docs/providers/local/r/file.html
 # to use `doctl` to generate this yaml file, run:
-# doctl k8s cluster kubeconfig show project-shaungc-digitalocean-cluster > kubeconfig.yaml
+# doctl k8s cluster kubeconfig show project-shaungc-digitalocean-cluster-<random> > kubeconfig.yaml
 resource "local_file" "kubeconfig" {
     sensitive_content     = digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.raw_config
     filename = "kubeconfig.yaml"

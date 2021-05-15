@@ -25,7 +25,7 @@ This repository provisions the entire Kubernetes cluster as below in the image. 
     - Kubernetes CLI (version v1.15.2) for kubernetes CRD resources management support
     - Helm CLI (version v2.16.1) for helm release resources management support
 - Optionally install `brew install doctl` for the digitalocean cli tool
-    - To let `doctl` generate `kubeconfig.yaml`, run `doctl k8s cluster kubeconfig show project-shaungc-digitalocean-cluster > kubeconfig.yaml`
+    - To let `doctl` generate `kubeconfig.yaml`, run `doctl k8s cluster kubeconfig show project-shaungc-digitalocean-cluster-<random> > kubeconfig.yaml`
 - Run `export KUBECONFIG=kubeconfig.yaml`. The terraform provider `kubernetes` will need this file present.
 
 Optional, nice to have (useful for debug):
@@ -109,7 +109,7 @@ What we've done, and how we set it up. Two phases:
     - The `config.yaml` only does `terraform plan` and will not make any actual changes by default. Passing the Circle CI build roughly verifies that Terraform backend, all the variables including credentials and the resources are working great.
 - Running both your app build (in another repo) AND terraform (this repo) in Circle CI, sequentially.
     - Refer to [CircleCI doc: sharing data among jobs](https://circleci.com/docs/2.0/workflows/#using-workspaces-to-share-data-among-jobs).
-    - Context: Continuous deployment often comes with two big parts: docker build, then deploy. This Terraform only handles the deploy part, and needs you to porvide a docker build image tag, as a terraform variable input. The image tag is the same that AWS CodePipeline refer to as "artifacts". 
+    - Context: Continuous deployment often comes with two big parts: docker build, then deploy. This Terraform only handles the deploy part, and needs you to porvide a docker build image tag, as a terraform variable input. The image tag is the same that AWS CodePipeline refer to as "artifacts".
     - Complete CI/CD automation: in order to have CircleCI automate build and deploy for us, we need to combine them into one `config.yaml`. The basic idea: you have two repository, one for your app containing `Dockerfile`, another is this Terraform repo. You choose either one to put CircleCI's `config.yaml` to start the automation, and in the CircleCI job **you retrieve another repo's code by either git clone or docker pull**, so you have access to both repos in a single CircleCI `config.yaml`.
     - You can refer to the example in [iriversland2-public](https://github.com/rivernews/iriversland2-public) and look at the CircleCI `config.yaml`. It docker builds the app, push image to registry, then use Terraform script (from this repo) to update K8 resources and deploy changes to app on K8 cluster.
 
@@ -141,7 +141,7 @@ Still, there are changes that indeed need a certificate renewal. e.g., changes i
 
 ### The Role of CircleCI in this terraform repository
 
-It builds a base image for other project's CircleCI jobs to run the terraform scripts included in this repository. It also does `terraform plan` to provide a preliminary test on the terraform script. 
+It builds a base image for other project's CircleCI jobs to run the terraform scripts included in this repository. It also does `terraform plan` to provide a preliminary test on the terraform script.
 
 Currently in `config.yaml`, several parts are commented and disabled to minimize accidental changes to the infra, but you should consider uncomment them in the following cases:
 
