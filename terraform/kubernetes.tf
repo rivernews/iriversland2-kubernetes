@@ -13,6 +13,18 @@ resource "digitalocean_tag" "project-cluster" {
   name = "${var.project_name}-digitalocean-kubernetes-cluster-tag"
 }
 
+# expose k8s cluster name
+# so that other project can access by below:
+# data "aws_ssm_parameter" "kubernetes_cluster_name" {
+#   name  = "//terraform-managed/iriversland2-kubernetes/cluster-name"
+# }
+resource "aws_ssm_parameter" "kubernetes_cluster_name" {
+  name  = "//terraform-managed/iriversland2-kubernetes/cluster-name"
+  type  = "String"
+  value = digitalocean_kubernetes_cluster.project_digitalocean_cluster.name
+  overwrite = true
+}
+
 # https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/data-sources/kubernetes_versions
 data "digitalocean_kubernetes_versions" "shared" {
   version_prefix = "1.18."
