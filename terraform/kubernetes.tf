@@ -20,7 +20,7 @@ data "digitalocean_kubernetes_versions" "shared" {
 
 # Terraform official: https://www.terraform.io/docs/providers/do/d/kubernetes_cluster.html
 resource "digitalocean_kubernetes_cluster" "project_digitalocean_cluster" {
-  name    = "${var.project_name}-cluster"
+  name    = "${var.project_name}-cluster-${substr(random_uuid.random_domain.result, length(random_uuid.random_domain.result)-5, 5)}"
   region  = "sfo2"
 
   # according to tf do doc page
