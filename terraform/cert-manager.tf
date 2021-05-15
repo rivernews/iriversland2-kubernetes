@@ -87,7 +87,7 @@ resource "null_resource" "crd_cert_resources_install" {
   # Terraform provisioners: https://www.terraform.io/docs/provisioners/index.html
   # (CRD) Creation-Time Provisioners
   provisioner "local-exec" {
-    command = "echo INFO: installing CRD... && doctl k8s cluster kubeconfig show ${digitalocean_kubernetes_cluster.project_digitalocean_cluster.name} > ~/.kube/config && sleep 5 && kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/${local.jetstack_cert_crd_version}/deploy/manifests/00-crds.yaml && echo INFO: complete CRD installation, sleeping 10 sec... && sleep 10"
+    command = "echo INFO: installing CRD... && mkdir -p ~/.kube && doctl k8s cluster kubeconfig show ${digitalocean_kubernetes_cluster.project_digitalocean_cluster.name} > ~/.kube/config && sleep 5 && kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/${local.jetstack_cert_crd_version}/deploy/manifests/00-crds.yaml && echo INFO: complete CRD installation, sleeping 10 sec... && sleep 10"
   }
 
 
