@@ -16,12 +16,13 @@ module "code_server" {
   app_container_image_tag = "3.10.0-01-docker"
 
   app_secret_name_list = [
-    "/service/code-server/PASSWORD"
+    "/service/code-server/PASSWORD",
+    "/service/code-server/CODE_SERVER_PORT",
+    "/service/code-server/CODE_SERVER_VOLUME_MOUNT"
   ]
 
   persistent_volume_mount_path_secret_name_list = [
-    "/service/code-server/CODE_SERVER_VOLUME_MOUNT",
-    "/service/code-server/CODE_SERVER_PORT"
+    "/service/code-server/CODE_SERVER_VOLUME_MOUNT"
   ]
 
   enable_docker_socket = true
