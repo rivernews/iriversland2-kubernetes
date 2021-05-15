@@ -67,9 +67,6 @@ resource "helm_release" "prometheus_stack" {
     #
     # Way to debug such error: https://github.com/helm/helm/issues/5100#issuecomment-533787541
     kubernetes_cluster_role_binding.tiller,
-
-    # script `my-kubectl.sh` requires kubeconfig.yaml
-    local_file.kubeconfig
   ]
 }
 

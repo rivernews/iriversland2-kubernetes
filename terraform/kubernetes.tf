@@ -85,9 +85,6 @@ provider "kubernetes" {
   # all k8 provider versions: https://github.com/terraform-providers/terraform-provider-kubernetes/blob/master/CHANGELOG.md
   version = "1.13.3"
 
-  # config_path = "./${local_file.kubeconfig.filename}"
-  # config_path = "./kubeconfig.yaml"
-
   host = digitalocean_kubernetes_cluster.project_digitalocean_cluster.endpoint
 
   load_config_file = false
