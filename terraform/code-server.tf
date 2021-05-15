@@ -1,6 +1,6 @@
 module "code_server" {
   source  = "rivernews/kubernetes-microservice/digitalocean"
-  version = ">= v0.1.19" # >.1.19 for docker support
+  version = ">= v0.1.20" # >=.1.19 for docker support; >= .1.20 for fixing tf k8s deploy update error
 
   aws_region     = var.aws_region
   aws_access_key = var.aws_access_key
