@@ -25,6 +25,7 @@ module "code_server" {
   ]
 
   enable_docker_socket = true
+  use_recreate_deployment_strategy = true
 
   depend_on = [
     helm_release.project-nginx-ingress
