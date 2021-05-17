@@ -13,7 +13,7 @@ module "code_server" {
   app_deployed_domain = "code-server.shaungc.com"
 
   app_container_image     = "shaungc/code-server"
-  app_container_image_tag = "3.10.0-01-docker"
+  app_container_image_tag = "3.10.1-01-docker"
 
   app_secret_name_list = [
     "/service/code-server/PASSWORD",
