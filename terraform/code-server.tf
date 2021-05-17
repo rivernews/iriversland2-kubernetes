@@ -18,7 +18,8 @@ module "code_server" {
   app_secret_name_list = [
     "/service/code-server/PASSWORD",
     "/service/code-server/CODE_SERVER_PORT",
-    "/service/code-server/CODE_SERVER_VOLUME_MOUNT"
+    "/service/code-server/CODE_SERVER_VOLUME_MOUNT",
+    "/app/appl-tracky/ADMINS"
   ]
 
   persistent_volume_mount_path_secret_name_list = [
