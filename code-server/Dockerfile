@@ -11,6 +11,11 @@ RUN cd /tmp && curl -LO https://storage.googleapis.com/kubernetes-release/releas
     sudo mv ./kubectl /bin/kubectl && \
     sudo chmod +x /bin/kubectl
 
+# Terraform Swithcer
+# https://github.com/warrensbox/terraform-switcher
+#
+# List all versions
+# tfswitch -l
 RUN curl -L https://raw.githubusercontent.com/warrensbox/terraform-switcher/release/install.sh | sudo sh
 
 RUN cd /tmp && curl -OL https://github.com/digitalocean/doctl/releases/download/v${DOCTL_VERSION}/doctl-${DOCTL_VERSION}-linux-amd64.tar.gz && \
