@@ -21,6 +21,10 @@ RUN curl -L https://raw.githubusercontent.com/warrensbox/terraform-switcher/rele
 RUN cd /tmp && curl -OL https://github.com/digitalocean/doctl/releases/download/v${DOCTL_VERSION}/doctl-${DOCTL_VERSION}-linux-amd64.tar.gz && \
     sudo tar xf doctl-${DOCTL_VERSION}-linux-amd64.tar.gz --directory /usr/bin
 
+# `rclone config`
+# select #15 Google drive
+# check out client id & secret (both is required!) at
+# https://console.cloud.google.com/apis/credentials?project=appl-tracky&folder=&organizationId=
 RUN cd /tmp && curl https://rclone.org/install.sh | sudo bash
 
 RUN sudo rm -rf /tmp/* && \
