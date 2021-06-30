@@ -1,6 +1,6 @@
 module "code_server" {
   source  = "rivernews/kubernetes-microservice/digitalocean"
-  version = ">= v0.1.21"
+  version = ">= v0.1.22"
 
   aws_region     = var.aws_region
   aws_access_key = var.aws_access_key
