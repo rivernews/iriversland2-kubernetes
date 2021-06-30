@@ -27,6 +27,9 @@ module "code_server" {
     size = "3Gi"
   }]
 
+  memory_guaranteed = "400Mi"
+  memory_max_allowed = "1Gi"
+
   enable_docker_socket = true
 
   depend_on = [
