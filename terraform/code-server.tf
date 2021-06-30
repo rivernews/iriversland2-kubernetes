@@ -22,7 +22,7 @@ module "code_server" {
     "/app/appl-tracky/ADMINS"
   ]
 
-  persistent_volume_mount_path_secret_name_list = [{
+  persistent_volume_mount_setting_list = [{
     mount_path_secret_name = "/service/code-server/CODE_SERVER_VOLUME_MOUNT"
     size = "3Gi"
   }]

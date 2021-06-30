@@ -21,7 +21,7 @@ module "postgres_cluster" {
     "/database/postgres_cluster_kubernetes/SQL_DATA_VOLUME_MOUNT",
   ]
 
-  persistent_volume_mount_path_secret_name_list = [{
+  persistent_volume_mount_setting_list = [{
     mount_path_secret_name = "/database/postgres_cluster_kubernetes/SQL_DATA_VOLUME_MOUNT"
     size = "1Gi"
   }]
