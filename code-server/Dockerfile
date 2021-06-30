@@ -3,12 +3,12 @@ FROM codercom/code-server:3.10.2
 ENV DOCTL_VERSION=1.36.0
 
 # install dev tools (doctl, terraform, kubectl, pyenv)
-RUN sudo apt-get update -y && \
-    sudo apt-get install -y unzip docker.io zsh && \
+RUN sudo apt-get update --assume-yes && \
+    sudo apt-get install --assume-yes unzip docker.io zsh && \
     docker --version && \
     # for pyenv
     # https://github.com/pyenv/pyenv/wiki#suggested-build-environment
-    sudo apt-get install make build-essential libssl-dev zlib1g-dev \
+    sudo apt-get install --assume-yes make build-essential libssl-dev zlib1g-dev \
     libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
     libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
 
