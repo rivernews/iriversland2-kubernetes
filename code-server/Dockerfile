@@ -1,15 +1,22 @@
-FROM codercom/code-server:3.10.1
+FROM codercom/code-server:3.10.2
 
 ENV DOCTL_VERSION=1.36.0
 
-# install dev tools (doctl, terraform, kubectl)
+# install dev tools (doctl, terraform, kubectl, pyenv)
 RUN sudo apt-get update -y && \
     sudo apt-get install -y unzip docker.io zsh && \
-    docker --version
+    docker --version && \
+    # for pyenv
+    # https://github.com/pyenv/pyenv/wiki#suggested-build-environment
+    sudo apt-get install make build-essential libssl-dev zlib1g-dev \
+    libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
+    libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
 
 RUN cd /tmp && curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.15.2/bin/linux/amd64/kubectl && \
     sudo mv ./kubectl /bin/kubectl && \
     sudo chmod +x /bin/kubectl
+
+RUN curl https://pyenv.run | bash
 
 # Terraform Swithcer
 # https://github.com/warrensbox/terraform-switcher
