@@ -26,6 +26,8 @@ module "postgres_cluster" {
     size = "1Gi"
   }]
 
+  memory_guaranteed = "100Mi"
+
   depend_on = [
     helm_release.project-nginx-ingress
   ]
@@ -56,6 +58,8 @@ module "redis_cluster" {
   app_secret_name_list = [
     "/database/redis_cluster_kubernetes/REDIS_PASSWORD"
   ]
+
+  memory_guaranteed = "50Mi"
 
   depend_on = [
     # Redis exposes tcp services, which relies on ingress controller
