@@ -29,7 +29,7 @@ resource "aws_ssm_parameter" "kubernetes_cluster_name" {
 
 # https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/data-sources/kubernetes_versions
 data "digitalocean_kubernetes_versions" "shared" {
-  version_prefix = "1.18."
+  version_prefix = "1.21."
 }
 
 # Terraform official: https://www.terraform.io/docs/providers/do/d/kubernetes_cluster.html
