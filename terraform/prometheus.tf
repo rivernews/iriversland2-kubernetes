@@ -5,9 +5,10 @@ resource "helm_release" "prometheus_stack" {
   namespace = kubernetes_service_account.tiller.metadata.0.namespace
 
   force_update = true
-
+  # Based on
+  # https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/README.md
   repository = "https://prometheus-community.github.io/helm-charts"
-  chart      = "prometheus-community/kube-prometheus-stack"
+  chart      = "kube-prometheus-stack"
 
   values = [<<-EOF
     defaultRules:

@@ -149,7 +149,7 @@ resource "helm_release" "project-nginx-ingress" {
 resource "helm_release" "project-external-dns" {
   name      = "external-dns"
   repository = "https://charts.helm.sh/stable"
-  chart     = "stable/external-dns"
+  chart     = "external-dns"
   namespace = kubernetes_service_account.tiller.metadata.0.namespace
 
   # see available version by `. ./my-helm.sh search -l stable/external-dns`

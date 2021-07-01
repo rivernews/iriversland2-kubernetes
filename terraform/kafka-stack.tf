@@ -11,7 +11,7 @@ resource "helm_release" "kafka_stack" {
   wait = true
 
   repository = "https://charts.bitnami.com/bitnami"
-  chart      = "bitnami/kafka"
+  chart      = "kafka"
   version    = "7.0.3"
 
 
