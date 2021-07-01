@@ -20,12 +20,6 @@ resource "kubernetes_secret" "tls_route53_secret" {
 #
 #
 
-
-data "helm_repository" "jetstack" {
-  name = "jetstack"
-  url  = "https://charts.jetstack.io"
-}
-
 resource "kubernetes_namespace" "cert_manager" {
   metadata {
     name = "cert-manager"
@@ -83,14 +77,6 @@ resource "null_resource" "crd_cert_resources_install" {
     docker_email = var.docker_email
   }
 
-
-  # Terraform provisioners: https://www.terraform.io/docs/provisioners/index.html
-  # (CRD) Creation-Time Provisioners
-  provisioner "local-exec" {
-    command = "echo INFO: installing CRD... && mkdir -p ~/.kube && doctl k8s cluster kubeconfig show ${digitalocean_kubernetes_cluster.project_digitalocean_cluster.name} > ~/.kube/config && sleep 5 && kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/${local.jetstack_cert_crd_version}/deploy/manifests/00-crds.yaml && echo INFO: complete CRD installation, sleeping 10 sec... && sleep 10"
-  }
-
-
   # (Issuer) Creation-Time Provisioners
   provisioner "local-exec" {
     command = <<EOT
@@ -136,19 +122,6 @@ EOT
     command = "echo INFO: complete installing CRD and clusterissuer, will sleep 15 sec... && sleep 15"
   }
 
-  # (CRD) Destroy-Time Provisioners
-  provisioner "local-exec" {
-    when    = destroy
-
-    # recommended resource to delete when removing cert-manager
-    # based on jetstack/cert-manager doc:
-    # http://docs.cert-manager.io/en/latest/tasks/upgrading/upgrading-0.5-0.6.html#upgrading-from-older-versions-using-helm
-    command = "kubectl delete crd certificates.certmanager.k8s.io clusterissuers.certmanager.k8s.io issuers.certmanager.k8s.io \n echo \n echo \n echo \n echo INFO: delete certificate resources complete, will sleep for 10 sec... \n sleep 10"
-
-    # force destroy all resources created by cert-manager
-    # command = "kubectl delete customresourcedefinitions.apiextensions.k8s.io certificates.certmanager.k8s.io clusterissuers.certmanager.k8s.io issuers.certmanager.k8s.io orders.certmanager.k8s.io certificaterequests.certmanager.k8s.io challenges.certmanager.k8s.io \n echo \n echo \n echo \n echo INFO: delete certificate resources complete, will sleep for 10 sec... \n sleep 10"
-  }
-
   # (Issuer Cert Secret)
   # TODO: deprecated for "destroy" provisioner referencing external resources / variables
   # we can follow the post below to correct the logic
@@ -184,9 +157,9 @@ EOT
 
 resource "helm_release" "project_cert_manager" {
   name = "cert-manager"
-  repository = data.helm_repository.jetstack.metadata.0.name
+  repository = "https://charts.jetstack.io"
   chart = "jetstack/cert-manager"
-  version = "v0.10.0-alpha.0"
+  version = "v1.4.0"
 
   namespace = kubernetes_namespace.cert_manager.metadata.0.name
   timeout   = "540"
@@ -211,6 +184,11 @@ resource "helm_release" "project_cert_manager" {
   set {
     name  = "webhook.enabled"
     value = "false"
+  }
+
+  set {
+    name = "installCRDs"
+    value = "true"
   }
 
 

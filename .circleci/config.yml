@@ -144,6 +144,19 @@ jobs:
 # https://circleci.com/docs/2.0/local-cli/#validate-a-circleci-config
 # You can install circle cli by `brew install circleci`
 workflows:
+  # TODO: delete this after finish dev on branch `upgrade-cert-manager`
+  build-dev-upgrade-cert-manager:
+    jobs:
+      - build:
+          filters:
+              branches:
+                only:
+                  - upgrade-cert-manager
+      - exec_terraform:
+          filters:
+              branches:
+                only:
+                  - upgrade-cert-manager
   build-tf-toolkit:
     jobs:
       - build:

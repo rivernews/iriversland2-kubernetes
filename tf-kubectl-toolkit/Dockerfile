@@ -1,8 +1,8 @@
-# Dockerfile referred to 
+# Dockerfile referred to
 # https://github.com/broadinstitute/docker-terraform
 FROM alpine:3.10
 
-ENV TERRAFORM_VERSION=0.12.18
+ENV TERRAFORM_VERSION=1.0.1
 ENV DOCTL_VERSION=1.36.0
 
 # install curl

@@ -29,7 +29,7 @@ resource "helm_release" "project-nginx-ingress" {
   # or chart = "stable/nginx-ingress"
   # see https://github.com/digitalocean/digitalocean-cloud-controller-manager/issues/162
 
-  repository = data.helm_repository.stable.metadata.0.name
+  repository = "https://charts.helm.sh/stable"
   chart      = "nginx-ingress"
   # version = ""
 

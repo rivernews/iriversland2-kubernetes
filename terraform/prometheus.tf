@@ -9,7 +9,7 @@ resource "helm_release" "prometheus_stack" {
   # don't rely on terraform helm provider to check on resource created successfully or not
   wait = true
 
-  repository = data.helm_repository.stable.metadata[0].name
+  repository = "https://charts.helm.sh/stable"
   chart      = "stable/prometheus-operator"
   version    = "8.12.3"
 
