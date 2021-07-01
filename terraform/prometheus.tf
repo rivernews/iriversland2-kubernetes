@@ -1,16 +1,13 @@
-# prometheus chart
-# https://github.com/helm/charts/tree/master/stable/prometheus-operator
+# Based on
+# https://artifacthub.io/packages/helm/prometheus-worawutchan/kube-prometheus-stack
 resource "helm_release" "prometheus_stack" {
   name      = "prometheus-stack-release"
   namespace = kubernetes_service_account.tiller.metadata.0.namespace
 
   force_update = true
 
-  # don't rely on terraform helm provider to check on resource created successfully or not
-  wait = true
-
-  repository = "https://charts.helm.sh/stable"
-  chart      = "stable/prometheus-operator"
+  repository = "https://prometheus-community.github.io/helm-charts"
+  chart      = "prometheus-community/kube-prometheus-stack"
 
   values = [<<-EOF
     defaultRules:
