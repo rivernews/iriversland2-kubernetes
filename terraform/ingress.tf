@@ -282,14 +282,7 @@ resource "kubernetes_ingress" "project-ingress-resource" {
   }
 
   depends_on = [
-    # do not run cert-manager before creating this ingress resource
-    # ingress resource must be created first
-    # see "4. Create ingress with tls-acme annotation and tls spec":
-    # https://medium.com/asl19-developers/use-lets-encrypt-cert-manager-and-external-dns-to-publish-your-kubernetes-apps-to-your-website-ff31e4e3badf
-    # DON't ->
-
-    # above may not be true - see https://github.com/jetstack/cert-manager/blob/master/docs/tutorials/acme/quick-start/index.rst#step-7---deploy-a-tls-ingress-resource
-    helm_release.project_cert_manager,
+    helm_release.project_cert_manager
   ]
 }
 
