@@ -133,8 +133,8 @@ jobs:
                 python release.py -d -y
                 ;;
 
-              *)
-               # release
+              release*)
+                # release
                 python release.py -f -y
                 ;;
             esac
@@ -147,20 +147,20 @@ jobs:
 # You can install circle cli by `brew install circleci`
 workflows:
   # TODO: delete this after finish dev on branch `upgrade-cert-manager`
-  upgrade-cert-manager:
+  release-upgrade-cert-manager:
     jobs:
       # - build:
       #     filters:
       #         branches:
       #           only:
-      #             - upgrade-cert-manager
+      #             - release-upgrade-cert-manager
       - exec_terraform:
           filters:
               branches:
                 only:
-                  - upgrade-cert-manager
-          requires:
-              - build
+                  - release-upgrade-cert-manager
+          # requires:
+          #     - build
   destroy-upgrade-cert-manager:
     jobs:
       # - build:
@@ -173,8 +173,8 @@ workflows:
               branches:
                 only:
                   - destroy-upgrade-cert-manager
-          requires:
-              - build
+          # requires:
+          #     - build
   build-tf-toolkit:
     jobs:
       - build:
