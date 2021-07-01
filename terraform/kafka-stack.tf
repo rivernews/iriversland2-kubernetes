@@ -1,8 +1,3 @@
-data "helm_repository" "kafka_stack" {
-  name = "bitnami"
-  url  = "https://charts.bitnami.com/bitnami"
-}
-
 resource "helm_release" "kafka_stack" {
   # TODO: temp disable
   count = 0
@@ -15,7 +10,7 @@ resource "helm_release" "kafka_stack" {
   # don't rely on terraform helm provider to check on resource created successfully or not
   wait = true
 
-  repository = data.helm_repository.kafka_stack.metadata[0].name
+  repository = "https://charts.bitnami.com/bitnami"
   chart      = "bitnami/kafka"
   version    = "7.0.3"
 
