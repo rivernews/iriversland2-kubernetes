@@ -11,7 +11,6 @@ resource "helm_release" "prometheus_stack" {
 
   repository = "https://charts.helm.sh/stable"
   chart      = "stable/prometheus-operator"
-  version    = "8.12.3"
 
   values = [<<-EOF
     defaultRules:
