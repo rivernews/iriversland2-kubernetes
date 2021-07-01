@@ -7,6 +7,8 @@ resource "helm_release" "prometheus_stack" {
   force_update = true
   # Based on
   # https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/README.md
+  # Successful example
+  # https://github.com/hashicorp/terraform-provider-helm/issues/585#issuecomment-707379744
   repository = "https://prometheus-community.github.io/helm-charts"
   chart      = "kube-prometheus-stack"
 
