@@ -81,7 +81,7 @@ resource "null_resource" "crd_cert_resources_install" {
   provisioner "local-exec" {
     command = <<EOT
 echo INFO: creating issuer... && cat <<EOF | kubectl apply -f -
-apiVersion: certmanager.k8s.io/v1alpha1
+apiVersion: certmanager.k8s.io/v1
 kind: ClusterIssuer
 metadata:
   name: ${local.cert_cluster_issuer_name}
