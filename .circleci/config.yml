@@ -19,7 +19,7 @@ orbs:
 
 # yaml basic and advance: https://circleci.com/docs/2.0/writing-yaml/#section=configuration
 jobs:
-  build:
+  build_tf_toolkit:
     docker:
       - image: circleci/buildpack-deps:stretch
     environment:
@@ -149,7 +149,7 @@ workflows:
   # TODO: delete this after finish dev on branch `upgrade-cert-manager`
   release-upgrade-cert-manager:
     jobs:
-      # - build:
+      # - build_tf_toolkit:
       #     filters:
       #         branches:
       #           only:
@@ -160,10 +160,10 @@ workflows:
                 only:
                   - release-upgrade-cert-manager
           # requires:
-          #     - build
+          #     - build_tf_toolkit
   destroy-upgrade-cert-manager:
     jobs:
-      - build:
+      - build_tf_toolkit:
           filters:
               branches:
                 only:
@@ -174,10 +174,10 @@ workflows:
                 only:
                   - destroy-upgrade-cert-manager
           requires:
-              - build
+              - build_tf_toolkit
   build-tf-toolkit:
     jobs:
-      - build:
+      - build_tf_toolkit:
           filters:
               branches:
                 only:
@@ -191,11 +191,11 @@ workflows:
                   - destroy-release
   build-release:
     jobs:
-      - build:
+      - build_tf_toolkit:
           filters:
               branches:
                 only:
-                  - master--disabled
+                  - release
       - build_postgres:
           filters:
               branches:
@@ -214,3 +214,4 @@ workflows:
           requires:
             - build_postgres
             - build_code_server
+            - build_tf_toolkit
