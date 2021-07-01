@@ -144,7 +144,21 @@ jobs:
 # https://circleci.com/docs/2.0/local-cli/#validate-a-circleci-config
 # You can install circle cli by `brew install circleci`
 workflows:
-  build-master:
+  build-tf-toolkit:
+    jobs:
+      - build:
+          filters:
+              branches:
+                only:
+                  - master--disabled
+  build-destroy:
+    jobs:
+      - exec_terraform:
+          filters:
+              branches:
+                only:
+                  - destroy-release
+  build-release:
     jobs:
       - build:
           filters:
@@ -166,7 +180,6 @@ workflows:
               branches:
                 only:
                   - release
-                  - destroy-release
           requires:
             - build_postgres
             - build_code_server
