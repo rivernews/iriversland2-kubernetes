@@ -23,7 +23,7 @@ resource "helm_release" "elasticsearch" {
 
   # https://github.com/elastic/helm-charts/blob/master/elasticsearch/examples/kubernetes-kind/values.yaml
   # defaults: https://github.com/elastic/helm-charts/blob/master/elasticsearch/values.yaml
-  # TODO: use `set_string` instead of values = [`<<-EOF`..., so that changes can be reflected on tf state correctly
+  # TODO: use `set` instead of values = [`<<-EOF`..., so that changes can be reflected on tf state correctly
   # currently the <<-EOF will let even changes in comments trigger tf to update
   values = [<<-EOF
     ---
@@ -90,9 +90,10 @@ resource "helm_release" "elasticsearch" {
   # all available configurations: https://github.com/elastic/helm-charts/tree/master/elasticsearch#configuration
 
 
-  set_string {
+  set {
     name  = "imageTag"
     value = "7.4.1" # lock down to version 7.4.1 of Elasticsearch --> but 6.X (e.g., latest 6.8.4 as of 11/20/2019) is recommended for better compatibility with other components
+    type = "string"
   }
 
   depends_on = [
@@ -126,12 +127,12 @@ resource "helm_release" "kibana" {
   # all available configurations: https://github.com/elastic/helm-charts/tree/master/kibana
 
 
-  set_string {
+  set {
     name  = "resources.requests.memory"
     value = "400Mi"
   }
 
-  set_string {
+  set {
     name  = "resources.limits.memory"
     value = "512Mi"
   }

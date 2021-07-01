@@ -77,22 +77,20 @@ resource "helm_release" "project-nginx-ingress" {
   # 2. allow the port in `digitalocean_firewall`
 
   # use api.shaungc.com:6378 on local to initiate connection
-  set_string {
+  set {
     name = "tcp.6378"
     value = "redis-cluster/redis-cluster-service:6379"
   }
 
   # use api.shaungc.com:5433 on local to initiate connection
-  set_string {
+  set {
     name = "tcp.5433"
     value = "postgres-cluster/postgres-cluster-service:5432"
   }
 
   # helm config for default certificate
   # https://github.com/helm/charts/blob/master/stable/nginx-ingress/values.yaml#L108
-  #
-  # also use `set_string` to avoid bool parsing error in configmap
-  set_string {
+  set {
     name  = "controller.extraArgs.default-ssl-certificate"
     value = "${kubernetes_namespace.cert_manager.metadata.0.name}/${local.central_tls_ing_certificate_secret_name}"
   }
