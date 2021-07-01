@@ -45,6 +45,48 @@ jobs:
             docker push $IMAGE_NAME:latest
             docker push $IMAGE_NAME:$CIRCLE_SHA1
 
+  build_postgres:
+    docker:
+      - image: circleci/buildpack-deps:stretch
+    environment:
+      IMAGE_NAME: shaungc/postgres-cdc
+      # change this and release.json to pick up changes and use it in deployment
+      IMAGE_TAG: 11.5-r25
+    working_directory: ~/repo/postgres-cdc
+    steps:
+      - checkout: # retrieves the code from GitHub
+          path: ~/repo
+      - setup_remote_docker
+      - run:
+          name: Build and push postgres image
+          command: |
+            docker build -f Dockerfile -t $IMAGE_NAME:latest .
+            echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+            docker tag $IMAGE_NAME:latest $IMAGE_NAME:$IMAGE_TAG
+            docker push $IMAGE_NAME:latest
+            docker push $IMAGE_NAME:$IMAGE_TAG
+
+  build_code_server:
+    docker:
+      - image: circleci/buildpack-deps:stretch
+    environment:
+      IMAGE_NAME: shaungc/code-server
+      # change this and tf microservice module `app_container_image_tag` to pick up changes and use it in deployment
+      IMAGE_TAG: 3.10.2
+    working_directory: ~/repo/code-server
+    steps:
+      - checkout:
+          path: ~/repo
+      - setup_remote_docker
+      - run:
+          name: Build and push code-server image
+          command: |
+            docker build -f Dockerfile -t $IMAGE_NAME:latest .
+            echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+            docker tag $IMAGE_NAME:latest $IMAGE_NAME:$IMAGE_TAG
+            docker push $IMAGE_NAME:latest
+            docker push $IMAGE_NAME:$IMAGE_TAG
+
   exec_terraform:
     docker:
       - image: shaungc/terraform-kubectl-image
@@ -64,9 +106,7 @@ jobs:
           command: |
             kubectl version --client
             DIGITALOCEAN_ACCESS_TOKEN=$TF_VAR_do_token doctl auth init
-            mkdir -p ~/.kube
-            doctl k8s cluster kubeconfig show project-shaungc-digitalocean-cluster > ~/.kube/config || true
-            kubectl get all --all-namespaces || true
+            doctl k8s cluster list
             docker -v
       - run:
           name: Initiate Terraform Against Cluster
@@ -104,18 +144,42 @@ jobs:
 # https://circleci.com/docs/2.0/local-cli/#validate-a-circleci-config
 # You can install circle cli by `brew install circleci`
 workflows:
-  build-master:
+  build-tf-toolkit:
     jobs:
       - build:
           filters:
               branches:
                 only:
                   - master--disabled
+  build-destroy:
+    jobs:
+      - exec_terraform:
+          filters:
+              branches:
+                only:
+                  - destroy-release
+  build-release:
+    jobs:
+      - build:
+          filters:
+              branches:
+                only:
+                  - master--disabled
+      - build_postgres:
+          filters:
+              branches:
+                only:
+                  - release
+      - build_code_server:
+          filters:
+              branches:
+                only:
+                  - release
       - exec_terraform:
           filters:
               branches:
                 only:
                   - release
-                  - destroy-release
-          # requires:
-          #   - build
+          requires:
+            - build_postgres
+            - build_code_server

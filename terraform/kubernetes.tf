@@ -13,14 +13,28 @@ resource "digitalocean_tag" "project-cluster" {
   name = "${var.project_name}-digitalocean-kubernetes-cluster-tag"
 }
 
+# expose k8s cluster name
+# so that other project can access by below:
+# data "aws_ssm_parameter" "kubernetes_cluster_name" {
+#   name  = "terraform-managed.iriversland2-kubernetes.cluster-name"
+# }
+resource "aws_ssm_parameter" "kubernetes_cluster_name" {
+  # ssm name rules
+  # https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-paramstore-su-create.html
+  name  = "terraform-managed.iriversland2-kubernetes.cluster-name"
+  type  = "String"
+  value = digitalocean_kubernetes_cluster.project_digitalocean_cluster.name
+  overwrite = true
+}
+
 # https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/data-sources/kubernetes_versions
 data "digitalocean_kubernetes_versions" "shared" {
-  version_prefix = "1.18."
+  version_prefix = "1.21."
 }
 
 # Terraform official: https://www.terraform.io/docs/providers/do/d/kubernetes_cluster.html
 resource "digitalocean_kubernetes_cluster" "project_digitalocean_cluster" {
-  name    = "${var.project_name}-cluster"
+  name    = "${var.project_name}-cluster-${local.random_short}"
   region  = "sfo2"
 
   # according to tf do doc page
@@ -60,7 +74,7 @@ provider "local" {
 
 # tf doc: https://www.terraform.io/docs/providers/local/r/file.html
 # to use `doctl` to generate this yaml file, run:
-# doctl k8s cluster kubeconfig show project-shaungc-digitalocean-cluster > kubeconfig.yaml
+# doctl k8s cluster kubeconfig show project-shaungc-digitalocean-cluster-<random> > kubeconfig.yaml
 resource "local_file" "kubeconfig" {
     sensitive_content     = digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.raw_config
     filename = "kubeconfig.yaml"
@@ -83,10 +97,7 @@ provider "kubernetes" {
   # related merge request: https://github.com/terraform-providers/terraform-provider-kubernetes/pull/690
 
   # all k8 provider versions: https://github.com/terraform-providers/terraform-provider-kubernetes/blob/master/CHANGELOG.md
-  version = "1.11.1"
-
-  # config_path = "./${local_file.kubeconfig.filename}"
-  # config_path = "./kubeconfig.yaml"
+  version = "1.13.3"
 
   host = digitalocean_kubernetes_cluster.project_digitalocean_cluster.endpoint
 

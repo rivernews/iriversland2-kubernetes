@@ -57,13 +57,7 @@ resource "helm_release" "prometheus_stack" {
     # destroy provisioner will not run upon tainted (which is, update, or a re-create / replace is needed)
     when    = destroy
     command = join("\n", [
-      "bash prometheus/del-crd.sh"
-      # "kubectl delete crd prometheuses.monitoring.coreos.com",
-      # "kubectl delete crd prometheusrules.monitoring.coreos.com",
-      # "kubectl delete crd servicemonitors.monitoring.coreos.com",
-      # "kubectl delete crd podmonitors.monitoring.coreos.com",
-      # "kubectl delete crd alertmanagers.monitoring.coreos.com",
-      # "kubectl delete crd thanosrulers.monitoring.coreos.com",
+      "bash prometheus/del-crd.sh ${digitalocean_kubernetes_cluster.project_digitalocean_cluster.name}"
     ])
   }
 
@@ -73,9 +67,6 @@ resource "helm_release" "prometheus_stack" {
     #
     # Way to debug such error: https://github.com/helm/helm/issues/5100#issuecomment-533787541
     kubernetes_cluster_role_binding.tiller,
-
-    # script `my-kubectl.sh` requires kubeconfig.yaml
-    local_file.kubeconfig
   ]
 }
 

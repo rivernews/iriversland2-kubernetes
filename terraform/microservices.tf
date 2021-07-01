@@ -1,6 +1,6 @@
 module "postgres_cluster" {
   source  = "rivernews/kubernetes-microservice/digitalocean"
-  version = ">= v0.1.18"
+  version = ">= v0.1.22"
 
   aws_region     = var.aws_region
   aws_access_key = var.aws_access_key
@@ -21,7 +21,12 @@ module "postgres_cluster" {
     "/database/postgres_cluster_kubernetes/SQL_DATA_VOLUME_MOUNT",
   ]
 
-  persistent_volume_mount_path_secret_name_list = ["/database/postgres_cluster_kubernetes/SQL_DATA_VOLUME_MOUNT"]
+  persistent_volume_mount_setting_list = [{
+    mount_path_secret_name = "/database/postgres_cluster_kubernetes/SQL_DATA_VOLUME_MOUNT"
+    size = "1Gi"
+  }]
+
+  memory_guaranteed = "100Mi"
 
   depend_on = [
     helm_release.project-nginx-ingress
@@ -31,7 +36,7 @@ module "postgres_cluster" {
 
 module "redis_cluster" {
   source  = "rivernews/kubernetes-microservice/digitalocean"
-  version = ">= v0.1.18"
+  version = ">= v0.1.22"
 
   aws_region     = var.aws_region
   aws_access_key = var.aws_access_key
@@ -40,7 +45,7 @@ module "redis_cluster" {
   node_pool_name = digitalocean_kubernetes_cluster.project_digitalocean_cluster.node_pool.0.name
 
   app_label           = "redis-cluster"
-  
+
   # This has to be 6379, since the redis image we're using spins up Redis on 6379 by default,
   # thus if you want to change port number, setting k8s service & deployment port is not enough
   # you also need to change Redis configuration so that it listens on the changed port
@@ -53,6 +58,8 @@ module "redis_cluster" {
   app_secret_name_list = [
     "/database/redis_cluster_kubernetes/REDIS_PASSWORD"
   ]
+
+  memory_guaranteed = "50Mi"
 
   depend_on = [
     # Redis exposes tcp services, which relies on ingress controller

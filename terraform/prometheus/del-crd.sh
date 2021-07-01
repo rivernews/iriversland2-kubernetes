@@ -4,6 +4,8 @@ unset KUBECONFIG
 
 set -e
 
+KUBERNETES_CLUSTER_NAME=${1}
+
 if [ -z "$TF_VAR_do_token" ]
 then
     echo "Skip doctl login"
@@ -14,7 +16,7 @@ fi
 
 # make sure .kube dir exist to avoid error 'No such file or directory'
 mkdir -p ~/.kube
-doctl k8s cluster kubeconfig show project-shaungc-digitalocean-cluster > ~/.kube/config
+doctl k8s cluster kubeconfig show ${KUBERNETES_CLUSTER_NAME} > ~/.kube/config
 
 ls -l ~/.kube/
 
