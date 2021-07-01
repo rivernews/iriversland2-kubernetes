@@ -53,6 +53,9 @@ resource "null_resource" "crd_cert_resources_install" {
 
     # list all dependencies here
 
+    # only for creation (no effect for update)
+    helm_cert_manager_dependency = helm_release.project_cert_manager.name
+
     cert_manager_namespace = kubernetes_namespace.cert_manager.metadata.0.name
 
     jetstack_cert_crd_version = local.jetstack_cert_crd_version
@@ -197,6 +200,6 @@ resource "helm_release" "project_cert_manager" {
 
     helm_release.project-nginx-ingress,
 
-    null_resource.crd_cert_resources_install
+    # null_resource.crd_cert_resources_install
   ]
 }
