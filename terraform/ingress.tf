@@ -148,6 +148,7 @@ resource "helm_release" "project-nginx-ingress" {
 # format for `set` refer to official repo README: https://github.com/helm/charts/tree/master/stable/external-dns
 resource "helm_release" "project-external-dns" {
   name      = "external-dns"
+  repository = "https://charts.helm.sh/stable"
   chart     = "stable/external-dns"
   namespace = kubernetes_service_account.tiller.metadata.0.namespace
 
@@ -156,7 +157,7 @@ resource "helm_release" "project-external-dns" {
   #
   # currenlty latest is not working, but app version 0.5.16 is confirm working so locking down here
   # https://github.com/kubernetes-sigs/external-dns/issues/1262#issuecomment-551912180
-  version = "v2.6.1"
+  # version = "v2.6.1"
 
   force_update = true
 
