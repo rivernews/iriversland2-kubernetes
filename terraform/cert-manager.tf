@@ -164,6 +164,11 @@ resource "helm_release" "project_cert_manager" {
   namespace = kubernetes_namespace.cert_manager.metadata.0.name
   timeout   = "540"
 
+  # Lets Kubernetes enough time to recognize the CRD and start up cert-managers validating webhook
+  # Based on
+  # https://github.com/hashicorp/terraform-provider-kubernetes-alpha/issues/72#issuecomment-802852500
+  wait = true
+
   # ingressShim is used together with the ingress rule annotation `kubernetes.io/tls-acme: "true"`
   # it is for automated TLS certificate renewal
   # the doc also mentioned it is installed by default
