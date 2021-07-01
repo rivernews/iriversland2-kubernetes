@@ -160,7 +160,7 @@ workflows:
                 only:
                   - release-upgrade-cert-manager
           # requires:
-          #     - build
+          #     - build_tf_toolkit
   destroy-upgrade-cert-manager:
     jobs:
       - build_tf_toolkit:
@@ -174,7 +174,7 @@ workflows:
                 only:
                   - destroy-upgrade-cert-manager
           requires:
-              - build
+              - build_tf_toolkit
   build-tf-toolkit:
     jobs:
       - build_tf_toolkit:
