@@ -127,15 +127,17 @@ jobs:
           name: Apply Terraform
           command: |
             source $BASH_ENV
-            if [ "${CIRCLE_BRANCH}" == "release" ];
-            then
-              python release.py -f -y
-            elif [ "${CIRCLE_BRANCH}" == "destroy-release" ];
-            then
-              python release.py -d -y
-            else
-              echo 'Skipped apply terraform'
-            fi
+            case $CIRCLE_BRANCH in
+              destroy-*)
+                # destroy
+                python release.py -d -y
+                ;;
+
+              *)
+               # release
+                python release.py -f -y
+                ;;
+            esac
       - slack/status:
           # mentions: 'here,'
           success_message: "*Build & Test Terraform Complete*\nThe Terraform base image \"shaungc/terraform-kubectl-image\" is ready to be used!"
@@ -145,18 +147,32 @@ jobs:
 # You can install circle cli by `brew install circleci`
 workflows:
   # TODO: delete this after finish dev on branch `upgrade-cert-manager`
-  build-dev-upgrade-cert-manager:
+  upgrade-cert-manager:
     jobs:
-      - build:
-          filters:
-              branches:
-                only:
-                  - upgrade-cert-manager
+      # - build:
+      #     filters:
+      #         branches:
+      #           only:
+      #             - upgrade-cert-manager
       - exec_terraform:
           filters:
               branches:
                 only:
                   - upgrade-cert-manager
+          requires:
+              - build
+  destroy-upgrade-cert-manager:
+    jobs:
+      # - build:
+      #     filters:
+      #         branches:
+      #           only:
+      #             - destroy-upgrade-cert-manager
+      - exec_terraform:
+          filters:
+              branches:
+                only:
+                  - destroy-upgrade-cert-manager
           requires:
               - build
   build-tf-toolkit:
