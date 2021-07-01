@@ -236,7 +236,9 @@ resource "kubernetes_ingress" "project-ingress-resource" {
 
       # if want to share single TLS certificate, then only one ing should contain this annotation
       # https://github.com/jetstack/cert-manager/issues/841#issuecomment-414299467
-      "certmanager.k8s.io/cluster-issuer" = local.cert_cluster_issuer_name
+      # Based on
+      # https://cert-manager.io/docs/usage/ingress/
+      "cert-manager.io/cluster-issuer" = local.cert_cluster_issuer_name
     }
   }
 
