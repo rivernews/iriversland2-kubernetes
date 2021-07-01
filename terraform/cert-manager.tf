@@ -198,8 +198,8 @@ resource "helm_release" "project_cert_manager" {
     kubernetes_cluster_role_binding.tiller,
     kubernetes_service_account.tiller,
 
-    helm_release.project-nginx-ingress,
-
-    # null_resource.crd_cert_resources_install
+    # Based on cert-manager doc, creation ordering should be
+    # install cert-manager -> install issuer -> configure ingress, etc
+    # helm_release.project-nginx-ingress,
   ]
 }
