@@ -163,18 +163,18 @@ workflows:
           #     - build
   destroy-upgrade-cert-manager:
     jobs:
-      # - build:
-      #     filters:
-      #         branches:
-      #           only:
-      #             - destroy-upgrade-cert-manager
+      - build:
+          filters:
+              branches:
+                only:
+                  - destroy-upgrade-cert-manager
       - exec_terraform:
           filters:
               branches:
                 only:
                   - destroy-upgrade-cert-manager
-          # requires:
-          #     - build
+          requires:
+              - build
   build-tf-toolkit:
     jobs:
       - build:
