@@ -27,6 +27,9 @@ resource "helm_release" "prometheus_stack" {
             "doks.digitalocean.com/node-pool": ${digitalocean_kubernetes_cluster.project_digitalocean_cluster.node_pool.0.name}
       nodeSelector:
         "doks.digitalocean.com/node-pool": ${digitalocean_kubernetes_cluster.project_digitalocean_cluster.node_pool.0.name}
+      # for debug purpose
+      # this should replace del-crd.sh, can delete the script
+      cleanupCustomResource: true
 
     prometheus:
       prometheusSpec:
@@ -52,14 +55,6 @@ resource "helm_release" "prometheus_stack" {
       adminPassword: "${data.aws_ssm_parameter.grafana_credentials.value}"
   EOF
   ]
-
-  provisioner "local-exec" {
-    # destroy provisioner will not run upon tainted (which is, update, or a re-create / replace is needed)
-    when    = destroy
-    command = join("\n", [
-      "bash prometheus/del-crd.sh ${digitalocean_kubernetes_cluster.project_digitalocean_cluster.name}"
-    ])
-  }
 
   depends_on = [
     # add the binding as dependency to avoid error below (due to binding deleted prior to refreshing / altering this resource)
