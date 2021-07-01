@@ -81,7 +81,7 @@ resource "null_resource" "crd_cert_resources_install" {
   provisioner "local-exec" {
     command = <<EOT
 echo INFO: creating issuer... && cat <<EOF | kubectl apply -f -
-apiVersion: certmanager.k8s.io/v1
+apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
   name: ${local.cert_cluster_issuer_name}
@@ -177,6 +177,10 @@ resource "helm_release" "project_cert_manager" {
       defaultIssuerKind: ClusterIssuer
       defaultACMEChallengeType: dns01
       defaultACMEDNS01ChallengeProvider: route53
+
+      # Based on
+      # https://cert-manager.io/docs/usage/ingress/#optional-configuration
+      defaultIssuerGroup: cert-manager.io
   EOF
   ]
 
