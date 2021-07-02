@@ -91,20 +91,20 @@ spec:
     email: ${var.docker_email}
     privateKeySecretRef:
       name: ${local.cert_cluster_issuer_k8_secret_name}
-    dns01:
-        providers:
-        - name: route53
-          route53:
-            region: ${var.aws_region}
-            accessKeyID: ${var.aws_access_key}
-            secretAccessKeySecretRef:
-                name: ${kubernetes_secret.tls_route53_secret.metadata.0.name}
-                key: secret-access-key
+    # dns01:
+    #     providers:
+    #     - name: route53
+    #       route53:
+    #         region: ${var.aws_region}
+    #         accessKeyID: ${var.aws_access_key}
+    #         secretAccessKeySecretRef:
+    #             name: ${kubernetes_secret.tls_route53_secret.metadata.0.name}
+    #             key: secret-access-key
     solvers:
     - dns01:
-        selector:
-          matchLabels:
-            use-route53-solver: "true"
+        # selector:
+        #   matchLabels:
+        #     use-route53-solver: "true"
         route53:
             region: ${var.aws_region}
             accessKeyID: ${var.aws_access_key}
