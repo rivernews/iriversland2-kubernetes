@@ -79,7 +79,7 @@ resource "null_resource" "crd_cert_resources_install" {
   # (Issuer) Creation-Time Provisioners
   provisioner "local-exec" {
     command = <<EOT
-echo INFO: creating issuer... && cat <<EOF | kubectl apply -f -
+echo INFO: creating issuer after 60 seconds... && sleep 60  && cat <<EOF | kubectl apply -f -
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
@@ -161,7 +161,7 @@ resource "helm_release" "project_cert_manager" {
   version = "v1.4.0"
 
   namespace = kubernetes_namespace.cert_manager.metadata.0.name
-  timeout   = "540"
+  timeout   = "600"
 
   # Lets Kubernetes enough time to recognize the CRD and start up cert-managers validating webhook
   # Based on
