@@ -98,7 +98,7 @@ jobs:
       - run:
           name: Prepare terraform
           command: |
-            sh ../tf-kubectl-toolkit/circleci.sh
+            bash ../tf-kubectl-toolkit/circleci.sh
       - run:
           name: Plan Terraform
           command: |
@@ -140,7 +140,7 @@ jobs:
       - run:
           name: Prepare terraform
           command: |
-            sh ../tf-kubectl-toolkit/circleci.sh
+            bash ../tf-kubectl-toolkit/circleci.sh
       - run:
           name: Plan Terraform
           command: |
