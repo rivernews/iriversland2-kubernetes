@@ -35,3 +35,6 @@ provider "helm" {
     client_key         = data.digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.client_key
   }
 }
+
+# https://github.com/terraform-providers/terraform-provider-digitalocean/issues/234#issuecomment-493375811
+provider "null" {}

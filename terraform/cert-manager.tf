@@ -101,18 +101,18 @@ spec:
     #             name: ${kubernetes_secret.tls_route53_secret.metadata.0.name}
     #             key: secret-access-key
     solvers:
-    - dns01:
-        selector:
-          dnsZones:
-          - "shaungc.com"
-          # matchLabels:
-          #   use-route53-solver: "true"
+    - selector:
+        dnsZones:
+        - "shaungc.com"
+        # matchLabels:
+        #   use-route53-solver: "true"
+      dns01:
         route53:
-            region: ${var.aws_region}
-            accessKeyID: ${var.aws_access_key}
-            secretAccessKeySecretRef:
-                name: ${kubernetes_secret.tls_route53_secret.metadata.0.name}
-                key: secret-access-key
+          region: ${var.aws_region}
+          accessKeyID: ${var.aws_access_key}
+          secretAccessKeySecretRef:
+            name: ${kubernetes_secret.tls_route53_secret.metadata.0.name}
+            key: secret-access-key
 
 EOF
 EOT
