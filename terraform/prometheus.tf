@@ -17,7 +17,7 @@ resource "helm_release" "prometheus_stack" {
         rules:
             kubernetesResources:
                 limits:
-                    memory: "200Mi"
+                    memory: "600Mi"
 
     prometheusOperator:
       admissionWebhooks:
