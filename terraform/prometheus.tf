@@ -4,7 +4,11 @@ resource "helm_release" "prometheus_stack" {
   name      = "prometheus-stack-release"
   namespace = kubernetes_service_account.tiller.metadata.0.namespace
 
-  force_update = true
+  # `force` would cause error "primary clusterIP can not be unset"
+  # a k8s bug, as of 7/6/2021
+  # https://github.com/helm/helm/issues/7956#issuecomment-790650411
+  # force_update = true
+
   # Based on
   # https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/README.md
   # Successful example
@@ -13,45 +17,24 @@ resource "helm_release" "prometheus_stack" {
   chart      = "kube-prometheus-stack"
 
   values = [<<-EOF
-    defaultRules:
-        rules:
-            kubernetesResources:
-                limits:
-                    memory: "600Mi"
-
-    prometheusOperator:
-      admissionWebhooks:
-        patch:
-          nodeSelector:
-            "doks.digitalocean.com/node-pool": ${data.digitalocean_kubernetes_cluster.project_digitalocean_cluster.node_pool.0.name}
-      nodeSelector:
-        "doks.digitalocean.com/node-pool": ${data.digitalocean_kubernetes_cluster.project_digitalocean_cluster.node_pool.0.name}
-      # for debug purpose
-      # this should replace del-crd.sh, can delete the script
-      cleanupCustomResource: true
-
-    prometheus:
-      prometheusSpec:
-        nodeSelector:
-          "doks.digitalocean.com/node-pool": ${data.digitalocean_kubernetes_cluster.project_digitalocean_cluster.node_pool.0.name}
-
-    alertmanager:
-      alertmanagerSpec:
-        nodeSelector:
-          "doks.digitalocean.com/node-pool": ${data.digitalocean_kubernetes_cluster.project_digitalocean_cluster.node_pool.0.name}
-
+    # Options based on
+    # https://github.com/grafana/helm-charts/blob/main/charts/grafana/values.yaml
     grafana:
       ingress:
         enabled: true
+        ingressClassName: "nginx"
         annotations:
-          kubernetes.io/ingress.class: "nginx"
           nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
         hosts:
           - "grafana.shaungc.com"
         tls:
           - hosts:
             - "grafana.shaungc.com"
+      adminUser: "${var.docker_email}"
       adminPassword: "${data.aws_ssm_parameter.grafana_credentials.value}"
+
+    # Other configurable options
+    # https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml
   EOF
   ]
 
@@ -61,6 +44,8 @@ resource "helm_release" "prometheus_stack" {
     #
     # Way to debug such error: https://github.com/helm/helm/issues/5100#issuecomment-533787541
     kubernetes_cluster_role_binding.tiller,
+
+    kubernetes_ingress.project-ingress-resource
   ]
 }
 

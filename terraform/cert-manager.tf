@@ -53,8 +53,6 @@ resource "null_resource" "crd_cert_resources_install" {
 
     # list all dependencies here
 
-    cluster_name = data.digitalocean_kubernetes_cluster.project_digitalocean_cluster.name
-    do_token = var.do_token
     cluster_dependency = local_file.kubeconfig.filename
 
     # only for creation (no effect for update)
@@ -83,7 +81,7 @@ resource "null_resource" "crd_cert_resources_install" {
   # (Issuer) Creation-Time Provisioners
   provisioner "local-exec" {
     command = <<EOT
-echo INFO: creating issuer after 60 seconds... && sleep 60  && cat <<EOF | kubectl apply -f -
+echo INFO: creating issuer after 60 seconds ... && sleep 60 && cat <<EOF | kubectl apply -f -
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
