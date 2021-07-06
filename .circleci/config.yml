@@ -87,6 +87,42 @@ jobs:
             docker push $IMAGE_NAME:latest
             docker push $IMAGE_NAME:$IMAGE_TAG
 
+  cluster_exec_terraform:
+    docker:
+      - image: shaungc/terraform-kubectl-image
+    working_directory: ~/repo/cluster
+    steps:
+      - checkout:
+          path: ~/repo
+      - setup_remote_docker
+      - run:
+          name: Prepare terraform
+          command: |
+            sh ./circleci.sh
+      - run:
+          name: Plan Terraform
+          command: |
+            source $BASH_ENV
+            terraform plan
+      - run:
+          name: Apply Terraform
+          command: |
+            source $BASH_ENV
+            case $CIRCLE_BRANCH in
+              destroy-cluster)
+                # destroy
+                terraform destroy --auto-approve
+                ;;
+
+              release-cluster)
+                # release
+                terraform apply --auto-approve
+                ;;
+            esac
+      - slack/status:
+          # mentions: 'here,'
+          success_message: "*Cluster Terraform Job Complete*\nThe cluster is created/updated/destroyed successfully"
+
   exec_terraform:
     docker:
       - image: shaungc/terraform-kubectl-image
@@ -96,27 +132,9 @@ jobs:
           path: ~/repo
       - setup_remote_docker # sets up a remote, isolated environment for each build. This is required before you use any docker command inside a job step.
       - run:
-          name: Setup Computed Environment Variable
+          name: Prepare terraform
           command: |
-            set -ex
-            TF_VAR_droplet_size=$(if [ "<< pipeline.parameters.kubernetes-cluster-droplet-size >>" = "" ]; then echo "${DIGITALOCEAN_KUBERNETES_CLUSTER_DROPLET_SIZE:-s-4vcpu-8gb}"; else echo "<< pipeline.parameters.kubernetes-cluster-droplet-size >>"; fi)
-            echo "export TF_VAR_droplet_size=$TF_VAR_droplet_size" >> $BASH_ENV
-      - run:
-          name: Check Deploy Tools Availability
-          command: |
-            kubectl version --client
-            DIGITALOCEAN_ACCESS_TOKEN=$TF_VAR_do_token doctl auth init
-            doctl k8s cluster list
-            docker -v
-      - run:
-          name: Initiate Terraform Against Cluster
-          command: |
-            chmod +x init-backend-cicd.sh
-            sh ./init-backend-cicd.sh
-      - run:
-          name: Validate Terraform
-          command: |
-            terraform validate
+            sh ./circleci.sh
       - run:
           name: Plan Terraform
           command: |
@@ -182,6 +200,15 @@ workflows:
               branches:
                 only:
                   - master--disabled
+  build-cluster:
+    jobs:
+      - cluster_exec_terraform:
+          filters:
+              branches:
+                only:
+                  - release-cluster
+                  - destroy-cluster
+
   build-destroy:
     jobs:
       - exec_terraform:
