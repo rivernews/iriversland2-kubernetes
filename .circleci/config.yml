@@ -215,19 +215,19 @@ workflows:
 
   build-cluster:
     jobs:
-      - build_tf_toolkit:
-          filters:
-              branches:
-                only:
-                  - release-cluster
+      # - build_tf_toolkit:
+      #     filters:
+      #         branches:
+      #           only:
+      #             - release-cluster
       - cluster_exec_terraform:
           filters:
               branches:
                 only:
                   - release-cluster
                   - destroy-cluster
-          requires:
-            - build_tf_toolkit
+          # requires:
+          #   - build_tf_toolkit
 
   build-destroy:
     jobs:
