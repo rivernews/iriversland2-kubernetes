@@ -18,6 +18,7 @@ kubectl version --client
 DIGITALOCEAN_ACCESS_TOKEN=$TF_VAR_do_token doctl auth init
 doctl k8s cluster list
 docker -v
+terraform -v
 
 # Yield back to original path
 cd ${ORIGINAL_DIR}
