@@ -15,14 +15,5 @@ DIGITALOCEAN_ACCESS_TOKEN=$TF_VAR_do_token doctl auth init
 doctl k8s cluster list
 docker -v
 
-# Initiate Terraform Against Cluster
-echo "Initiate Terraform Against Cluster"
-chmod +x init-backend-cicd.sh
-sh ./init-backend-cicd.sh
-
-# Validate Terraform
-echo "Validate Terraform"
-terraform validate
-
 # Yield back to original path
 cd ${ORIGINAL_DIR}

@@ -103,6 +103,12 @@ jobs:
           name: Plan Terraform
           command: |
             source $BASH_ENV
+
+            echo "Initiate Terraform Against Cluster"
+            chmod +x init-backend-cicd.sh
+            sh ./init-backend-cicd.sh
+            terraform validate
+
             terraform plan
       - run:
           name: Apply Terraform
@@ -139,6 +145,12 @@ jobs:
           name: Plan Terraform
           command: |
             source $BASH_ENV
+
+            echo "Initiate Terraform Against Cluster"
+            chmod +x init-backend-cicd.sh
+            sh ./init-backend-cicd.sh
+            terraform validate
+
             echo "Using droplet size ${TF_VAR_droplet_size}..."
             python release.py -p -y
       - run:
