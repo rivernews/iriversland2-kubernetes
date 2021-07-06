@@ -1,8 +1,3 @@
-# expose k8s cluster name
-# so that other project can access by below:
-# data "aws_ssm_parameter" "kubernetes_cluster_name" {
-#   name  = "terraform-managed.iriversland2-kubernetes.cluster-name"
-# }
 resource "aws_ssm_parameter" "kubernetes_cluster_name" {
   # ssm name rules
   # https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-paramstore-su-create.html

@@ -102,9 +102,11 @@ spec:
     #             key: secret-access-key
     solvers:
     - dns01:
-        # selector:
-        #   matchLabels:
-        #     use-route53-solver: "true"
+        selector:
+          dnsZones:
+          - "shaungc.com"
+          # matchLabels:
+          #   use-route53-solver: "true"
         route53:
             region: ${var.aws_region}
             accessKeyID: ${var.aws_access_key}

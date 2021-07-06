@@ -3,9 +3,6 @@
 # Set TF_VAR_do_token to use your Digital Ocean token automatically
 provider "digitalocean" {
   token   = var.do_token
-
-  # version changelog: https://github.com/digitalocean/terraform-provider-digitalocean/blob/master/CHANGELOG.md
-  # version = "1.22.2"
 }
 
 provider "aws" {

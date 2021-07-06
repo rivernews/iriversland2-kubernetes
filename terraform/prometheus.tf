@@ -23,9 +23,9 @@ resource "helm_release" "prometheus_stack" {
       admissionWebhooks:
         patch:
           nodeSelector:
-            "doks.digitalocean.com/node-pool": ${digitalocean_kubernetes_cluster.project_digitalocean_cluster.node_pool.0.name}
+            "doks.digitalocean.com/node-pool": ${data.digitalocean_kubernetes_cluster.project_digitalocean_cluster.node_pool.0.name}
       nodeSelector:
-        "doks.digitalocean.com/node-pool": ${digitalocean_kubernetes_cluster.project_digitalocean_cluster.node_pool.0.name}
+        "doks.digitalocean.com/node-pool": ${data.digitalocean_kubernetes_cluster.project_digitalocean_cluster.node_pool.0.name}
       # for debug purpose
       # this should replace del-crd.sh, can delete the script
       cleanupCustomResource: true
@@ -33,12 +33,12 @@ resource "helm_release" "prometheus_stack" {
     prometheus:
       prometheusSpec:
         nodeSelector:
-          "doks.digitalocean.com/node-pool": ${digitalocean_kubernetes_cluster.project_digitalocean_cluster.node_pool.0.name}
+          "doks.digitalocean.com/node-pool": ${data.digitalocean_kubernetes_cluster.project_digitalocean_cluster.node_pool.0.name}
 
     alertmanager:
       alertmanagerSpec:
         nodeSelector:
-          "doks.digitalocean.com/node-pool": ${digitalocean_kubernetes_cluster.project_digitalocean_cluster.node_pool.0.name}
+          "doks.digitalocean.com/node-pool": ${data.digitalocean_kubernetes_cluster.project_digitalocean_cluster.node_pool.0.name}
 
     grafana:
       ingress:
