@@ -212,14 +212,22 @@ workflows:
               branches:
                 only:
                   - master--disabled
+
   build-cluster:
     jobs:
+      - build_tf_toolkit:
+          filters:
+              branches:
+                only:
+                  - release-cluster
       - cluster_exec_terraform:
           filters:
               branches:
                 only:
                   - release-cluster
                   - destroy-cluster
+          requires:
+            - build_tf_toolkit
 
   build-destroy:
     jobs:
