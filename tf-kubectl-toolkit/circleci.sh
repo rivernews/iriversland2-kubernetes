@@ -1,7 +1,7 @@
-set -ex
+set -e
 
 ORIGINAL_DIR=$(pwd)
-cd $(git rev-parse --show-toplevel)
+cd $(git rev-parse --show-toplevel)/terraform
 
 # Setup Computed Environment Variable
 echo "Setup Computed Environment Variable"
