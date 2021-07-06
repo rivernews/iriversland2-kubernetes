@@ -1,12 +1,6 @@
 # based on tutorial: https://logz.io/blog/deploying-the-elk-stack-on-kubernetes-with-helm/
 # another established tutorial by linode: https://www.linode.com/docs/applications/containers/how-to-deploy-the-elastic-stack-on-kubernetes/
 
-# helm release terraform doc: https://www.terraform.io/docs/providers/helm/release.html
-data "helm_repository" "elastic_stack" {
-  name = "elastic"
-  url  = "https://helm.elastic.co"
-}
-
 # this release will create 3 pods running elasticsearch
 # you can verify by running `kubectl get pods --namespace=default -l app=elasticsearch-master -w`
 # do port forwarding by `. ./my-kubectl.sh port-forward svc/elasticsearch-master -n kube-system 9200`
@@ -22,14 +16,14 @@ resource "helm_release" "elasticsearch" {
 
   force_update = true
 
-  repository = data.helm_repository.elastic_stack.metadata[0].name
+  repository = "https://helm.elastic.co"
   chart      = "elasticsearch"
   version    = "7.4.1" # lock down version based on `Chart.yaml`, refer to https://github.com/elastic/helm-charts/blob/1f9e8a4f8a4edbf2773b4553953abb6074ee77ce/elasticsearch/Chart.yaml
   # chart version 7.4.1 ==> es version 7.4.1
 
   # https://github.com/elastic/helm-charts/blob/master/elasticsearch/examples/kubernetes-kind/values.yaml
   # defaults: https://github.com/elastic/helm-charts/blob/master/elasticsearch/values.yaml
-  # TODO: use `set_string` instead of values = [`<<-EOF`..., so that changes can be reflected on tf state correctly
+  # TODO: use `set` instead of values = [`<<-EOF`..., so that changes can be reflected on tf state correctly
   # currently the <<-EOF will let even changes in comments trigger tf to update
   values = [<<-EOF
     ---
@@ -45,7 +39,7 @@ resource "helm_release" "elasticsearch" {
     # Kubernetes replica count for the statefulset (i.e. how many pods) && Data node replicas (statefulset)
     # must specify at least 1 otherwise elasticsearch cannot launch
     replicas: "1"
-    
+
     # Allocate smaller chunks of memory per pod.
     resources:
         requests:
@@ -86,7 +80,7 @@ resource "helm_release" "elasticsearch" {
   ]
 
   # terraform helm provider is buggy and will fail even if successfully installed resources: https://github.com/terraform-providers/terraform-provider-helm/issues/138
-  # 
+  #
   # use below commands instead to inspect the pod readiness and logs
   # `. ./my-kubectl.sh get pods --namespace=kube-system -l app=elasticsearch-master --watch` to wait and expect a 1/1 READY
   # `. ./my-kubectl.sh logs --follow  elasticsearch-master-0 -n kube-system` for logs after pods created and elasticsearch start spinning up
@@ -96,9 +90,10 @@ resource "helm_release" "elasticsearch" {
   # all available configurations: https://github.com/elastic/helm-charts/tree/master/elasticsearch#configuration
 
 
-  set_string {
+  set {
     name  = "imageTag"
     value = "7.4.1" # lock down to version 7.4.1 of Elasticsearch --> but 6.X (e.g., latest 6.8.4 as of 11/20/2019) is recommended for better compatibility with other components
+    type = "string"
   }
 
   depends_on = [
@@ -114,7 +109,7 @@ resource "helm_release" "elasticsearch" {
 resource "helm_release" "kibana" {
   # TODO: temp disable
   count = 0
-  
+
   name      = "kibana-release"
   namespace = kubernetes_service_account.tiller.metadata.0.namespace
 
@@ -124,7 +119,7 @@ resource "helm_release" "kibana" {
   # you should always use kubectl or port-forwarding to verify
   wait = true
 
-  repository = data.helm_repository.elastic_stack.metadata[0].name
+  repository = "https://helm.elastic.co"
   chart      = "kibana"
   version    = "7.4.1"
 
@@ -132,12 +127,12 @@ resource "helm_release" "kibana" {
   # all available configurations: https://github.com/elastic/helm-charts/tree/master/kibana
 
 
-  set_string {
+  set {
     name  = "resources.requests.memory"
     value = "400Mi"
   }
 
-  set_string {
+  set {
     name  = "resources.limits.memory"
     value = "512Mi"
   }
@@ -164,7 +159,7 @@ resource "helm_release" "kibana" {
 
 #   force_update = true
 
-#   repository = data.helm_repository.elastic_stack.metadata[0].name
+#   repository = "https://helm.elastic.co"
 #   chart      = "metricbeat"
 #   # version    = "6.0.1" # TODO: lock down version after this release works
 # }

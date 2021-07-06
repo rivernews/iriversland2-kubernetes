@@ -1,8 +1,3 @@
-data "helm_repository" "kafka_stack" {
-  name = "bitnami"
-  url  = "https://charts.bitnami.com/bitnami"
-}
-
 resource "helm_release" "kafka_stack" {
   # TODO: temp disable
   count = 0
@@ -15,8 +10,8 @@ resource "helm_release" "kafka_stack" {
   # don't rely on terraform helm provider to check on resource created successfully or not
   wait = true
 
-  repository = data.helm_repository.kafka_stack.metadata[0].name
-  chart      = "bitnami/kafka"
+  repository = "https://charts.bitnami.com/bitnami"
+  chart      = "kafka"
   version    = "7.0.3"
 
 
@@ -52,7 +47,7 @@ resource "helm_release" "kafka_stack" {
 #   aws_region     = var.aws_region
 #   aws_access_key = var.aws_access_key
 #   aws_secret_key = var.aws_secret_key
-#   cluster_name   = digitalocean_kubernetes_cluster.project_digitalocean_cluster.name
+#   cluster_name   = data.digitalocean_kubernetes_cluster.project_digitalocean_cluster.name
 
 #   app_label           = "kafka-connect"
 #   app_exposed_port    = 8083 # exposes kafka connect REST API on port 8083

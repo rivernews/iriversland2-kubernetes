@@ -2,6 +2,8 @@ kubeconfig.yaml
 
 **credentials**
 
+local.auto.tfvars
+
 #  Local .terraform directories
 **/.terraform/*
 

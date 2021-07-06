@@ -1,12 +1,12 @@
 module "code_server" {
   source  = "rivernews/kubernetes-microservice/digitalocean"
-  version = ">= v0.1.24"
+  version = ">= v0.1.31"
 
   aws_region     = var.aws_region
   aws_access_key = var.aws_access_key
   aws_secret_key = var.aws_secret_key
-  cluster_name   = digitalocean_kubernetes_cluster.project_digitalocean_cluster.name
-  node_pool_name = digitalocean_kubernetes_cluster.project_digitalocean_cluster.node_pool.0.name
+  cluster_name   = data.digitalocean_kubernetes_cluster.project_digitalocean_cluster.name
+  node_pool_name = data.digitalocean_kubernetes_cluster.project_digitalocean_cluster.node_pool.0.name
 
   app_label           = "code-server"
   app_exposed_port    = 8003

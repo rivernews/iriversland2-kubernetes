@@ -19,7 +19,7 @@ orbs:
 
 # yaml basic and advance: https://circleci.com/docs/2.0/writing-yaml/#section=configuration
 jobs:
-  build:
+  build_tf_toolkit:
     docker:
       - image: circleci/buildpack-deps:stretch
     environment:
@@ -87,6 +87,48 @@ jobs:
             docker push $IMAGE_NAME:latest
             docker push $IMAGE_NAME:$IMAGE_TAG
 
+  cluster_exec_terraform:
+    docker:
+      - image: shaungc/terraform-kubectl-image
+    working_directory: ~/repo/cluster
+    steps:
+      - checkout:
+          path: ~/repo
+      - setup_remote_docker
+      - run:
+          name: Prepare terraform
+          command: |
+            sh ../tf-kubectl-toolkit/circleci.sh "<< pipeline.parameters.kubernetes-cluster-droplet-size >>"
+      - run:
+          name: Plan Terraform
+          command: |
+            source $BASH_ENV
+
+            echo "Initiate Terraform Against Cluster"
+            chmod +x init-backend-cicd.sh
+            sh ./init-backend-cicd.sh
+            terraform validate
+
+            terraform plan
+      - run:
+          name: Apply Terraform
+          command: |
+            source $BASH_ENV
+            case $CIRCLE_BRANCH in
+              destroy-cluster)
+                # destroy
+                terraform destroy --auto-approve
+                ;;
+
+              release-cluster)
+                # release
+                terraform apply --auto-approve
+                ;;
+            esac
+      - slack/status:
+          # mentions: 'here,'
+          success_message: "*Cluster Terraform Job Complete*\nThe cluster is created/updated/destroyed successfully"
+
   exec_terraform:
     docker:
       - image: shaungc/terraform-kubectl-image
@@ -96,46 +138,36 @@ jobs:
           path: ~/repo
       - setup_remote_docker # sets up a remote, isolated environment for each build. This is required before you use any docker command inside a job step.
       - run:
-          name: Setup Computed Environment Variable
+          name: Prepare terraform
           command: |
-            set -ex
-            TF_VAR_droplet_size=$(if [ "<< pipeline.parameters.kubernetes-cluster-droplet-size >>" = "" ]; then echo "${DIGITALOCEAN_KUBERNETES_CLUSTER_DROPLET_SIZE:-s-4vcpu-8gb}"; else echo "<< pipeline.parameters.kubernetes-cluster-droplet-size >>"; fi)
-            echo "export TF_VAR_droplet_size=$TF_VAR_droplet_size" >> $BASH_ENV
-      - run:
-          name: Check Deploy Tools Availability
-          command: |
-            kubectl version --client
-            DIGITALOCEAN_ACCESS_TOKEN=$TF_VAR_do_token doctl auth init
-            doctl k8s cluster list
-            docker -v
-      - run:
-          name: Initiate Terraform Against Cluster
-          command: |
-            chmod +x init-backend-cicd.sh
-            sh ./init-backend-cicd.sh
-      - run:
-          name: Validate Terraform
-          command: |
-            terraform validate
+            sh ../tf-kubectl-toolkit/circleci.sh "<< pipeline.parameters.kubernetes-cluster-droplet-size >>"
       - run:
           name: Plan Terraform
           command: |
             source $BASH_ENV
+
+            echo "Initiate Terraform Against Cluster"
+            chmod +x init-backend-cicd.sh
+            sh ./init-backend-cicd.sh
+            terraform validate
+
             echo "Using droplet size ${TF_VAR_droplet_size}..."
             python release.py -p -y
       - run:
           name: Apply Terraform
           command: |
             source $BASH_ENV
-            if [ "${CIRCLE_BRANCH}" == "release" ];
-            then
-              python release.py -f -y
-            elif [ "${CIRCLE_BRANCH}" == "destroy-release" ];
-            then
-              python release.py -d -y
-            else
-              echo 'Skipped apply terraform'
-            fi
+            case $CIRCLE_BRANCH in
+              destroy-*)
+                # destroy
+                python release.py -d -y
+                ;;
+
+              release*)
+                # release
+                python release.py -f -y
+                ;;
+            esac
       - slack/status:
           # mentions: 'here,'
           success_message: "*Build & Test Terraform Complete*\nThe Terraform base image \"shaungc/terraform-kubectl-image\" is ready to be used!"
@@ -146,11 +178,28 @@ jobs:
 workflows:
   build-tf-toolkit:
     jobs:
-      - build:
+      - build_tf_toolkit:
           filters:
               branches:
                 only:
                   - master--disabled
+
+  build-cluster:
+    jobs:
+      # - build_tf_toolkit:
+      #     filters:
+      #         branches:
+      #           only:
+      #             - release-cluster
+      - cluster_exec_terraform:
+          filters:
+              branches:
+                only:
+                  - release-cluster
+                  - destroy-cluster
+          # requires:
+          #   - build_tf_toolkit
+
   build-destroy:
     jobs:
       - exec_terraform:
@@ -160,11 +209,11 @@ workflows:
                   - destroy-release
   build-release:
     jobs:
-      - build:
+      - build_tf_toolkit:
           filters:
               branches:
                 only:
-                  - master--disabled
+                  - release
       - build_postgres:
           filters:
               branches:
@@ -183,3 +232,4 @@ workflows:
           requires:
             - build_postgres
             - build_code_server
+            - build_tf_toolkit

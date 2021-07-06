@@ -1,65 +1,42 @@
-# prometheus chart
-# https://github.com/helm/charts/tree/master/stable/prometheus-operator
+# Based on
+# https://artifacthub.io/packages/helm/prometheus-worawutchan/kube-prometheus-stack
 resource "helm_release" "prometheus_stack" {
   name      = "prometheus-stack-release"
   namespace = kubernetes_service_account.tiller.metadata.0.namespace
 
-  force_update = true
+  # `force` would cause error "primary clusterIP can not be unset"
+  # a k8s bug, as of 7/6/2021
+  # https://github.com/helm/helm/issues/7956#issuecomment-790650411
+  # force_update = true
 
-  # don't rely on terraform helm provider to check on resource created successfully or not
-  wait = true
-
-  repository = data.helm_repository.stable.metadata[0].name
-  chart      = "stable/prometheus-operator"
-  version    = "8.12.3"
+  # Based on
+  # https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/README.md
+  # Successful example
+  # https://github.com/hashicorp/terraform-provider-helm/issues/585#issuecomment-707379744
+  repository = "https://prometheus-community.github.io/helm-charts"
+  chart      = "kube-prometheus-stack"
 
   values = [<<-EOF
-    defaultRules:
-        rules:
-            kubernetesResources:
-                limits:
-                    memory: "200Mi"
-
-    prometheusOperator:
-      admissionWebhooks:
-        patch:
-          nodeSelector:
-            "doks.digitalocean.com/node-pool": ${digitalocean_kubernetes_cluster.project_digitalocean_cluster.node_pool.0.name}
-      nodeSelector:
-        "doks.digitalocean.com/node-pool": ${digitalocean_kubernetes_cluster.project_digitalocean_cluster.node_pool.0.name}
-
-    prometheus:
-      prometheusSpec:
-        nodeSelector:
-          "doks.digitalocean.com/node-pool": ${digitalocean_kubernetes_cluster.project_digitalocean_cluster.node_pool.0.name}
-
-    alertmanager:
-      alertmanagerSpec:
-        nodeSelector:
-          "doks.digitalocean.com/node-pool": ${digitalocean_kubernetes_cluster.project_digitalocean_cluster.node_pool.0.name}
-
+    # Options based on
+    # https://github.com/grafana/helm-charts/blob/main/charts/grafana/values.yaml
     grafana:
       ingress:
         enabled: true
+        ingressClassName: "nginx"
         annotations:
-          kubernetes.io/ingress.class: "nginx"
           nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
         hosts:
           - "grafana.shaungc.com"
         tls:
           - hosts:
             - "grafana.shaungc.com"
+      adminUser: "${var.docker_email}"
       adminPassword: "${data.aws_ssm_parameter.grafana_credentials.value}"
+
+    # Other configurable options
+    # https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml
   EOF
   ]
-
-  provisioner "local-exec" {
-    # destroy provisioner will not run upon tainted (which is, update, or a re-create / replace is needed)
-    when    = destroy
-    command = join("\n", [
-      "bash prometheus/del-crd.sh ${digitalocean_kubernetes_cluster.project_digitalocean_cluster.name}"
-    ])
-  }
 
   depends_on = [
     # add the binding as dependency to avoid error below (due to binding deleted prior to refreshing / altering this resource)
@@ -67,6 +44,8 @@ resource "helm_release" "prometheus_stack" {
     #
     # Way to debug such error: https://github.com/helm/helm/issues/5100#issuecomment-533787541
     kubernetes_cluster_role_binding.tiller,
+
+    kubernetes_ingress.project-ingress-resource
   ]
 }
 

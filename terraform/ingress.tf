@@ -29,7 +29,7 @@ resource "helm_release" "project-nginx-ingress" {
   # or chart = "stable/nginx-ingress"
   # see https://github.com/digitalocean/digitalocean-cloud-controller-manager/issues/162
 
-  repository = data.helm_repository.stable.metadata.0.name
+  repository = "https://charts.helm.sh/stable"
   chart      = "nginx-ingress"
   # version = ""
 
@@ -77,22 +77,20 @@ resource "helm_release" "project-nginx-ingress" {
   # 2. allow the port in `digitalocean_firewall`
 
   # use api.shaungc.com:6378 on local to initiate connection
-  set_string {
+  set {
     name = "tcp.6378"
     value = "redis-cluster/redis-cluster-service:6379"
   }
 
   # use api.shaungc.com:5433 on local to initiate connection
-  set_string {
+  set {
     name = "tcp.5433"
     value = "postgres-cluster/postgres-cluster-service:5432"
   }
 
   # helm config for default certificate
   # https://github.com/helm/charts/blob/master/stable/nginx-ingress/values.yaml#L108
-  #
-  # also use `set_string` to avoid bool parsing error in configmap
-  set_string {
+  set {
     name  = "controller.extraArgs.default-ssl-certificate"
     value = "${kubernetes_namespace.cert_manager.metadata.0.name}/${local.central_tls_ing_certificate_secret_name}"
   }
@@ -150,7 +148,8 @@ resource "helm_release" "project-nginx-ingress" {
 # format for `set` refer to official repo README: https://github.com/helm/charts/tree/master/stable/external-dns
 resource "helm_release" "project-external-dns" {
   name      = "external-dns"
-  chart     = "stable/external-dns"
+  repository = "https://charts.helm.sh/stable"
+  chart     = "external-dns"
   namespace = kubernetes_service_account.tiller.metadata.0.namespace
 
   # see available version by `. ./my-helm.sh search -l stable/external-dns`
@@ -158,7 +157,7 @@ resource "helm_release" "project-external-dns" {
   #
   # currenlty latest is not working, but app version 0.5.16 is confirm working so locking down here
   # https://github.com/kubernetes-sigs/external-dns/issues/1262#issuecomment-551912180
-  version = "v2.6.1"
+  # version = "v2.6.1"
 
   force_update = true
 
@@ -237,7 +236,9 @@ resource "kubernetes_ingress" "project-ingress-resource" {
 
       # if want to share single TLS certificate, then only one ing should contain this annotation
       # https://github.com/jetstack/cert-manager/issues/841#issuecomment-414299467
-      "certmanager.k8s.io/cluster-issuer" = local.cert_cluster_issuer_name
+      # Based on
+      # https://cert-manager.io/docs/usage/ingress/
+      "cert-manager.io/cluster-issuer" = local.cert_cluster_issuer_name
     }
   }
 
@@ -281,14 +282,7 @@ resource "kubernetes_ingress" "project-ingress-resource" {
   }
 
   depends_on = [
-    # do not run cert-manager before creating this ingress resource
-    # ingress resource must be created first
-    # see "4. Create ingress with tls-acme annotation and tls spec":
-    # https://medium.com/asl19-developers/use-lets-encrypt-cert-manager-and-external-dns-to-publish-your-kubernetes-apps-to-your-website-ff31e4e3badf
-    # DON't ->
-
-    # above may not be true - see https://github.com/jetstack/cert-manager/blob/master/docs/tutorials/acme/quick-start/index.rst#step-7---deploy-a-tls-ingress-resource
-    helm_release.project_cert_manager,
+    helm_release.project_cert_manager
   ]
 }
 

@@ -56,7 +56,6 @@ aws_secret_key = "AWS secret"
 aws_region = "AWS region like us-east-2"
 
 docker_email = "Dockerhub email"
-docker_username = "Dockerhub username"
 docker_password = "Dockerhub password"
 ```
 

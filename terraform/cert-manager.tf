@@ -20,19 +20,9 @@ resource "kubernetes_secret" "tls_route53_secret" {
 #
 #
 
-
-data "helm_repository" "jetstack" {
-  name = "jetstack"
-  url  = "https://charts.jetstack.io"
-}
-
 resource "kubernetes_namespace" "cert_manager" {
   metadata {
     name = "cert-manager"
-
-    labels = {
-      "certmanager.k8s.io/disable-validation" = "true"
-    }
   }
 }
 
@@ -63,6 +53,11 @@ resource "null_resource" "crd_cert_resources_install" {
 
     # list all dependencies here
 
+    cluster_dependency = local_file.kubeconfig.filename
+
+    # only for creation (no effect for update)
+    helm_cert_manager_dependency = helm_release.project_cert_manager.name
+
     cert_manager_namespace = kubernetes_namespace.cert_manager.metadata.0.name
 
     jetstack_cert_crd_version = local.jetstack_cert_crd_version
@@ -83,19 +78,11 @@ resource "null_resource" "crd_cert_resources_install" {
     docker_email = var.docker_email
   }
 
-
-  # Terraform provisioners: https://www.terraform.io/docs/provisioners/index.html
-  # (CRD) Creation-Time Provisioners
-  provisioner "local-exec" {
-    command = "echo INFO: installing CRD... && mkdir -p ~/.kube && doctl k8s cluster kubeconfig show ${digitalocean_kubernetes_cluster.project_digitalocean_cluster.name} > ~/.kube/config && sleep 5 && kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/${local.jetstack_cert_crd_version}/deploy/manifests/00-crds.yaml && echo INFO: complete CRD installation, sleeping 10 sec... && sleep 10"
-  }
-
-
   # (Issuer) Creation-Time Provisioners
   provisioner "local-exec" {
     command = <<EOT
-echo INFO: creating issuer... && cat <<EOF | kubectl apply -f -
-apiVersion: certmanager.k8s.io/v1alpha1
+echo INFO: creating issuer after 60 seconds ... && sleep 60 && cat <<EOF | kubectl apply -f -
+apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
   name: ${local.cert_cluster_issuer_name}
@@ -106,26 +93,28 @@ spec:
     email: ${var.docker_email}
     privateKeySecretRef:
       name: ${local.cert_cluster_issuer_k8_secret_name}
-    dns01:
-        providers:
-        - name: route53
-          route53:
-            region: ${var.aws_region}
-            accessKeyID: ${var.aws_access_key}
-            secretAccessKeySecretRef:
-                name: ${kubernetes_secret.tls_route53_secret.metadata.0.name}
-                key: secret-access-key
+    # dns01:
+    #     providers:
+    #     - name: route53
+    #       route53:
+    #         region: ${var.aws_region}
+    #         accessKeyID: ${var.aws_access_key}
+    #         secretAccessKeySecretRef:
+    #             name: ${kubernetes_secret.tls_route53_secret.metadata.0.name}
+    #             key: secret-access-key
     solvers:
-    - dns01:
-        selector:
-          matchLabels:
-            use-route53-solver: "true"
+    - selector:
+        dnsZones:
+        - "shaungc.com"
+        # matchLabels:
+        #   use-route53-solver: "true"
+      dns01:
         route53:
-            region: ${var.aws_region}
-            accessKeyID: ${var.aws_access_key}
-            secretAccessKeySecretRef:
-                name: ${kubernetes_secret.tls_route53_secret.metadata.0.name}
-                key: secret-access-key
+          region: ${var.aws_region}
+          accessKeyID: ${var.aws_access_key}
+          secretAccessKeySecretRef:
+            name: ${kubernetes_secret.tls_route53_secret.metadata.0.name}
+            key: secret-access-key
 
 EOF
 EOT
@@ -134,19 +123,6 @@ EOT
   # (Sleep)
   provisioner "local-exec" {
     command = "echo INFO: complete installing CRD and clusterissuer, will sleep 15 sec... && sleep 15"
-  }
-
-  # (CRD) Destroy-Time Provisioners
-  provisioner "local-exec" {
-    when    = destroy
-
-    # recommended resource to delete when removing cert-manager
-    # based on jetstack/cert-manager doc:
-    # http://docs.cert-manager.io/en/latest/tasks/upgrading/upgrading-0.5-0.6.html#upgrading-from-older-versions-using-helm
-    command = "kubectl delete crd certificates.certmanager.k8s.io clusterissuers.certmanager.k8s.io issuers.certmanager.k8s.io \n echo \n echo \n echo \n echo INFO: delete certificate resources complete, will sleep for 10 sec... \n sleep 10"
-
-    # force destroy all resources created by cert-manager
-    # command = "kubectl delete customresourcedefinitions.apiextensions.k8s.io certificates.certmanager.k8s.io clusterissuers.certmanager.k8s.io issuers.certmanager.k8s.io orders.certmanager.k8s.io certificaterequests.certmanager.k8s.io challenges.certmanager.k8s.io \n echo \n echo \n echo \n echo INFO: delete certificate resources complete, will sleep for 10 sec... \n sleep 10"
   }
 
   # (Issuer Cert Secret)
@@ -184,12 +160,17 @@ EOT
 
 resource "helm_release" "project_cert_manager" {
   name = "cert-manager"
-  repository = data.helm_repository.jetstack.metadata.0.name
-  chart = "jetstack/cert-manager"
-  version = "v0.10.0-alpha.0"
+  repository = "https://charts.jetstack.io"
+  chart = "cert-manager"
+  version = "v1.4.0"
 
   namespace = kubernetes_namespace.cert_manager.metadata.0.name
-  timeout   = "540"
+  timeout   = "600"
+
+  # Lets Kubernetes enough time to recognize the CRD and start up cert-managers validating webhook
+  # Based on
+  # https://github.com/hashicorp/terraform-provider-kubernetes-alpha/issues/72#issuecomment-802852500
+  wait = true
 
   # ingressShim is used together with the ingress rule annotation `kubernetes.io/tls-acme: "true"`
   # it is for automated TLS certificate renewal
@@ -204,13 +185,16 @@ resource "helm_release" "project_cert_manager" {
       defaultIssuerKind: ClusterIssuer
       defaultACMEChallengeType: dns01
       defaultACMEDNS01ChallengeProvider: route53
+
+      # Based on
+      # https://cert-manager.io/docs/usage/ingress/#optional-configuration
+      defaultIssuerGroup: cert-manager.io
   EOF
   ]
 
-  # diable webhook to avoid error using stable/cert-manager: https://github.com/jetstack/cert-manager/issues/1255#issuecomment-465129995
   set {
-    name  = "webhook.enabled"
-    value = "false"
+    name = "installCRDs"
+    value = "true"
   }
 
 
@@ -218,8 +202,8 @@ resource "helm_release" "project_cert_manager" {
     kubernetes_cluster_role_binding.tiller,
     kubernetes_service_account.tiller,
 
-    helm_release.project-nginx-ingress,
-
-    null_resource.crd_cert_resources_install
+    # Based on cert-manager doc, creation ordering should be
+    # install cert-manager -> install issuer -> configure ingress, etc
+    # helm_release.project-nginx-ingress,
   ]
 }
