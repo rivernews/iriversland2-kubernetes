@@ -98,7 +98,7 @@ jobs:
       - run:
           name: Prepare terraform
           command: |
-            bash ../tf-kubectl-toolkit/circleci.sh "<< pipeline.parameters.kubernetes-cluster-droplet-size >>"
+            sh ../tf-kubectl-toolkit/circleci.sh "<< pipeline.parameters.kubernetes-cluster-droplet-size >>"
       - run:
           name: Plan Terraform
           command: |
@@ -140,7 +140,7 @@ jobs:
       - run:
           name: Prepare terraform
           command: |
-            bash ../tf-kubectl-toolkit/circleci.sh "<< pipeline.parameters.kubernetes-cluster-droplet-size >>"
+            sh ../tf-kubectl-toolkit/circleci.sh "<< pipeline.parameters.kubernetes-cluster-droplet-size >>"
       - run:
           name: Plan Terraform
           command: |
