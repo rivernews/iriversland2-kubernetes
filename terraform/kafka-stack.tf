@@ -47,7 +47,7 @@ resource "helm_release" "kafka_stack" {
 #   aws_region     = var.aws_region
 #   aws_access_key = var.aws_access_key
 #   aws_secret_key = var.aws_secret_key
-#   cluster_name   = digitalocean_kubernetes_cluster.project_digitalocean_cluster.name
+#   cluster_name   = data.digitalocean_kubernetes_cluster.project_digitalocean_cluster.name
 
 #   app_label           = "kafka-connect"
 #   app_exposed_port    = 8083 # exposes kafka connect REST API on port 8083

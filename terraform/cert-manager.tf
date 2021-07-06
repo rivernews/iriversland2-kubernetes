@@ -79,7 +79,7 @@ resource "null_resource" "crd_cert_resources_install" {
   # (Issuer) Creation-Time Provisioners
   provisioner "local-exec" {
     command = <<EOT
-echo INFO: creating issuer... && cat <<EOF | kubectl apply -f -
+echo INFO: creating issuer after 60 seconds... && sleep 60  && cat <<EOF | kubectl apply -f -
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
@@ -91,26 +91,28 @@ spec:
     email: ${var.docker_email}
     privateKeySecretRef:
       name: ${local.cert_cluster_issuer_k8_secret_name}
-    dns01:
-        providers:
-        - name: route53
-          route53:
-            region: ${var.aws_region}
-            accessKeyID: ${var.aws_access_key}
-            secretAccessKeySecretRef:
-                name: ${kubernetes_secret.tls_route53_secret.metadata.0.name}
-                key: secret-access-key
+    # dns01:
+    #     providers:
+    #     - name: route53
+    #       route53:
+    #         region: ${var.aws_region}
+    #         accessKeyID: ${var.aws_access_key}
+    #         secretAccessKeySecretRef:
+    #             name: ${kubernetes_secret.tls_route53_secret.metadata.0.name}
+    #             key: secret-access-key
     solvers:
-    - dns01:
-        selector:
-          matchLabels:
-            use-route53-solver: "true"
+    - selector:
+        dnsZones:
+        - "shaungc.com"
+        # matchLabels:
+        #   use-route53-solver: "true"
+      dns01:
         route53:
-            region: ${var.aws_region}
-            accessKeyID: ${var.aws_access_key}
-            secretAccessKeySecretRef:
-                name: ${kubernetes_secret.tls_route53_secret.metadata.0.name}
-                key: secret-access-key
+          region: ${var.aws_region}
+          accessKeyID: ${var.aws_access_key}
+          secretAccessKeySecretRef:
+            name: ${kubernetes_secret.tls_route53_secret.metadata.0.name}
+            key: secret-access-key
 
 EOF
 EOT
@@ -161,7 +163,7 @@ resource "helm_release" "project_cert_manager" {
   version = "v1.4.0"
 
   namespace = kubernetes_namespace.cert_manager.metadata.0.name
-  timeout   = "540"
+  timeout   = "600"
 
   # Lets Kubernetes enough time to recognize the CRD and start up cert-managers validating webhook
   # Based on

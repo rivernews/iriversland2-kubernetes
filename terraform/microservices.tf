@@ -1,12 +1,12 @@
 module "postgres_cluster" {
   source  = "rivernews/kubernetes-microservice/digitalocean"
-  version = ">= v0.1.24"
+  version = ">= v0.1.29"
 
   aws_region     = var.aws_region
   aws_access_key = var.aws_access_key
   aws_secret_key = var.aws_secret_key
-  cluster_name   = digitalocean_kubernetes_cluster.project_digitalocean_cluster.name
-  node_pool_name = digitalocean_kubernetes_cluster.project_digitalocean_cluster.node_pool.0.name
+  cluster_name   = data.digitalocean_kubernetes_cluster.project_digitalocean_cluster.name
+  node_pool_name = data.digitalocean_kubernetes_cluster.project_digitalocean_cluster.node_pool.0.name
 
   app_label           = "postgres-cluster"
   app_exposed_port    = 5432
@@ -36,13 +36,13 @@ module "postgres_cluster" {
 
 module "redis_cluster" {
   source  = "rivernews/kubernetes-microservice/digitalocean"
-  version = ">= v0.1.24"
+  version = ">= v0.1.29"
 
   aws_region     = var.aws_region
   aws_access_key = var.aws_access_key
   aws_secret_key = var.aws_secret_key
-  cluster_name   = digitalocean_kubernetes_cluster.project_digitalocean_cluster.name
-  node_pool_name = digitalocean_kubernetes_cluster.project_digitalocean_cluster.node_pool.0.name
+  cluster_name   = data.digitalocean_kubernetes_cluster.project_digitalocean_cluster.name
+  node_pool_name = data.digitalocean_kubernetes_cluster.project_digitalocean_cluster.node_pool.0.name
 
   app_label           = "redis-cluster"
 
