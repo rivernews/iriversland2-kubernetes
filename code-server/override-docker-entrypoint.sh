@@ -15,7 +15,13 @@ if [ ! -e "$HOME/.zshrc" ]; then
     git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 fi
 
-# TODO: add zsh plugin - so that autocomplete and highlight can be used
+# TODO: add zsh plugin - so that autocomplete and highlight can be used, like below
+# plugins=(
+#     git
+#     zsh-syntax-highlighting
+#     zsh-autosuggestions
+#   vscode
+# )
 
 # TODO: install settings-sync extension and download settings
 
