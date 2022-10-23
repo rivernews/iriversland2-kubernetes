@@ -53,7 +53,7 @@ resource "null_resource" "crd_cert_resources_install" {
 
     # list all dependencies here
 
-    cluster_dependency = local_file.kubeconfig.filename
+    cluster_dependency = local_sensitive_file.kubeconfig.filename
 
     # only for creation (no effect for update)
     helm_cert_manager_dependency = helm_release.project_cert_manager.name
