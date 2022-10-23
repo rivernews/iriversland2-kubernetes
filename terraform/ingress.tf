@@ -144,49 +144,43 @@ resource "helm_release" "project-nginx-ingress" {
 }
 
 
-# based on SO answer: https://stackoverflow.com/a/55968709/9814131
-# format for `set` refer to official repo README: https://github.com/helm/charts/tree/master/stable/external-dns
 resource "helm_release" "project-external-dns" {
   name      = "external-dns"
-  repository = "https://charts.helm.sh/stable"
+  # API doc
+  # https://github.com/kubernetes-sigs/external-dns/tree/master/charts/external-dns
+  repository = "https://kubernetes-sigs.github.io/external-dns"
   chart     = "external-dns"
   namespace = kubernetes_service_account.tiller.metadata.0.namespace
 
-  # see available version by `. ./my-helm.sh search -l stable/external-dns`
-  # app version refer to: https://github.com/kubernetes-sigs/external-dns/blob/master/CHANGELOG.md
+  # previous helm chart uses 0.5.16 external-dns version
+  # https://github.com/kubernetes-sigs/external-dns/issues/1262#issuecomment-551912180 (chart page https://github.com/helm/charts/tree/master/stable/external-dns)
   #
-  # currenlty latest is not working, but app version 0.5.16 is confirm working so locking down here
-  # https://github.com/kubernetes-sigs/external-dns/issues/1262#issuecomment-551912180
-  # version = "v2.6.1"
+  # k8s 1.22 upgrade requires >=0.10 external-dns version
+  # https://github.com/kubernetes-sigs/external-dns/issues/2623#issuecomment-1104516299
+  #
+  # we need to use a higher helm chart version that provides enough newer external-dns version
+  # https://github.com/kubernetes-sigs/external-dns/blob/master/charts/external-dns/CHANGELOG.md
+  # 1.11.0 helm chart runs v0.12.2 external-dns
+  version = "1.11.0"
 
   force_update = true
 
-  set {
-    name  = "provider"
-    value = "aws"
-  }
-
-  set {
-    name  = "aws.credentials.accessKey"
-    value = var.aws_access_key
-  }
-
-  set {
-    name  = "aws.credentials.secretKey"
-    value = var.aws_secret_key
-  }
-
-  set {
-    name  = "aws.region"
-    value = var.aws_region
-  }
-
-  # domains you want external-dns to be able to edit
-  # see terraform official blog: https://www.hashicorp.com/blog/using-the-kubernetes-and-helm-providers-with-terraform-0-12
-  set {
-    name  = "domainFilters[0]"
-    value = var.managed_k8_rx_domain
-  }
+  values = [<<-EOF
+    provider: aws
+    env:
+      - name: AWS_ACCESS_KEY_ID
+        value: ${var.aws_access_key}
+      - name: AWS_SECRET_ACCESS_KEY
+        value: ${var.aws_secret_key}
+      - name: AWS_REGION
+        value: ${var.aws_region}
+    domainFilters:
+      - ${var.managed_k8_rx_domain}
+    policy: sync
+    rbac:
+      create: true
+  EOF
+  ]
 
   #   set {
   #     name  = "registry"
@@ -196,16 +190,6 @@ resource "helm_release" "project-external-dns" {
   #       name  = "txt-owner-id"
   #       value = "google-site-verification=E0yvL3DSuVCidTSdHUHMQWONt1iZYWXVqCVRkn4gQTQ"
   #     }
-
-  set {
-    name  = "policy"
-    value = "sync" # "sync" | "upsert-only" (default): will disable deletion
-  }
-
-  set {
-    name  = "rbac.create"
-    value = true
-  }
 
   depends_on = [
     kubernetes_cluster_role_binding.tiller,
@@ -228,7 +212,7 @@ resource "kubernetes_ingress_v1" "project-ingress-resource" {
       # we are already setting most of these configs in nginx controller
 
       # let the host below be interpreted as regex
-      # "nginx.ingress.kubernetes.io/use-regex" = "true"
+      "nginx.ingress.kubernetes.io/use-regex" = "true"
 
       # this is used together with ingressShim in ingress controller
       # https://docs.cert-manager.io/en/release-0.10/tasks/issuing-certificates/ingress-shim.html#configuration
