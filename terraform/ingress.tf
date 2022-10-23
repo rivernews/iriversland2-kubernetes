@@ -29,9 +29,9 @@ resource "helm_release" "project-nginx-ingress" {
   # or chart = "stable/nginx-ingress"
   # see https://github.com/digitalocean/digitalocean-cloud-controller-manager/issues/162
 
-  repository = "https://charts.helm.sh/stable"
-  chart      = "nginx-ingress"
-  # version = ""
+  repository = "https://kubernetes.github.io/ingress-nginx"
+  chart      = "ingress-nginx"
+  # version = "4.0.6"
 
   # available `set` specs: https://github.com/helm/charts/tree/master/stable/nginx-ingress
 
@@ -216,7 +216,7 @@ resource "helm_release" "project-external-dns" {
 
 # template copied from terraform official doc: https://www.terraform.io/docs/providers/kubernetes/r/ingress.html
 # modified based on SO answer: https://stackoverflow.com/a/55968709/9814131
-resource "kubernetes_ingress" "project-ingress-resource" {
+resource "kubernetes_ingress_v1" "project-ingress-resource" {
   metadata {
     name      = "tls-wildcard-cert-ingress-resource"
     namespace = kubernetes_namespace.cert_manager.metadata.0.name
@@ -273,7 +273,14 @@ resource "kubernetes_ingress" "project-ingress-resource" {
             # for actual routes and service backends,
             # they should be created by each microservice
             # preferrably in their namespaces
-            backend {}
+            backend {
+              service {
+                name = "dummy-svc"
+                port {
+                  name = "dummy-port"
+                }
+              }
+            }
             path = "/"
           }
         }

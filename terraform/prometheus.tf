@@ -45,7 +45,8 @@ resource "helm_release" "prometheus_stack" {
     # Way to debug such error: https://github.com/helm/helm/issues/5100#issuecomment-533787541
     kubernetes_cluster_role_binding.tiller,
 
-    kubernetes_ingress.project-ingress-resource
+    # kubernetes_ingress.project-ingress-resource
+    kubernetes_ingress_v1.project-ingress-resource
   ]
 }
 
