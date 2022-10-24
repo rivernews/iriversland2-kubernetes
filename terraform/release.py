@@ -1,6 +1,6 @@
 # doc: https://docs.python.org/3/library/argparse.html
 # example: http://zetcode.com/python/argparse/
-import argparse 
+import argparse
 import json
 import re
 import subprocess
@@ -51,7 +51,7 @@ MANIFEST_IMAGE_TAGS = [
 def validate_tag(docker_build_hash):
     if docker_build_hash.lower().strip() == 'latest':
         return 'latest'
-    
+
     # check by version number (X.X.X)-rX
     version_pattern = re.compile(r'[0-9]+\.[0-9]+.*')
     if version_pattern.match(docker_build_hash):
@@ -85,17 +85,17 @@ def terraform_deploy():
     parser.add_argument('-dry', '--dryrun', action='store_true', help="If set, prints out what would've been removed but doesn't actually remove anything.")
 
     for manifest in MANIFEST_IMAGE_TAGS:
-    
+
         # action=store - just store the value of the arg as a string
         # there's other choices like store_true, store_false, store_const, so that when user specify the flag, an internal value is set
         # see python doc: https://docs.python.org/3/library/argparse.html#action
         parser.add_argument('-{}'.format(manifest['arg_name_short']), '--{}'.format(manifest['arg_name_full']), type=validate_tag, action='store', help="set new {} docker image hash for deployment".format(manifest['project name']))
-        
+
     args_data = parser.parse_args()
 
     with open('release.json') as f:
         release_history = json.load(f)
-    
+
     if not release_history:
         print('INFO: no history release available.')
         apply_release = []
@@ -110,7 +110,7 @@ def terraform_deploy():
             }
             apply_release.update(single_manifest)
             changed_release.update(single_manifest)
-    
+
     if not changed_release:
         print('no change given')
     else:
@@ -120,7 +120,7 @@ def terraform_deploy():
                 release_history[-1][arg_name_full] if release_history and arg_name_full in release_history[-1] else None,
                 hash_value
             ))
-    
+
     if args_data.delete:
         terraform_base_command = ['terraform', 'destroy', '-auto-approve']
     elif args_data.plan:
@@ -132,7 +132,7 @@ def terraform_deploy():
         terraform_base_command += ['-dry-run'] if args_data.dryrun else []
     else:
         terraform_base_command = ['terraform', 'apply', '-auto-approve']
-    
+
     if not args_data.remove:
         terraform_command = terraform_base_command + ['-var={}={}'.format(env_name, hash_value) for env_name, hash_value in apply_release.items()]
     else:
@@ -141,7 +141,7 @@ def terraform_deploy():
     if args_data.target:
         # terraform_command += [' '.join([f'-target={target}' for target in args_data.target ])]
         terraform_command += ['-target={}'.format(target) for target in args_data.target]
-    
+
     prompt_message = "\nTerraform command:\n{}\n\nPlease review the change above.\n".format(' '.join(terraform_command))
     if args_data.yes:
         prompt_message += '\nSkipped confirmation...'
@@ -149,8 +149,10 @@ def terraform_deploy():
     else:
         input(prompt_message)
 
+    print('Running...')
+
     # run terraform here
-    if args_data.delete or args_data.plan or args_data.refresh or args_data.remove:  
+    if args_data.delete or args_data.plan or args_data.refresh or args_data.remove:
         subprocess.run(terraform_command, check=True) if python_version == 3 else subprocess.check_call(terraform_command)
         # also delete tfstate in s3 in case of destroy all
         if args_data.delete and (not args_data.target):
@@ -173,7 +175,7 @@ def terraform_deploy():
 
     """
         Example:
-        terraform apply -var="app_container_image_tag=d41b9b2a6a6b2c645ac36539d8492c9991113f0f" -var="appl_tracky_api_image_tag=49f5d6dbb12e2b23e9b737ccbf79033bc748929a" -auto-approve 
+        terraform apply -var="app_container_image_tag=d41b9b2a6a6b2c645ac36539d8492c9991113f0f" -var="appl_tracky_api_image_tag=49f5d6dbb12e2b23e9b737ccbf79033bc748929a" -auto-approve
     """
 
 
