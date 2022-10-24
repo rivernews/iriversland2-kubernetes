@@ -11,10 +11,6 @@ locals {
   ]
 }
 
-# code based: https://medium.com/@stepanvrany/terraforming-dok8s-helm-and-traefik-included-7ac42b5543dc
-# Terraform official: helm_release - an instance of a chart running in a Kubernetes cluster. A Chart is a Helm package
-# https://www.terraform.io/docs/providers/helm/release.html
-# `helm_release` is similar to `helm install ...`
 resource "helm_release" "project-nginx-ingress" {
   name      = "nginx-ingress-controller"
   namespace = kubernetes_service_account.tiller.metadata.0.namespace
@@ -26,40 +22,56 @@ resource "helm_release" "project-nginx-ingress" {
   # unless you don't see the changed config reflected and you want to debug
   force_update = false
 
-  # or chart = "stable/nginx-ingress"
-  # see https://github.com/digitalocean/digitalocean-cloud-controller-manager/issues/162
+  # k8s/ingress-nginx
+  # https://github.com/kubernetes/ingress-nginx/tree/main/charts/ingress-nginx
+  # repository = "https://kubernetes.github.io/ingress-nginx"
+  # chart      = "ingress-nginx"
+  # version = "4.0.5"
 
-  repository = "https://kubernetes.github.io/ingress-nginx"
-  chart      = "ingress-nginx"
-  # version = "4.0.6"
-
+  # legacy chart
   # available `set` specs: https://github.com/helm/charts/tree/master/stable/nginx-ingress
+  # repository = "https://charts.helm.sh/stable"
+  # chart      = "nginx-ingress"
+  # version = "1.41.3" # provides nginx ingress of v0.34.1
+
+  # Bitnami
+  # https://github.com/bitnami/charts/tree/main/bitnami/nginx-ingress-controller
+  repository = "https://charts.bitnami.com/bitnami"
+  chart = "nginx-ingress-controller"
+  version = "9.3.18"
+
 
   # `set` below refer to SO answer
   # https://stackoverflow.com/a/55968709/9814131
 
   set {
-    name  = "controller.kind"
+    name  = "kind" # Bitnami
+    # name  = "controller.kind"
     value = "DaemonSet"
   }
 
   set {
-    name  = "controller.hostNetwork"
+    name  = "hostNetwork"
     value = true
   }
 
   set {
-    name  = "controller.dnsPolicy"
+    name  = "dnsPolicy" # bitnami
+    # name  = "controller.dnsPolicy"
     value = "ClusterFirstWithHostNet"
   }
 
+  # seems below API no longer exist
   set {
-    name  = "controller.daemonset.useHostPort"
+    name  = "daemonset.useHostPort" # bitnami
+    # name  = "controller.daemonset.useHostPort"
+    # name = "controller.hostPort.enabled" # k8s/nginx-ingres
     value = true
   }
 
   set {
-    name  = "controller.service.type"
+    name  = "service.type" # bitnami
+    # name  = "controller.service.type"
     value = "ClusterIP"
   }
 
@@ -91,34 +103,35 @@ resource "helm_release" "project-nginx-ingress" {
   # helm config for default certificate
   # https://github.com/helm/charts/blob/master/stable/nginx-ingress/values.yaml#L108
   set {
-    name  = "controller.extraArgs.default-ssl-certificate"
+    # Additional command line arguments to pass to nginx-ingress-controller
+    name  = "extraArgs.default-ssl-certificate"
     value = "${kubernetes_namespace.cert_manager.metadata.0.name}/${local.central_tls_ing_certificate_secret_name}"
   }
 
   values = [<<-EOF
-    controller:
-        # global nginx settings for all ingress rules
-        config:
-            # If a TLS block is present in ingress rule, the controller WILL redirect to TLS by default
-            # However, it may not work for some reason; recommended to config this up in each service app
-            ssl-redirect: "false"
+    # controller: # legacy & k8s ingress first level
+    # global nginx settings for all ingress rules
+    config:
+        # If a TLS block is present in ingress rule, the controller WILL redirect to TLS by default
+        # However, it may not work for some reason; recommended to config this up in each service app
+        ssl-redirect: "false"
 
-            # never use this
-            # redirecting to https even if there is no TLS block in your ingress
-            # force-ssl-redirect: "false"
+        # never use this
+        # redirecting to https even if there is no TLS block in your ingress
+        # force-ssl-redirect: "false"
 
-            # hsts config
-            hsts: "true"
-            hsts-include-subdomains: "true"
-            hsts-max-age: "0"
-            hsts-preload: "false"
+        # hsts config
+        hsts: "true"
+        hsts-include-subdomains: "true"
+        hsts-max-age: "0"
+        hsts-preload: "false"
 
-            # set the upload file size limit
-            # k8 nginx ingress doc: https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#proxy-body-size
-            proxy-body-size: "1m" # default is 1m
+        # set the upload file size limit
+        # k8 nginx ingress doc: https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#proxy-body-size
+        proxy-body-size: "1m" # default is 1m
 
-            location-snippet: |
-                # add custom nginx config here for location block
+        location-snippet: |
+            # add custom nginx config here for location block
   EOF
   ]
 
@@ -131,7 +144,8 @@ resource "helm_release" "project-nginx-ingress" {
 
   # nginx debugging: https://github.com/kubernetes/ingress-nginx/blob/master/docs/troubleshooting.md#debug-logging
   set {
-    name  = "controller.extraArgs.v"
+    name  = "controller.extraArgs.v" # bitnami
+    # name  = "controller.extraArgs.v"
     value = "4"
   }
 
@@ -198,8 +212,8 @@ resource "helm_release" "project-external-dns" {
 }
 
 
-# template copied from terraform official doc: https://www.terraform.io/docs/providers/kubernetes/r/ingress.html
-# modified based on SO answer: https://stackoverflow.com/a/55968709/9814131
+# API doc
+# https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/ingress_v1
 resource "kubernetes_ingress_v1" "project-ingress-resource" {
   metadata {
     name      = "tls-wildcard-cert-ingress-resource"
@@ -212,7 +226,7 @@ resource "kubernetes_ingress_v1" "project-ingress-resource" {
       # we are already setting most of these configs in nginx controller
 
       # let the host below be interpreted as regex
-      "nginx.ingress.kubernetes.io/use-regex" = "true"
+      # "nginx.ingress.kubernetes.io/use-regex" = "true"
 
       # this is used together with ingressShim in ingress controller
       # https://docs.cert-manager.io/en/release-0.10/tasks/issuing-certificates/ingress-shim.html#configuration
@@ -227,6 +241,7 @@ resource "kubernetes_ingress_v1" "project-ingress-resource" {
   }
 
   spec {
+    ingress_class_name = "nginx"
 
     # do not put this same tls block in other ingress resources spec
     # if you want to share the tls domain, just place tls in one of the ingress resource
@@ -259,9 +274,9 @@ resource "kubernetes_ingress_v1" "project-ingress-resource" {
             # preferrably in their namespaces
             backend {
               service {
-                name = "dummy-svc"
+                name = "dummysvc-oktofail"
                 port {
-                  name = "dummy-port"
+                  number = 80
                 }
               }
             }
