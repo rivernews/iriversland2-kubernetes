@@ -149,6 +149,8 @@ def terraform_deploy():
     else:
         input(prompt_message)
 
+    print('Running...')
+    
     # run terraform here
     if args_data.delete or args_data.plan or args_data.refresh or args_data.remove:  
         subprocess.run(terraform_command, check=True) if python_version == 3 else subprocess.check_call(terraform_command)

@@ -1,1 +1,1 @@
-terraform init -backend-config=backend-credentials.tfvars
+terraform init -backend-config=backend-credentials.tfvars "$@"

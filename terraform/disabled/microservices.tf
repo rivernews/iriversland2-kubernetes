@@ -36,7 +36,7 @@ module "postgres_cluster" {
 
 module "redis_cluster" {
   source  = "rivernews/kubernetes-microservice/digitalocean"
-  version = ">= v0.1.31"
+  version = ">= v0.2.1"
 
   aws_region     = var.aws_region
   aws_access_key = var.aws_access_key
