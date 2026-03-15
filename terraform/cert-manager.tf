@@ -163,7 +163,7 @@ resource "helm_release" "project_cert_manager" {
   name = "cert-manager"
   repository = "https://charts.jetstack.io"
   chart = "cert-manager"
-  version = "v1.7.3"
+  version = "v1.20.0"
 
   namespace = kubernetes_namespace_v1.cert_manager.metadata.0.name
   timeout   = "600"
@@ -184,8 +184,6 @@ resource "helm_release" "project_cert_manager" {
     ingressShim:
       defaultIssuerName: ${local.cert_cluster_issuer_name}
       defaultIssuerKind: ClusterIssuer
-      defaultACMEChallengeType: dns01
-      defaultACMEDNS01ChallengeProvider: route53
 
       # Based on
       # https://cert-manager.io/docs/usage/ingress/#optional-configuration

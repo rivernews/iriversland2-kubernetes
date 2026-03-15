@@ -28,7 +28,8 @@ resource "helm_release" "prometheus_stack" {
         hosts:
           - "grafana.shaungc.com"
         tls:
-          - hosts:
+          - secretName: ${local.central_tls_ing_certificate_secret_name}
+            hosts:
             - "grafana.shaungc.com"
       adminUser: "${var.docker_email}"
       adminPassword: "${data.aws_ssm_parameter.grafana_credentials.value}"
