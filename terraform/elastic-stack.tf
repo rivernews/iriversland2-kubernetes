@@ -12,7 +12,7 @@ resource "helm_release" "elasticsearch" {
   count = 0
 
   name      = "elasticsearch-release"
-  namespace = kubernetes_service_account.tiller.metadata.0.namespace
+  namespace = kubernetes_service_account_v1.tiller.metadata.0.namespace
 
   force_update = true
 
@@ -90,15 +90,15 @@ resource "helm_release" "elasticsearch" {
   # all available configurations: https://github.com/elastic/helm-charts/tree/master/elasticsearch#configuration
 
 
-  set {
+  set = [{
     name  = "imageTag"
     value = "7.4.1" # lock down to version 7.4.1 of Elasticsearch --> but 6.X (e.g., latest 6.8.4 as of 11/20/2019) is recommended for better compatibility with other components
     type = "string"
-  }
+  }]
 
   depends_on = [
-    kubernetes_cluster_role_binding.tiller,
-    kubernetes_service_account.tiller
+    kubernetes_cluster_role_binding_v1.tiller,
+    kubernetes_service_account_v1.tiller
   ]
 }
 
@@ -111,7 +111,7 @@ resource "helm_release" "kibana" {
   count = 0
 
   name      = "kibana-release"
-  namespace = kubernetes_service_account.tiller.metadata.0.namespace
+  namespace = kubernetes_service_account_v1.tiller.metadata.0.namespace
 
   force_update = true
 
@@ -127,15 +127,16 @@ resource "helm_release" "kibana" {
   # all available configurations: https://github.com/elastic/helm-charts/tree/master/kibana
 
 
-  set {
-    name  = "resources.requests.memory"
-    value = "400Mi"
-  }
-
-  set {
-    name  = "resources.limits.memory"
-    value = "512Mi"
-  }
+  set = [
+    {
+      name  = "resources.requests.memory"
+      value = "400Mi"
+    },
+    {
+      name  = "resources.limits.memory"
+      value = "512Mi"
+    }
+  ]
 
   values = [<<-EOF
     lifecycle:
@@ -155,7 +156,7 @@ resource "helm_release" "kibana" {
 # # you can see how beat is being indexed by running `curl localhost:9200/_cat/indices`
 # resource "helm_release" "metricbeat" {
 #   name      = "metricbeat-release"
-#   namespace = "${kubernetes_service_account.tiller.metadata.0.namespace}"
+#   namespace = "${kubernetes_service_account_v1.tiller.metadata.0.namespace}"
 
 #   force_update = true
 

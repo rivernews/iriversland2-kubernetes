@@ -17,7 +17,7 @@ locals {
 # `helm_release` is similar to `helm install ...`
 resource "helm_release" "project-nginx-ingress" {
   name      = "nginx-ingress-controller"
-  namespace = kubernetes_service_account.tiller.metadata.0.namespace
+  namespace = kubernetes_service_account_v1.tiller.metadata.0.namespace
 
   # this will delete & re-create this controller when config changed
   # note that this will let your service temporarily down as the controller pod IP will change
@@ -33,67 +33,83 @@ resource "helm_release" "project-nginx-ingress" {
   chart      = "nginx-ingress"
   # version = ""
 
-  # available `set` specs: https://github.com/helm/charts/tree/master/stable/nginx-ingress
+  # available `set` specs (customizable parameters): https://github.com/helm/charts/tree/master/stable/nginx-ingress
 
   # `set` below refer to SO answer
   # https://stackoverflow.com/a/55968709/9814131
 
-  set {
-    name  = "controller.kind"
-    value = "DaemonSet"
-  }
-
-  set {
-    name  = "controller.hostNetwork"
-    value = true
-  }
-
-  set {
-    name  = "controller.dnsPolicy"
-    value = "ClusterFirstWithHostNet"
-  }
-
-  set {
-    name  = "controller.daemonset.useHostPort"
-    value = true
-  }
-
-  set {
-    name  = "controller.service.type"
-    value = "ClusterIP"
-  }
-
-  set {
-    name  = "rbac.create"
-    value = true
-  }
-
-  # exposing tcp services (non-http services, non-web server)
-  # helm's way: https://github.com/helm/charts/issues/5408#issuecomment-388843681
-  # nginx-ingress doc supporting tcp load balancing: https://kubernetes.github.io/ingress-nginx/user-guide/exposing-tcp-udp-services/
-  #
-  # steps required to expost a tcp port:
-  # 1. specify the tcp port here and service it should point to
-  # 2. allow the port in `digitalocean_firewall`
-
-  # use api.shaungc.com:6378 on local to initiate connection
-  set {
-    name = "tcp.6378"
-    value = "redis-cluster/redis-cluster-service:6379"
-  }
-
-  # use api.shaungc.com:5433 on local to initiate connection
-  set {
-    name = "tcp.5433"
-    value = "postgres-cluster/postgres-cluster-service:5432"
-  }
-
-  # helm config for default certificate
-  # https://github.com/helm/charts/blob/master/stable/nginx-ingress/values.yaml#L108
-  set {
-    name  = "controller.extraArgs.default-ssl-certificate"
-    value = "${kubernetes_namespace.cert_manager.metadata.0.name}/${local.central_tls_ing_certificate_secret_name}"
-  }
+  set = [
+    {
+      name  = "controller.kind"
+      value = "DaemonSet"
+    },
+    {
+      name  = "controller.hostNetwork"
+      value = true
+    },
+    {
+      name  = "controller.dnsPolicy"
+      value = "ClusterFirstWithHostNet"
+    },
+    {
+      name  = "controller.daemonset.useHostPort"
+      value = true
+    },
+    {
+      name  = "controller.service.type"
+      value = "ClusterIP"
+    },
+    {
+      name  = "rbac.create"
+      value = true
+    },
+    {
+      name  = "rbac.apiVersion"
+      value = "v1"
+    },
+    {
+      name  = "image.repository"
+      value = "bitnamilegacy/nginx"
+    },
+    {
+      # choose from https://hub.docker.com/r/bitnamilegacy/external-dns/tags?name=debian
+      name  = "image.tag"
+      value = "1.22.0-debian-11-r44"
+    },
+    # exposing tcp services (non-http services, non-web server)
+    # helm's way: https://github.com/helm/charts/issues/5408#issuecomment-388843681
+    # nginx-ingress doc supporting tcp load balancing: https://kubernetes.github.io/ingress-nginx/user-guide/exposing-tcp-udp-services/
+    #
+    # steps required to expost a tcp port:
+    # 1. specify the tcp port here and service it should point to
+    # 2. allow the port in `digitalocean_firewall`
+    # use api.shaungc.com:6378 on local to initiate connection
+    {
+      name = "tcp.6378"
+      value = "redis-cluster/redis-cluster-service:6379"
+    },
+    # use api.shaungc.com:5433 on local to initiate connection
+    {
+      name = "tcp.5433"
+      value = "postgres-cluster/postgres-cluster-service:5432"
+    },
+    # helm config for default certificate: https://github.com/helm/charts/blob/master/stable/nginx-ingress/values.yaml#L108
+    {
+      name  = "controller.extraArgs.default-ssl-certificate"
+      value = "${kubernetes_namespace_v1.cert_manager.metadata.0.name}/${local.central_tls_ing_certificate_secret_name}"
+    },
+    # in order to let terraform reflect update of this nginx controller, have to set to RollingUpdate; otherwise changes in tf won't take effect on k8
+    # see https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/#updating-a-daemonset
+    {
+      name  = "updateStrategy.type"
+      value = "RollingUpdate"
+    },
+    # nginx debugging: https://github.com/kubernetes/ingress-nginx/blob/master/docs/troubleshooting.md#debug-logging
+    {
+      name  = "controller.extraArgs.v"
+      value = "4"
+    },
+  ]
 
   values = [<<-EOF
     controller:
@@ -120,29 +136,22 @@ resource "helm_release" "project-nginx-ingress" {
             location-snippet: |
                 # add custom nginx config here for location block
   EOF
-  ]
-
-  # in order to let terraform reflect update of this nginx controller, have to set to RollingUpdate; otherwise changes in tf won't take effect on k8
-  # see https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/#updating-a-daemonset
-  set {
-    name  = "updateStrategy.type"
-    value = "RollingUpdate"
-  }
-
-  # nginx debugging: https://github.com/kubernetes/ingress-nginx/blob/master/docs/troubleshooting.md#debug-logging
-  set {
-    name  = "controller.extraArgs.v"
-    value = "4"
-  }
+  ] # The values block remains separate as it's a different way of passing configurations.
 
   depends_on = [
-    kubernetes_cluster_role_binding.tiller,
-    kubernetes_service_account.tiller,
+    kubernetes_cluster_role_binding_v1.tiller,
+    kubernetes_service_account_v1.tiller,
 
     null_resource.crd_cert_resources_install
   ]
 }
 
+resource "kubernetes_namespace_v1" "project-external-dns" {
+  metadata {
+    name = "external-dns"
+  }
+  wait_for_default_service_account = true
+}
 
 # based on SO answer: https://stackoverflow.com/a/55968709/9814131
 # format for `set` refer to official repo README: https://github.com/helm/charts/tree/master/stable/external-dns
@@ -150,7 +159,7 @@ resource "helm_release" "project-external-dns" {
   name      = "external-dns"
   repository = "https://charts.helm.sh/stable"
   chart     = "external-dns"
-  namespace = kubernetes_service_account.tiller.metadata.0.namespace
+  namespace = kubernetes_namespace_v1.project-external-dns.metadata.0.name
 
   # see available version by `. ./my-helm.sh search -l stable/external-dns`
   # app version refer to: https://github.com/kubernetes-sigs/external-dns/blob/master/CHANGELOG.md
@@ -160,70 +169,71 @@ resource "helm_release" "project-external-dns" {
   # version = "v2.6.1"
 
   force_update = true
+  timeout = 120
 
-  set {
-    name  = "provider"
-    value = "aws"
-  }
-
-  set {
-    name  = "aws.credentials.accessKey"
-    value = var.aws_access_key
-  }
-
-  set {
-    name  = "aws.credentials.secretKey"
-    value = var.aws_secret_key
-  }
-
-  set {
-    name  = "aws.region"
-    value = var.aws_region
-  }
-
-  # domains you want external-dns to be able to edit
-  # see terraform official blog: https://www.hashicorp.com/blog/using-the-kubernetes-and-helm-providers-with-terraform-0-12
-  set {
-    name  = "domainFilters[0]"
-    value = var.managed_k8_rx_domain
-  }
-
-  #   set {
-  #     name  = "registry"
-  #     value = "txt"
-  #   }
-  #     set {
-  #       name  = "txt-owner-id"
-  #       value = "google-site-verification=E0yvL3DSuVCidTSdHUHMQWONt1iZYWXVqCVRkn4gQTQ"
-  #     }
-
-  set {
-    name  = "policy"
-    value = "sync" # "sync" | "upsert-only" (default): will disable deletion
-  }
-
-  set {
-    name  = "rbac.create"
-    value = true
-  }
+  set = [
+    {
+      name  = "provider"
+      value = "aws"
+    },
+    {
+      name  = "aws.credentials.accessKey"
+      value = var.aws_access_key
+    },
+    {
+      name  = "aws.credentials.secretKey"
+      value = var.aws_secret_key
+    },
+    {
+      name  = "aws.region"
+      value = var.aws_region
+    },
+    # domains you want external-dns to be able to edit
+    # see terraform official blog: https://www.hashicorp.com/blog/using-the-kubernetes-and-helm-providers-with-terraform-0-12
+    {
+      name  = "domainFilters[0]"
+      value = var.managed_k8_rx_domain
+    },
+    {
+      name  = "policy"
+      value = "sync" # "sync" | "upsert-only" (default): will disable deletion
+    },
+    {
+      name  = "rbac.create"
+      value = true
+    },
+    {
+      name  = "rbac.apiVersion"
+      value = "v1"
+    },
+    {
+      name  = "image.repository"
+      value = "bitnamilegacy/external-dns"
+    },
+    {
+      # choose from https://hub.docker.com/r/bitnamilegacy/external-dns/tags?name=debian
+      name  = "image.tag"
+      value = "0.18.0-debian-12-r4"
+    },
+  ]
 
   depends_on = [
-    kubernetes_cluster_role_binding.tiller,
-    kubernetes_service_account.tiller
+    kubernetes_cluster_role_binding_v1.tiller,
   ]
 }
 
 
 # template copied from terraform official doc: https://www.terraform.io/docs/providers/kubernetes/r/ingress.html
 # modified based on SO answer: https://stackoverflow.com/a/55968709/9814131
-resource "kubernetes_ingress" "project-ingress-resource" {
+resource "kubernetes_ingress_v1" "project-ingress-resource" {
   metadata {
     name      = "tls-wildcard-cert-ingress-resource"
-    namespace = kubernetes_namespace.cert_manager.metadata.0.name
+    namespace = kubernetes_namespace_v1.cert_manager.metadata.0.name
 
     # annotation spec: https://github.com/kubernetes/ingress-nginx/blob/master/docs/user-guide/nginx-configuration/annotations.md#annotations
     annotations = {
-      "kubernetes.io/ingress.class" = "nginx"
+      # deprecated
+      # "kubernetes.io/ingress.class" = "nginx"
 
       # we are already setting most of these configs in nginx controller
 
@@ -243,6 +253,7 @@ resource "kubernetes_ingress" "project-ingress-resource" {
   }
 
   spec {
+    ingress_class_name = "nginx"
 
     # do not put this same tls block in other ingress resources spec
     # if you want to share the tls domain, just place tls in one of the ingress resource
@@ -273,8 +284,16 @@ resource "kubernetes_ingress" "project-ingress-resource" {
             # for actual routes and service backends,
             # they should be created by each microservice
             # preferrably in their namespaces
-            backend {}
+            backend {
+              service {
+                name = "placeholder-service"
+                port {
+                  number = 80
+                }
+              }
+            }
             path = "/"
+            path_type = "Prefix"
           }
         }
       }
@@ -285,4 +304,3 @@ resource "kubernetes_ingress" "project-ingress-resource" {
     helm_release.project_cert_manager
   ]
 }
-

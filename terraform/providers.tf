@@ -10,7 +10,6 @@ provider "digitalocean" {
 
 provider "kubernetes" {
   host             = data.digitalocean_kubernetes_cluster.project_digitalocean_cluster.endpoint
-  load_config_file = false
   token            = data.digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config[0].token
   cluster_ca_certificate = base64decode(
     data.digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config[0].cluster_ca_certificate
@@ -21,7 +20,7 @@ provider "kubernetes" {
 provider "helm" {
   debug = true
 
-  kubernetes {
+  kubernetes = {
     # official doc: https://www.terraform.io/docs/providers/helm/index.html#authentication
     # config_path = "kubeconfig.yaml"
 

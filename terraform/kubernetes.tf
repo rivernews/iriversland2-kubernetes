@@ -10,7 +10,7 @@ data "digitalocean_kubernetes_cluster" "project_digitalocean_cluster" {
 # and not getting error about "localhost" -
 # if no valid kube config found, kubectl default to localhost
 # since our k8s is on DO, this indicates a missing kube config
-resource "local_file" "kubeconfig" {
-  sensitive_content     = data.digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.raw_config
+resource "local_sensitive_file" "kubeconfig" {
+  content     = data.digitalocean_kubernetes_cluster.project_digitalocean_cluster.kube_config.0.raw_config
   filename = pathexpand("~/.kube/config")
 }

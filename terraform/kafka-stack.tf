@@ -3,7 +3,7 @@ resource "helm_release" "kafka_stack" {
   count = 0
 
   name      = "kafka-stack-release"
-  namespace = kubernetes_service_account.tiller.metadata.0.namespace
+  namespace = kubernetes_service_account_v1.tiller.metadata.0.namespace
 
   force_update = true
 

@@ -2,7 +2,7 @@
 # https://artifacthub.io/packages/helm/prometheus-worawutchan/kube-prometheus-stack
 resource "helm_release" "prometheus_stack" {
   name      = "prometheus-stack-release"
-  namespace = kubernetes_service_account.tiller.metadata.0.namespace
+  namespace = kubernetes_service_account_v1.tiller.metadata.0.namespace
 
   # `force` would cause error "primary clusterIP can not be unset"
   # a k8s bug, as of 7/6/2021
@@ -43,9 +43,9 @@ resource "helm_release" "prometheus_stack" {
     # Error: rpc error: code = Unknown desc = configmaps is forbidden: User "system:serviceaccount:kube-system:tiller-service-account" cannot list resource "configmaps" in API group "" in the namespace "kube-system"
     #
     # Way to debug such error: https://github.com/helm/helm/issues/5100#issuecomment-533787541
-    kubernetes_cluster_role_binding.tiller,
+    kubernetes_cluster_role_binding_v1.tiller,
 
-    kubernetes_ingress.project-ingress-resource
+    kubernetes_ingress_v1.project-ingress-resource
   ]
 }
 

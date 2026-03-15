@@ -55,6 +55,7 @@ aws_access_key = "AWS key"
 aws_secret_key = "AWS secret"
 aws_region = "AWS region like us-east-2"
 
+# cluster does not need this
 docker_email = "Dockerhub email"
 docker_password = "Dockerhub password"
 ```

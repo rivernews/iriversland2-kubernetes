@@ -2,8 +2,6 @@ kubeconfig.yaml
 
 **credentials**
 
-local.auto.tfvars
-
 #  Local .terraform directories
 **/.terraform/*
 
@@ -15,7 +13,7 @@ local.auto.tfvars
 
 # .tfvars files
 # *.tfvars
-**local**.tfvars
+local.auto.tfvars
 
 .DS_Store
 
