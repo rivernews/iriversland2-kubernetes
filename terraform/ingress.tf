@@ -22,6 +22,8 @@ resource "helm_release" "project-nginx-ingress" {
   # unless you don't see the changed config reflected and you want to debug
   force_update = false
 
+  timeout = 300
+
   # k8s/ingress-nginx
   # https://github.com/kubernetes/ingress-nginx/tree/main/charts/ingress-nginx
   # repository = "https://kubernetes.github.io/ingress-nginx"
@@ -73,6 +75,11 @@ resource "helm_release" "project-nginx-ingress" {
     name  = "service.type" # bitnami
     # name  = "controller.service.type"
     value = "ClusterIP"
+  }
+
+  set {
+    name = "image.repository"
+    value = "bitnamilegacy/nginx-ingress-controller"
   }
 
   set {

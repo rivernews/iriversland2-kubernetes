@@ -52,7 +52,7 @@ module "redis_cluster" {
   app_exposed_port    = 6379
 
   # https://github.com/bitnami/bitnami-docker-redis
-  app_container_image     = "bitnami/redis"
+  app_container_image     = "bitnamilegacy/redis"
   app_container_image_tag = var.redis_cluster_image_tag
 
   app_secret_name_list = [
