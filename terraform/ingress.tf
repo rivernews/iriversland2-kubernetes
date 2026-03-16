@@ -83,6 +83,11 @@ resource "helm_release" "project-nginx-ingress" {
   }
 
   set {
+    name = "defaultBackend.image.repository"
+    value = "bitnamilegacy/nginx"
+  }
+
+  set {
     name  = "rbac.create"
     value = true
   }
