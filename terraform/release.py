@@ -157,7 +157,7 @@ def terraform_deploy():
         # also delete tfstate in s3 in case of destroy all
         if args_data.delete and (not args_data.target):
             script_command = [
-                'sh', 'clean-s3-tf-state.sh'
+                'sh', 'cleanall-s3-tf-state.sh'
             ]
             subprocess.run(script_command, check=True) if python_version == 3 else subprocess.check_call(script_command)
     elif changed_release or args_data.force:

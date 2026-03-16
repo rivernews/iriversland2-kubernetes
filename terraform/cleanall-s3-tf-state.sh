@@ -17,10 +17,11 @@ if [[ -f "$CREDENTIALS_FILE" ]]; then
     [[ -n "$FILE_REGION" ]] && export TF_VAR_aws_region=${TF_VAR_aws_region:-$FILE_REGION}
 fi
 
+# TODO: make this script customizable by supporting 1) only remove /terraform resources 2) remove all (entire cluster)
 if [[ -z "$TF_VAR_aws_access_key" || -z "$TF_VAR_aws_secret_key" || -z "$TF_VAR_aws_region" ]]; then
     echo "One or more aws credentials are not provided, try to use local config"
     docker run --rm -ti -v ~/.aws:/root/.aws amazon/aws-cli --profile local \
-        s3 rm s3://iriversland-cloud/terraform/kubernetes/ \
+        s3 rm s3://iriversland-cloud/terraform/kubernetes/garage-base.remote-terraform.tfstate \
         --exclude '*' --include '*.tfstate' --recursive
 else
     docker run --rm -ti \
@@ -28,6 +29,6 @@ else
         --env AWS_SECRET_ACCESS_KEY=$TF_VAR_aws_secret_key \
         --env AWS_DEFAULT_REGION=$TF_VAR_aws_region \
         amazon/aws-cli \
-        s3 rm s3://iriversland-cloud/terraform/kubernetes/ \
+        s3 rm s3://iriversland-cloud/terraform/kubernetes/garage-base.remote-terraform.tfstate \
         --exclude '*' --include '*.tfstate' --recursive
 fi

@@ -173,6 +173,7 @@ resource "helm_release" "project-external-dns" {
   name      = "external-dns"
   repository = "https://kubernetes-sigs.github.io/external-dns/" 
   chart     = "external-dns"
+  # values doc at https://github.com/kubernetes-sigs/external-dns/tree/master/charts/external-dns
   # app version refer to: https://github.com/kubernetes-sigs/external-dns/blob/master/CHANGELOG.md
   namespace = kubernetes_namespace_v1.project-external-dns.metadata.0.name
 
@@ -190,7 +191,6 @@ env:
     value: ${var.aws_region}
 
 # domains you want external-dns to be able to edit
-# see terraform official blog: https://www.hashicorp.com/blog/using-the-kubernetes-and-helm-providers-with-terraform-0-12
 domainFilters:
   - ${var.managed_k8_rx_domain}
 policy: sync
